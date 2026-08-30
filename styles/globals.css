@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #F5F0E8;
+  --cream-dark: #EDE8DE;
+  --cream-border: #E0D9CE;
+  --black: #1A1A1A;
+  --black-soft: #2C2C2C;
+  --green: #2D5A27;
+  --green-l: #4A8C3F;
+  --green-pale: rgba(45,90,39,.08);
+  --gold: #C9A84C;
+  --muted: #6B6B5A;
+  --muted-light: #9A9A88;
+  --white: #FFFFFF;
+  --shadow: 0 2px 20px rgba(26,26,26,.08);
+  --shadow-md: 0 8px 40px rgba(26,26,26,.12);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--black);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* TYPE SYSTEM */
+.s-lbl {
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: .7rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.s-lbl::before { content: ""; width: 20px; height: 1.5px; background: var(--green); }
+.s-ttl {
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  text-transform: uppercase;
+  line-height: 1.02;
+  color: var(--black);
+  letter-spacing: .01em;
+}
+.s-ttl .kw { color: var(--green); }
+.s-desc { font-size: .95rem; color: var(--muted); line-height: 1.8; max-width: 480px; margin-top: .8rem; }
+
+/* BUTTONS */
+.btn-g {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--green);
+  color: var(--white);
+  padding: .9rem 2.2rem;
+  font-weight: 600;
+  font-size: .85rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all .25s;
+  box-shadow: 0 2px 12px rgba(45,90,39,.2);
+  text-decoration: none;
+}
+.btn-g:hover { background: var(--green-l); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(45,90,39,.3); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  padding: .9rem 2.2rem;
+  font-size: .85rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  cursor: pointer;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  transition: all .25s;
+  text-decoration: none;
+}
+.btn-outline:hover { background: var(--green); color: var(--white); }
+
+/* REVEAL ANIMATION */
+.rv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .65s ease, transform .65s ease;
+}
+.rv.in { opacity: 1; transform: none; }
+
+/* MARQUEE */
+.mqw { background: var(--green); padding: .7rem 0; overflow: hidden; }
+.mqt { display: flex; white-space: nowrap; animation: mq 22s linear infinite; }
+@keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.mqi {
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  font-size: .95rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--cream);
+  padding: 0 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .8rem;
+}
+.mqd { width: 4px; height: 4px; background: rgba(245,240,232,.4); border-radius: 50%; display: inline-block; }
+
+/* AURORA */
+.aurora-wrap { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.aurora-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .3; animation: auroraFloat 26s ease-in-out infinite; }
+.ab1 { width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(74,140,63,.5), transparent 70%); top: -10%; left: -10%; animation-duration: 28s; }
+.ab2 { width: 38vw; height: 38vw; background: radial-gradient(circle, rgba(45,90,39,.4), transparent 70%); bottom: -5%; right: -8%; animation-duration: 32s; animation-delay: -8s; }
+.ab3 { width: 30vw; height: 30vw; background: radial-gradient(circle, rgba(201,168,76,.25), transparent 70%); top: 40%; left: 60%; animation-duration: 24s; animation-delay: -14s; }
+@keyframes auroraFloat {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(4%,6%) scale(1.08); }
+  66% { transform: translate(-3%,-4%) scale(.95); }
+}
+@media (prefers-reduced-motion: reduce) { .aurora-blob { animation: none; } }
+
+/* PROMO STRIP */
+.promo-strip {
+  background: var(--gold);
+  color: var(--white);
+  text-align: center;
+  padding: .55rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: .02em;
+}
+.promo-strip:hover { background: #B8993F; }
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE LAYOUT PRIMITIVES
+   The pages used to hard-code desktop grids inline
+   (gridTemplateColumns:'1fr 1fr', '1fr 380px', '2fr 1fr 1fr 1fr'),
+   which inline styles can't make responsive — there is no media query
+   inside a style={{}} object. These classes replace them so every
+   multi-column layout collapses on phones, which is where most of this
+   audience actually browses.
+   ══════════════════════════════════════════════════════════ */
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+.grid-side { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; align-items: start; }
+.foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 1.5rem; }
+.cards-sm { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 1.5rem; }
+.pick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr)); gap: .7rem; }
+.sizes-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: .5rem; }
+.pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+.vol-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+.field-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.sticky-side { position: sticky; top: 120px; }
+
+@media (max-width: 1000px) {
+  .grid-side { grid-template-columns: 1fr; gap: 2.5rem; }
+  .sticky-side { position: static; }
+  .foot-grid { grid-template-columns: 1fr 1fr; gap: 2.2rem; }
+}
+@media (max-width: 900px) {
+  .grid-2 { grid-template-columns: 1fr; gap: 2.5rem; }
+  .vol-grid { grid-template-columns: repeat(2, 1fr); }
+  .vol-grid > * { border-right: none !important; border-bottom: 1px solid var(--cream-border); }
+}
+@media (max-width: 620px) {
+  .sizes-grid { grid-template-columns: repeat(4, 1fr); }
+  .pay-grid { grid-template-columns: 1fr; }
+  .field-2 { grid-template-columns: 1fr; }
+  .foot-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+/* ── NAV: desktop links vs. mobile burger ── */
+.nav-links { display: flex; gap: 0; list-style: none; align-items: center; margin: 0; }
+.nav-burger {
+  display: none; background: none; border: 1.5px solid var(--cream-border);
+  border-radius: 4px; cursor: pointer; padding: .45rem .6rem; line-height: 1;
+  font-size: 1.1rem; color: var(--black);
+}
+.mobile-panel {
+  position: fixed; left: 0; right: 0; z-index: 490;
+  background: rgba(245,240,232,.98); backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--cream-border); box-shadow: var(--shadow-md);
+  padding: 1rem 4vw 1.6rem; display: flex; flex-direction: column; gap: .2rem;
+}
+.mobile-panel a {
+  text-decoration: none; color: var(--black); font-size: .95rem; font-weight: 500;
+  padding: .85rem .2rem; border-bottom: 1px solid var(--cream-border);
+}
+.mobile-panel a:last-child { border-bottom: none; }
+
+@media (max-width: 880px) {
+  .nav-links { display: none; }
+  .nav-burger { display: block; }
+}
+
+/* ── TRACKING TIMELINE (/suivi) ── */
+.tl { list-style: none; margin: 0; padding: 0; }
+.tl-item { display: flex; gap: 1.1rem; align-items: flex-start; }
+.tl-rail { display: flex; flex-direction: column; align-items: center; align-self: stretch; }
+.tl-dot {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; border: 2px solid var(--cream-border);
+  background: var(--white); color: var(--muted-light);
+}
+.tl-item.done .tl-dot { background: var(--green); border-color: var(--green); color: var(--white); }
+.tl-item.current .tl-dot { border-color: var(--green); color: var(--green); box-shadow: 0 0 0 5px var(--green-pale); }
+.tl-line { width: 2px; flex: 1; min-height: 26px; background: var(--cream-border); }
+.tl-item.done .tl-line { background: var(--green); }
+.tl-body { padding-bottom: 1.6rem; }
+.tl-item:last-child .tl-body { padding-bottom: 0; }
+
+/* Anton is a display face only — never let it swallow long body copy. */
+.u-mono { font-variant-numeric: tabular-nums; letter-spacing: .06em; }
+
+/* Grid items default to min-width:auto, so a long unbreakable string (an email
+   address, a nowrap CTA label) can push a column wider than the viewport
+   instead of shrinking. Opting the children into min-width:0 is what lets the
+   single-column mobile layouts actually fit. */
+.grid-2 > *, .grid-side > *, .cards > *, .cards-sm > *, .pick-grid > * { min-width: 0; }
+
+/* Contact rows: icon · body · action */
+.c-card { display: flex; align-items: center; gap: 1.2rem; }
+.c-card .c-body { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.c-card .c-act { white-space: nowrap; }
+@media (max-width: 520px) {
+  .c-card { flex-wrap: wrap; gap: .9rem; }
+  .c-card .c-act { white-space: normal; flex-basis: 100%; }
+}
