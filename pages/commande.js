@@ -121,27 +121,27 @@ export default function Commande() {
 
   const inputStyle = {
     width:'100%', padding:'.75rem 1rem', border:'1.5px solid var(--cream-border)',
-    borderRadius:'4px', fontSize:'.9rem', fontFamily:'Inter',
+    borderRadius:'4px', fontSize:'.9rem', fontFamily:'inherit',
     background:'var(--white)', color:'var(--black)', outline:'none',
     transition:'border-color .2s',
   }
   const labelStyle = { display:'block', fontSize:'.75rem', fontWeight:600, letterSpacing:'.05em', textTransform:'uppercase', color:'var(--muted)', marginBottom:'.4rem' }
 
   if(done) return (
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'8rem 4vw',position:'relative',zIndex:1}}>
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2.5rem 1.15rem',position:'relative',zIndex:1}}>
       <div style={{textAlign:'center',maxWidth:520}}>
         <div style={{fontSize:'4rem',marginBottom:'1.5rem'}}>✅</div>
-        <h2 style={{fontFamily:'Anton',fontSize:'2rem',textTransform:'uppercase',marginBottom:'1rem'}}>Commande envoyée !</h2>
+        <h2 style={{fontFamily:'var(--display)',fontSize:'2rem',marginBottom:'1rem'}}>Commande envoyée !</h2>
 
         {orderRef && (
           <div style={{
-            background:'var(--white)', border:'1.5px solid var(--green)', borderRadius:'8px',
+            background:'var(--white)', border:'1.5px solid var(--green)', borderRadius:'20px',
             padding:'1.4rem', marginBottom:'1.8rem',
           }}>
             <div style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'.4rem'}}>
               Votre référence
             </div>
-            <div className="u-mono" style={{fontFamily:'Anton',fontSize:'2rem',color:'var(--green)',lineHeight:1.1}}>
+            <div className="u-mono" style={{fontFamily:'var(--display)',fontSize:'2rem',color:'var(--green)',lineHeight:1.1}}>
               {orderRef}
             </div>
             <p style={{fontSize:'.78rem',color:'var(--muted)',marginTop:'.6rem',lineHeight:1.6}}>
@@ -176,7 +176,7 @@ export default function Commande() {
         <meta name="description" content="Commandez vos uniformes personnalisés. Wizard en 3 étapes, envoi direct WhatsApp." />
       </Head>
 
-      <div style={{padding:'9rem 4vw 5rem',position:'relative',zIndex:1}}>
+      <div style={{padding:'1.6rem 1.15rem 2.5rem',position:'relative',zIndex:1}}>
         <p className="s-lbl">Wizard commande</p>
         <h1 className="s-ttl">Configurez votre <span className="kw">commande</span></h1>
 
@@ -187,8 +187,8 @@ export default function Commande() {
               <div style={{
                 width:32,height:32,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
                 fontWeight:700,fontSize:'.8rem',
-                background: step>i+1 ? 'var(--green)' : step===i+1 ? 'var(--green)' : 'var(--cream-border)',
-                color: step>=i+1 ? 'var(--white)' : 'var(--muted)',
+                background: step>=i+1 ? 'var(--grad)' : 'rgba(255,255,255,.07)',
+                color: step>=i+1 ? '#fff' : 'var(--muted)',
                 transition:'all .3s',
               }}>
                 {step>i+1 ? '✓' : i+1}
@@ -206,14 +206,14 @@ export default function Commande() {
             {/* ── STEP 1 : PRODUITS ── */}
             {step===1 && (
               <div>
-                <h3 style={{fontFamily:'Anton',fontSize:'1.2rem',textTransform:'uppercase',marginBottom:'1.5rem'}}>1. Choisissez vos produits</h3>
+                <h3 style={{fontFamily:'var(--display)',fontSize:'1.2rem',marginBottom:'1.5rem'}}>1. Choisissez vos produits</h3>
 
                 {/* Product picker */}
                 <div className="pick-grid" style={{marginBottom:'1.5rem'}}>
                   {PRODUCTS.map(p => (
                     <button key={p.name} onClick={()=>setSelProd(p)} style={{
-                      padding:'1rem .8rem',border:'1.5px solid',borderRadius:'6px',cursor:'pointer',
-                      fontFamily:'Inter',textAlign:'center',transition:'all .2s',
+                      padding:'1rem .8rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',
+                      fontFamily:'inherit',textAlign:'center',transition:'all .2s',
                       borderColor: selProd.name===p.name ? 'var(--green)' : 'var(--cream-border)',
                       background: selProd.name===p.name ? 'var(--green-pale)' : 'var(--white)',
                     }}>
@@ -230,10 +230,10 @@ export default function Commande() {
                   <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
                     {COLORS.map(c=>(
                       <button key={c} onClick={()=>setSelColor(c)} style={{
-                        padding:'.3rem .8rem',fontSize:'.75rem',border:'1.5px solid',borderRadius:'3px',cursor:'pointer',fontFamily:'Inter',fontWeight:500,
+                        padding:'.3rem .8rem',fontSize:'.75rem',border:'1.5px solid',borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',fontWeight:500,
                         borderColor:selColor===c?'var(--green)':'var(--cream-border)',
                         background:selColor===c?'var(--green)':'var(--cream)',
-                        color:selColor===c?'var(--white)':'var(--black)',
+                        color:selColor===c?'#fff':'var(--black)',
                       }}>{c}</button>
                     ))}
                   </div>
@@ -286,14 +286,14 @@ export default function Commande() {
             {/* ── STEP 2 : PERSONNALISATION ── */}
             {step===2 && (
               <div>
-                <h3 style={{fontFamily:'Anton',fontSize:'1.2rem',textTransform:'uppercase',marginBottom:'1.5rem'}}>2. Personnalisation</h3>
+                <h3 style={{fontFamily:'var(--display)',fontSize:'1.2rem',marginBottom:'1.5rem'}}>2. Personnalisation</h3>
 
                 <div style={{marginBottom:'1.5rem'}}>
                   <label style={labelStyle}>Technique d'impression</label>
                   <div className="pick-grid">
                     {TECHNIQUES.map(t=>(
                       <button key={t} onClick={()=>setOrder(o=>({...o,technique:t}))} style={{
-                        padding:'.8rem 1rem',border:'1.5px solid',borderRadius:'6px',cursor:'pointer',fontFamily:'Inter',fontSize:'.82rem',fontWeight:600,
+                        padding:'.8rem 1rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',fontFamily:'inherit',fontSize:'.82rem',fontWeight:600,
                         borderColor:order.technique===t?'var(--green)':'var(--cream-border)',
                         background:order.technique===t?'var(--green-pale)':'var(--white)',
                         color:order.technique===t?'var(--green)':'var(--black)',
@@ -309,7 +309,7 @@ export default function Commande() {
                 <div style={{marginBottom:'1.5rem'}}>
                   <label style={labelStyle}>Votre logo (PNG, SVG, PDF vectoriel)</label>
                   <div
-                    style={{border:'2px dashed var(--cream-border)',borderRadius:'6px',padding:'2rem',textAlign:'center',cursor:'pointer',background:'var(--cream)'}}
+                    style={{border:'2px dashed var(--cream-border)',borderRadius:'16px',padding:'2rem',textAlign:'center',cursor:'pointer',background:'var(--cream)'}}
                     onClick={()=>document.getElementById('logoUpload').click()}
                   >
                     {order.logoName ? (
@@ -352,7 +352,7 @@ export default function Commande() {
             {/* ── STEP 3 : LIVRAISON & PAIEMENT ── */}
             {step===3 && (
               <div>
-                <h3 style={{fontFamily:'Anton',fontSize:'1.2rem',textTransform:'uppercase',marginBottom:'1.5rem'}}>3. Livraison & Paiement</h3>
+                <h3 style={{fontFamily:'var(--display)',fontSize:'1.2rem',marginBottom:'1.5rem'}}>3. Livraison & Paiement</h3>
 
                 <div className="field-2">
                   <div>
@@ -403,7 +403,7 @@ export default function Commande() {
                       {key:'cib',label:'CIB / Edahabia',ic:'💳',sub:'−10% de remise'},
                     ].map(m=>(
                       <button key={m.key} onClick={()=>setPayMode(m.key)} style={{
-                        padding:'1rem',border:'1.5px solid',borderRadius:'6px',cursor:'pointer',fontFamily:'Inter',textAlign:'center',
+                        padding:'1rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',fontFamily:'inherit',textAlign:'center',
                         borderColor:payMode===m.key?'var(--green)':'var(--cream-border)',
                         background:payMode===m.key?'var(--green-pale)':'var(--white)',
                         transition:'all .2s',
@@ -428,8 +428,8 @@ export default function Commande() {
 
           {/* RIGHT — Récapitulatif */}
           <div className="sticky-side">
-            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'8px',overflow:'hidden'}}>
-              <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'Anton',fontSize:'1rem',textTransform:'uppercase',letterSpacing:'.04em'}}>
+            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden'}}>
+              <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontSize:'1rem',letterSpacing:'.04em'}}>
                 📋 Récapitulatif
               </div>
               <div style={{padding:'1.5rem'}}>
@@ -462,7 +462,7 @@ export default function Commande() {
                           <span>−{payDis.toLocaleString()} DA</span>
                         </div>
                       )}
-                      <div style={{display:'flex',justifyContent:'space-between',marginTop:'.8rem',paddingTop:'.8rem',borderTop:'1.5px solid var(--black)',fontFamily:'Anton',fontSize:'1.1rem'}}>
+                      <div style={{display:'flex',justifyContent:'space-between',marginTop:'.8rem',paddingTop:'.8rem',borderTop:'1.5px solid var(--black)',fontFamily:'var(--display)',fontSize:'1.1rem'}}>
                         <span>TOTAL</span>
                         <span style={{color:'var(--green)'}}>{final.toLocaleString()} DA</span>
                       </div>

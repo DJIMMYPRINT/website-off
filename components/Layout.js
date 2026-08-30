@@ -4,143 +4,77 @@ import { useRouter } from 'next/router'
 import Aurora from './Aurora'
 import { WA, PHONE_DISPLAY, EMAIL, ADDRESS, SITE_URL } from '../lib/constants'
 
-const NAV = [
-  { label: 'Accueil', href: '/' },
-  { label: 'Catalogue', href: '/catalogue' },
-  { label: 'Commande', href: '/commande' },
-  { label: 'Suivi', href: '/suivi' },
-  { label: 'Contact', href: '/contact' },
+// Line icons rather than emoji: the tab bar is chrome, and coloured emoji
+// fight the gradient fill on the active tile.
+const I = {
+  home: 'M3 10.5 12 3l9 7.5M5.5 9.5V20h13V9.5',
+  cat:  'M4 5h7v7H4zM13 5h7v7h-7zM4 14h7v6H4zM13 14h7v6h-7z',
+  cmd:  'M4 6h2l2.2 9.5A2 2 0 0 0 10.2 17h7.4a2 2 0 0 0 2-1.6L21 8H7M10 21h.01M17 21h.01',
+  suivi:'M3 8.5 12 4l9 4.5v7L12 20l-9-4.5zM3 8.5 12 13l9-4.5M12 13v7',
+  ctc:  'M4 5h16v11H8l-4 4z',
+}
+
+const TABS = [
+  { label: 'Accueil',   href: '/',          d: I.home },
+  { label: 'Catalogue', href: '/catalogue', d: I.cat },
+  { label: 'Commande',  href: '/commande',  d: I.cmd },
+  { label: 'Suivi',     href: '/suivi',     d: I.suivi },
+  { label: 'Contact',   href: '/contact',   d: I.ctc },
 ]
+
+const Icon = ({ d }) => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d={d} />
+  </svg>
+)
 
 export default function Layout({ children }) {
   const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
-  // Close the mobile panel on navigation, otherwise it stays open over the
-  // page the visitor just tapped through to.
-  useEffect(() => {
-    const close = () => setMenuOpen(false)
-    router.events.on('routeChangeComplete', close)
-    return () => router.events.off('routeChangeComplete', close)
-  }, [router.events])
 
   const isActive = (path) => router.pathname === path
 
   return (
-    <>
+    <div className="app-shell">
       <Aurora />
 
       {/* PROMO STRIP */}
       <div className="promo-strip" onClick={() => router.push('/commande')}>
-        🎁 Commandez 50 pièces ou plus — Remise volume automatique · Livraison partout en Algérie
+        🎁 50 pièces ou plus — remise volume automatique
       </div>
 
-      {/* NAV */}
-      <nav style={{
-        position: 'fixed',
-        top: 0, left: 0, right: 0,
-        zIndex: 500,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '.8rem 4vw',
-        borderBottom: scrolled || menuOpen ? '1px solid var(--cream-border)' : '1px solid transparent',
-        background: scrolled || menuOpen ? 'rgba(245,240,232,.96)' : 'transparent',
-        backdropFilter: scrolled || menuOpen ? 'blur(18px)' : 'none',
-        boxShadow: scrolled ? 'var(--shadow)' : 'none',
-        transition: 'background .4s, border-color .4s, box-shadow .4s',
-        marginTop: '36px',
-      }}>
-        {/* Brand */}
-        <Link href="/" style={{display:'flex',alignItems:'center',gap:'.7rem',textDecoration:'none'}}>
-          <img src="/djimmy-logo-96.png" alt="Djimmy Prints" style={{width:48,height:48,objectFit:'contain',borderRadius:'50%'}} />
-          <span style={{fontFamily:'Anton',fontSize:'1.25rem',letterSpacing:'.03em',color:'var(--black)',textTransform:'uppercase'}}>
-            DJIMMY <span style={{color:'var(--green)'}}>PRINTS</span>
+      {/* HEADER */}
+      <header className={`hdr${scrolled ? ' scrolled' : ''}`}>
+        <Link href="/" style={{display:'flex',alignItems:'center',gap:'.55rem',textDecoration:'none'}}>
+          <img src="/djimmy-logo-96.png" alt="Djimmy Prints"
+               style={{width:36,height:36,objectFit:'cover',borderRadius:'50%',border:'1px solid var(--line)'}} />
+          <span style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'.95rem',letterSpacing:'-.01em',color:'var(--txt)'}}>
+            Djimmy&nbsp;<span style={{
+              background:'var(--grad)', WebkitBackgroundClip:'text', backgroundClip:'text',
+              WebkitTextFillColor:'transparent', color:'transparent',
+            }}>Prints</span>
           </span>
         </Link>
 
-        {/* Desktop Links */}
-        <ul className="nav-links">
-          {NAV.map(({ label, href }) => (
-            <li key={href}>
-              <Link href={href} style={{
-                color: isActive(href) ? 'var(--black)' : 'var(--muted)',
-                textDecoration: 'none',
-                fontSize: '.75rem',
-                fontWeight: 500,
-                letterSpacing: '.1em',
-                textTransform: 'uppercase',
-                padding: '.45rem 1.1rem',
-                display: 'block',
-                position: 'relative',
-                borderBottom: isActive(href) ? '1.5px solid var(--green)' : 'none',
-                transition: 'color .2s',
-              }}>
-                {label}
-              </Link>
-            </li>
-          ))}
-          <li>
-            <Link
-              href="/devis"
-              style={{
-                background: 'var(--green)',
-                color: 'var(--white)',
-                borderRadius: '2px',
-                padding: '.45rem 1.3rem',
-                fontSize: '.75rem',
-                fontWeight: 600,
-                letterSpacing: '.1em',
-                textTransform: 'uppercase',
-                textDecoration: 'none',
-                marginLeft: '.5rem',
-                transition: 'background .2s',
-                display: 'inline-block',
-              }}
-              onMouseOver={e => e.currentTarget.style.background = 'var(--green-l)'}
-              onMouseOut={e => e.currentTarget.style.background = 'var(--green)'}
-            >
-              Devis Gratuit
-            </Link>
-          </li>
-        </ul>
-
-        {/* Mobile burger */}
-        <button
-          className="nav-burger"
-          aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(o => !o)}
-        >
-          {menuOpen ? '✕' : '☰'}
-        </button>
-      </nav>
-
-      {/* Mobile panel */}
-      {menuOpen && (
-        <div className="mobile-panel" style={{top: 110}}>
-          {NAV.map(({ label, href }) => (
-            <Link key={href} href={href} onClick={() => setMenuOpen(false)}
-              style={{color: isActive(href) ? 'var(--green)' : 'var(--black)', fontWeight: isActive(href) ? 700 : 500}}>
-              {label}
-            </Link>
-          ))}
-          <Link href="/devis" onClick={() => setMenuOpen(false)} className="btn-g" style={{marginTop:'.9rem',justifyContent:'center'}}>
-            Devis gratuit
-          </Link>
-          <a href={`https://wa.me/${WA}`} target="_blank" rel="noopener noreferrer"
-            style={{marginTop:'.6rem',background:'#25D366',color:'#fff',borderRadius:'3px',textAlign:'center',fontWeight:700,padding:'.85rem'}}>
-            💬 WhatsApp — {PHONE_DISPLAY}
-          </a>
-        </div>
-      )}
+        {/* /devis is reached from here rather than the tab bar, so it carries
+            its own current-page state — otherwise that page shows nothing
+            selected anywhere. */}
+        <Link href="/devis" className="btn-g"
+          aria-current={isActive('/devis') ? 'page' : undefined}
+          style={{
+            padding:'.55rem 1.05rem', fontSize:'.75rem',
+            boxShadow: isActive('/devis') ? '0 0 0 3px rgba(139,92,246,.32)' : '0 4px 14px rgba(99,102,241,.4)',
+          }}>
+          Devis
+        </Link>
+      </header>
 
       {/* PAGE CONTENT */}
       <main style={{position:'relative',zIndex:1}}>
@@ -149,67 +83,69 @@ export default function Layout({ children }) {
 
       {/* FOOTER */}
       <footer style={{
-        background: 'var(--black)',
-        color: 'var(--cream)',
-        padding: '4rem 4vw 2rem',
+        background: 'var(--bg-2)',
+        color: 'var(--txt)',
+        padding: '2.5rem 1.15rem 1.5rem',
         position: 'relative',
         zIndex: 1,
+        borderTop: '1px solid var(--line)',
       }}>
         <div className="foot-grid">
-          {/* Brand */}
           <div>
-            <div style={{display:'flex',alignItems:'center',gap:'.7rem',marginBottom:'1rem'}}>
-              <img src="/djimmy-logo-96.png" alt="Djimmy Prints" style={{width:44,height:44,objectFit:'contain',borderRadius:'50%'}} />
-              <span style={{fontFamily:'Anton',fontSize:'1.1rem',letterSpacing:'.05em',textTransform:'uppercase'}}>
-                DJIMMY <span style={{color:'var(--green-l)'}}>PRINTS</span>
+            <div style={{display:'flex',alignItems:'center',gap:'.6rem',marginBottom:'.9rem'}}>
+              <img src="/djimmy-logo-96.png" alt="Djimmy Prints"
+                   style={{width:34,height:34,objectFit:'cover',borderRadius:'50%',border:'1px solid var(--line)'}} />
+              <span style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'.95rem'}}>
+                Djimmy <span style={{color:'var(--vio)'}}>Prints</span>
               </span>
             </div>
-            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.55)',lineHeight:1.8,maxWidth:280}}>
-              Impression professionnelle sur uniformes et tenues de travail. Broderie, sérigraphie, transfert numérique. Livraison partout en Algérie.
+            <p style={{fontSize:'.83rem',color:'var(--muted)',lineHeight:1.75}}>
+              Impression professionnelle sur uniformes et tenues de travail.
+              Broderie, sérigraphie, transfert numérique. Livraison partout en Algérie.
             </p>
           </div>
 
-          {/* Navigation */}
           <div>
-            <p style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(245,240,232,.4)',marginBottom:'1rem'}}>Navigation</p>
-            {[['Accueil','/'],['Catalogue','/catalogue'],['Commander','/commande'],['Devis gratuit','/devis'],['Suivre ma commande','/suivi'],['Contact','/contact']].map(([label,href]) => (
-              <Link key={href} href={href} style={{display:'block',fontSize:'.85rem',color:'rgba(245,240,232,.6)',textDecoration:'none',marginBottom:'.5rem',transition:'color .2s'}}
-                onMouseOver={e=>e.currentTarget.style.color='var(--cream)'}
-                onMouseOut={e=>e.currentTarget.style.color='rgba(245,240,232,.6)'}>
-                {label}
-              </Link>
-            ))}
+            <p style={{fontSize:'.66rem',fontWeight:700,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--muted-light)',marginBottom:'.8rem'}}>Navigation</p>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.1rem .8rem'}}>
+              {[['Accueil','/'],['Catalogue','/catalogue'],['Commander','/commande'],['Devis gratuit','/devis'],['Suivre ma commande','/suivi'],['Contact','/contact']].map(([label,href]) => (
+                <Link key={href} href={href} style={{fontSize:'.83rem',color:'var(--muted)',textDecoration:'none',padding:'.3rem 0',display:'block'}}>
+                  {label}
+                </Link>
+              ))}
+            </div>
           </div>
 
-          {/* Services */}
           <div>
-            <p style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(245,240,232,.4)',marginBottom:'1rem'}}>Services</p>
-            {['Broderie','Sérigraphie','Transfert numérique','Sublimation','Flocage'].map(s => (
-              <p key={s} style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'.5rem'}}>{s}</p>
-            ))}
-          </div>
-
-          {/* Contact */}
-          <div>
-            <p style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(245,240,232,.4)',marginBottom:'1rem'}}>Contact</p>
-            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'.5rem'}}>📍 {ADDRESS}</p>
-            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'.5rem'}}>📞 {PHONE_DISPLAY}</p>
-            <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.6)',marginBottom:'1rem'}}>📧 {EMAIL}</p>
-            <a
-              href={`https://wa.me/${WA}`}
-              target="_blank" rel="noopener noreferrer"
-              style={{display:'inline-flex',alignItems:'center',gap:'.4rem',background:'#25D366',color:'#fff',padding:'.5rem 1.1rem',borderRadius:'3px',fontSize:'.78rem',fontWeight:700,textDecoration:'none'}}
-            >
+            <p style={{fontSize:'.66rem',fontWeight:700,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--muted-light)',marginBottom:'.8rem'}}>Contact</p>
+            <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:'.45rem'}}>📍 {ADDRESS}</p>
+            <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:'.45rem'}}>📞 {PHONE_DISPLAY}</p>
+            <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:'.9rem',overflowWrap:'anywhere'}}>📧 {EMAIL}</p>
+            <a href={`https://wa.me/${WA}`} target="_blank" rel="noopener noreferrer"
+               style={{display:'inline-flex',alignItems:'center',gap:'.4rem',background:'#25D366',color:'#04120A',padding:'.6rem 1.1rem',borderRadius:'100px',fontSize:'.78rem',fontWeight:700,textDecoration:'none'}}>
               💬 WhatsApp
             </a>
           </div>
         </div>
 
-        <div style={{borderTop:'1px solid rgba(245,240,232,.08)',paddingTop:'1.5rem',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem'}}>
-          <span style={{fontSize:'.75rem',color:'rgba(245,240,232,.3)'}}>© {new Date().getFullYear()} Djimmy Prints — {ADDRESS}</span>
-          <span style={{fontSize:'.75rem',color:'rgba(245,240,232,.3)'}}>{SITE_URL}</span>
+        <div style={{borderTop:'1px solid var(--line)',paddingTop:'1.1rem',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'.5rem'}}>
+          <span style={{fontSize:'.72rem',color:'var(--muted-light)'}}>© {new Date().getFullYear()} Djimmy Prints</span>
+          <span style={{fontSize:'.72rem',color:'var(--muted-light)'}}>{SITE_URL}</span>
         </div>
+
+        {/* Clears the fixed tab bar */}
+        <div className="tab-spacer" />
       </footer>
-    </>
+
+      {/* BOTTOM TAB BAR */}
+      <nav className="tabbar" aria-label="Navigation principale">
+        {TABS.map(t => (
+          <Link key={t.href} href={t.href} className={`tab${isActive(t.href) ? ' active' : ''}`}>
+            <span className="tab-ic"><Icon d={t.d} /></span>
+            {t.label}
+          </Link>
+        ))}
+      </nav>
+    </div>
   )
 }

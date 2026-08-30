@@ -11,7 +11,7 @@ const DELAIS = ['Dès que possible', 'Sous 1 semaine', 'Sous 2 semaines', 'Sous 
 
 const inputStyle = {
   width:'100%', padding:'.75rem 1rem', border:'1.5px solid var(--cream-border)',
-  borderRadius:'4px', fontSize:'.9rem', fontFamily:'Inter',
+  borderRadius:'4px', fontSize:'.9rem', fontFamily:'inherit',
   background:'var(--white)', color:'var(--black)', outline:'none',
 }
 const labelStyle = {
@@ -77,7 +77,7 @@ export default function Devis() {
   const est = estimate()
 
   if (sent) return (
-    <div style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'9rem 4vw 5rem',position:'relative',zIndex:1}}>
+    <div style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'1.6rem 1.15rem 2.5rem',position:'relative',zIndex:1}}>
       <div style={{textAlign:'center',maxWidth:520}}>
         <div style={{fontSize:'4rem',marginBottom:'1.5rem'}}>📨</div>
         <h1 className="s-ttl" style={{marginBottom:'1rem'}}>Demande <span className="kw">envoyée</span></h1>
@@ -101,7 +101,7 @@ export default function Devis() {
         <meta name="description" content="Demandez un devis gratuit pour vos uniformes personnalisés : produits, quantité, technique de marquage. Réponse sous 24h, livraison dans les 58 wilayas." />
       </Head>
 
-      <div style={{padding:'9rem 4vw 5rem',position:'relative',zIndex:1}}>
+      <div style={{padding:'1.6rem 1.15rem 2.5rem',position:'relative',zIndex:1}}>
         <p className="s-lbl">Devis gratuit</p>
         <h1 className="s-ttl">Chiffrons votre <span className="kw">projet</span></h1>
         <p className="s-desc">
@@ -120,8 +120,8 @@ export default function Devis() {
                   const on = picked.includes(p.name)
                   return (
                     <button key={p.name} type="button" onClick={() => toggle(p.name)} style={{
-                      padding:'.9rem .7rem', border:'1.5px solid', borderRadius:'6px', cursor:'pointer',
-                      fontFamily:'Inter', textAlign:'center', transition:'all .2s',
+                      padding:'.9rem .7rem', border:'1.5px solid', borderRadius:'16px', cursor:'pointer',
+                      fontFamily:'inherit', textAlign:'center', transition:'all .2s',
                       borderColor: on ? 'var(--green)' : 'var(--cream-border)',
                       background: on ? 'var(--green-pale)' : 'var(--white)',
                     }}>
@@ -160,10 +160,10 @@ export default function Devis() {
                   return (
                     <button key={t} type="button" onClick={() => setTechnique(val)} style={{
                       padding:'.45rem .95rem', fontSize:'.8rem', border:'1.5px solid', borderRadius:'3px',
-                      cursor:'pointer', fontFamily:'Inter', fontWeight:600,
+                      cursor:'pointer', fontFamily:'inherit', fontWeight:600,
                       borderColor: on ? 'var(--green)' : 'var(--cream-border)',
                       background: on ? 'var(--green)' : 'var(--cream)',
-                      color: on ? 'var(--white)' : 'var(--black)',
+                      color: on ? '#fff' : 'var(--black)',
                     }}>{t}</button>
                   )
                 })}
@@ -171,7 +171,7 @@ export default function Devis() {
             </div>
 
             {/* Coordonnées */}
-            <h3 style={{fontFamily:'Anton',fontSize:'1.1rem',textTransform:'uppercase',margin:'0 0 1.2rem'}}>5. Vos coordonnées</h3>
+            <h3 style={{fontFamily:'var(--display)',fontSize:'1.1rem',margin:'0 0 1.2rem'}}>5. Vos coordonnées</h3>
             <div className="field-2">
               <div>
                 <label style={labelStyle}>Nom complet *</label>
@@ -214,7 +214,7 @@ export default function Devis() {
             </div>
 
             {err && (
-              <p role="alert" style={{color:'#B3261E',fontSize:'.85rem',fontWeight:600,marginBottom:'1rem'}}>⚠️ {err}</p>
+              <p role="alert" style={{color:'#FF6B6B',fontSize:'.85rem',fontWeight:600,marginBottom:'1rem'}}>⚠️ {err}</p>
             )}
 
             <button onClick={send} className="btn-g">💬 Recevoir mon devis</button>
@@ -222,8 +222,8 @@ export default function Devis() {
 
           {/* ── SIDEBAR ── */}
           <div className="sticky-side">
-            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'8px',overflow:'hidden',marginBottom:'1.2rem'}}>
-              <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'Anton',fontSize:'1rem',textTransform:'uppercase',letterSpacing:'.04em'}}>
+            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden',marginBottom:'1.2rem'}}>
+              <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontSize:'1rem',letterSpacing:'.04em'}}>
                 📋 Votre demande
               </div>
               <div style={{padding:'1.5rem'}}>
@@ -249,7 +249,7 @@ export default function Devis() {
                     <div style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'.4rem'}}>
                       Ordre de budget
                     </div>
-                    <div style={{fontFamily:'Anton',fontSize:'1.35rem',color:'var(--green)',lineHeight:1.2}}>
+                    <div style={{fontFamily:'var(--display)',fontSize:'1.35rem',color:'var(--green)',lineHeight:1.2}}>
                       {est.lo.toLocaleString('fr-DZ')} – {est.hi.toLocaleString('fr-DZ')} DA
                     </div>
                     <p style={{fontSize:'.72rem',color:'var(--muted)',lineHeight:1.6,marginTop:'.5rem'}}>
@@ -261,7 +261,7 @@ export default function Devis() {
               </div>
             </div>
 
-            <div style={{background:'var(--green-pale)',border:'1.5px solid rgba(45,90,39,.2)',borderRadius:'8px',padding:'1.3rem'}}>
+            <div style={{background:'var(--green-pale)',border:'1.5px solid rgba(139,92,246,.3)',borderRadius:'20px',padding:'1.3rem'}}>
               <div style={{fontWeight:700,fontSize:'.88rem',marginBottom:'.5rem'}}>⏱️ Réponse sous 24h</div>
               <p style={{fontSize:'.8rem',color:'var(--muted)',lineHeight:1.7,marginBottom:'1rem'}}>
                 Vous savez déjà exactement ce que vous voulez, tailles comprises ?

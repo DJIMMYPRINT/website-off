@@ -18,14 +18,14 @@ export default function Contact() {
         <meta name="description" content="Contactez Djimmy Prints pour un devis gratuit. WhatsApp, email, ou visitez-nous à Aïn Bénian, Alger." />
       </Head>
 
-      <div style={{padding:'9rem 4vw 5rem',position:'relative',zIndex:1}}>
+      <div style={{padding:'1.6rem 1.15rem 2.5rem',position:'relative',zIndex:1}}>
         <p className="s-lbl">Contact & FAQ</p>
         <h1 className="s-ttl">On est là pour <span className="kw">vous aider</span></h1>
 
         <div className="grid-2" style={{gap:'5rem',marginTop:'4rem'}}>
           {/* LEFT — Contact */}
           <div>
-            <h2 style={{fontFamily:'Anton',fontSize:'1.4rem',textTransform:'uppercase',marginBottom:'2rem'}}>Nous contacter</h2>
+            <h2 style={{fontFamily:'var(--display)',fontSize:'1.4rem',marginBottom:'2rem'}}>Nous contacter</h2>
 
             {/* Cards contact */}
             {[
@@ -40,7 +40,7 @@ export default function Contact() {
                   padding:'1.4rem 1.5rem',marginBottom:'1rem',
                   background: c.highlight ? 'var(--green)' : 'var(--white)',
                   border:`1.5px solid ${c.highlight?'var(--green)':'var(--cream-border)'}`,
-                  borderRadius:'8px',textDecoration:'none',
+                  borderRadius:'20px',textDecoration:'none',
                   transition:'all .25s',
                 }}
                 onMouseOver={e=>{if(!c.highlight){e.currentTarget.style.borderColor='var(--green)';e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='var(--shadow)'}}}
@@ -48,18 +48,18 @@ export default function Contact() {
               >
                 <span style={{fontSize:'1.8rem',flexShrink:0}}>{c.ic}</span>
                 <div className="c-body">
-                  <div style={{fontWeight:700,fontSize:'.9rem',color:c.highlight?'var(--white)':'var(--black)',marginBottom:'.2rem'}}>{c.title}</div>
+                  <div style={{fontWeight:700,fontSize:'.9rem',color:c.highlight?'#fff':'var(--black)',marginBottom:'.2rem'}}>{c.title}</div>
                   <div style={{fontSize:'.82rem',color:c.highlight?'rgba(255,255,255,.75)':'var(--muted)'}}>{c.sub}</div>
                 </div>
-                <div className="c-act" style={{fontSize:'.78rem',fontWeight:600,color:c.highlight?'var(--white)':'var(--green)'}}>
+                <div className="c-act" style={{fontSize:'.78rem',fontWeight:600,color:c.highlight?'#fff':'var(--green)'}}>
                   {c.action} →
                 </div>
               </a>
             ))}
 
             {/* Horaires */}
-            <div style={{marginTop:'2rem',padding:'1.5rem',background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'8px'}}>
-              <div style={{fontFamily:'Anton',fontSize:'.9rem',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:'1rem'}}>🕐 Horaires</div>
+            <div style={{marginTop:'2rem',padding:'1.5rem',background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'20px'}}>
+              <div style={{fontFamily:'var(--display)',fontSize:'.9rem',letterSpacing:'.04em',marginBottom:'1rem'}}>🕐 Horaires</div>
               {[
                 ['Dimanche – Jeudi', '8h00 – 18h00'],
                 ['Vendredi', '8h00 – 12h00'],
@@ -75,12 +75,12 @@ export default function Contact() {
 
           {/* RIGHT — FAQ */}
           <div>
-            <h2 style={{fontFamily:'Anton',fontSize:'1.4rem',textTransform:'uppercase',marginBottom:'2rem'}}>Questions fréquentes</h2>
+            <h2 style={{fontFamily:'var(--display)',fontSize:'1.4rem',marginBottom:'2rem'}}>Questions fréquentes</h2>
             <div style={{display:'flex',flexDirection:'column',gap:'.8rem'}}>
               {FAQ.map((f,i) => (
                 <details key={i} style={{
                   background:'var(--white)',border:'1.5px solid var(--cream-border)',
-                  borderRadius:'6px',overflow:'hidden',
+                  borderRadius:'16px',overflow:'hidden',
                 }}>
                   <summary style={{
                     padding:'1.1rem 1.3rem',cursor:'pointer',fontWeight:700,
@@ -101,24 +101,24 @@ export default function Contact() {
             {/* CTA dévis */}
             <div style={{
               marginTop:'2rem',
-              background:'var(--green)',borderRadius:'8px',
+              background:'var(--green)',borderRadius:'20px',
               padding:'2rem',textAlign:'center',position:'relative',overflow:'hidden',
             }}>
-              <div style={{position:'absolute',inset:0,fontFamily:'Anton',fontSize:'5rem',color:'rgba(255,255,255,.05)',display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none',letterSpacing:'.05em'}}>
+              <div style={{position:'absolute',inset:0,fontFamily:'var(--display)',fontSize:'5rem',color:'rgba(255,255,255,.05)',display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none',letterSpacing:'.05em'}}>
                 DEVIS
               </div>
               <div style={{position:'relative',zIndex:1}}>
-                <div style={{fontFamily:'Anton',fontSize:'1.4rem',textTransform:'uppercase',color:'var(--cream)',marginBottom:'.5rem'}}>
+                <div style={{fontFamily:'var(--display)',fontSize:'1.4rem',color:'#fff',marginBottom:'.5rem'}}>
                   Devis gratuit sous 24h
                 </div>
-                <p style={{fontSize:'.85rem',color:'rgba(245,240,232,.75)',marginBottom:'1.5rem'}}>
+                <p style={{fontSize:'.85rem',color:'rgba(255,255,255,.75)',marginBottom:'1.5rem'}}>
                   Décrivez votre besoin sur WhatsApp et recevez un devis personnalisé rapidement.
                 </p>
                 <a href={`https://wa.me/${WA}?text=Bonjour, je souhaite un devis pour mes uniformes.`}
                   target="_blank" rel="noopener noreferrer"
                   style={{
                     display:'inline-flex',alignItems:'center',gap:'.5rem',
-                    background:'var(--cream)',color:'var(--green)',
+                    background:'#fff',color:'#0B0D16',
                     padding:'.9rem 2rem',fontWeight:700,fontSize:'.85rem',
                     letterSpacing:'.05em',textTransform:'uppercase',
                     borderRadius:'3px',textDecoration:'none',

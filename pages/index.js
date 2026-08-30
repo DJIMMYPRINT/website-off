@@ -58,10 +58,10 @@ export default function Home() {
 
       {/* ── HERO ── */}
       <section style={{
-        minHeight: '100vh',
+        minHeight: 'calc(100vh - 190px)', /* clears promo + header + tab bar */
         display: 'flex',
         alignItems: 'center',
-        padding: '9rem 4vw 5rem',
+        padding: '1.6rem 1.15rem 2.5rem',
         position: 'relative',
         overflow: 'hidden',
       }}>
@@ -69,7 +69,7 @@ export default function Home() {
           {/* Badge */}
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '.6rem',
-            background: 'var(--green-pale)', border: '1px solid rgba(45,90,39,.2)',
+            background: 'var(--green-pale)', border: '1px solid rgba(139,92,246,.3)',
             padding: '.4rem 1rem', borderRadius: '100px',
             fontSize: '.72rem', fontWeight: 600, letterSpacing: '.12em',
             textTransform: 'uppercase', color: 'var(--green)', marginBottom: '2rem',
@@ -80,10 +80,10 @@ export default function Home() {
 
           {/* H1 */}
           <h1 style={{
-            fontFamily: 'Anton', fontWeight: 400,
-            fontSize: 'clamp(2.8rem, 8vw, 6.2rem)',
-            lineHeight: 1.03, textTransform: 'uppercase',
-            letterSpacing: '.005em', marginBottom: '1.8rem', color: 'var(--black)',
+            fontFamily: 'var(--display)', fontWeight: 800,
+            fontSize: 'clamp(2.2rem, 10vw, 3rem)',
+            lineHeight: 1.08,
+            letterSpacing: '-.02em', marginBottom: '1.4rem', color: 'var(--txt)',
           }}>
             Fait pour ceux<br/>
             <span style={{color: 'var(--green)'}}>qui rêvent grand.</span>
@@ -115,7 +115,7 @@ export default function Home() {
           }}>
             {[['500+','Clients satisfaits'],['48H','Délai de traitement'],['58','Wilayas livrées'],['5+','Techniques d\'impression']].map(([n,l]) => (
               <div key={l}>
-                <div style={{fontFamily:'Anton',fontSize:'2.6rem',fontWeight:400,color:'var(--green)',lineHeight:1}}>{n}</div>
+                <div style={{fontFamily:'var(--display)',fontSize:'2.6rem',fontWeight:400,color:'var(--green)',lineHeight:1}}>{n}</div>
                 <div style={{fontSize:'.72rem',color:'var(--muted)',letterSpacing:'.07em',marginTop:'.3rem',fontWeight:500,textTransform:'uppercase'}}>{l}</div>
               </div>
             ))}
@@ -137,14 +137,14 @@ export default function Home() {
       </div>
 
       {/* ── SERVICES ── */}
-      <section ref={rv(0)} className="rv" style={{padding:'5.5rem 4vw',background:'rgba(255,255,255,.5)',backdropFilter:'blur(6px)',position:'relative',zIndex:1}}>
+      <section ref={rv(0)} className="rv" style={{padding:'2.6rem 1.15rem',background:'rgba(255,255,255,.5)',backdropFilter:'blur(6px)',position:'relative',zIndex:1}}>
         <p className="s-lbl">Nos techniques</p>
         <h2 className="s-ttl">Ce qu'on fait <span className="kw">mieux que tout le monde</span></h2>
         <div className="cards" style={{marginTop:'3rem'}}>
           {SERVICES.map((s, i) => (
             <div key={s.name} ref={rv(10 + i)} className="rv" style={{
               background: 'var(--cream)', border: '1.5px solid var(--cream-border)',
-              padding: '2.2rem 1.8rem', borderRadius: '6px',
+              padding: '1.5rem 1.3rem', borderRadius: '16px',
               transition: 'all .3s', cursor: 'default',
               transitionDelay: `${i * 0.08}s`,
             }}
@@ -152,7 +152,7 @@ export default function Home() {
               onMouseOut={e => { e.currentTarget.style.borderColor='var(--cream-border)'; e.currentTarget.style.boxShadow='none'; e.currentTarget.style.transform='none'; }}
             >
               <span style={{fontSize:'1.8rem',marginBottom:'1.1rem',display:'block'}}>{s.ic}</span>
-              <div style={{fontFamily:'Anton',fontSize:'1.15rem',textTransform:'uppercase',letterSpacing:'.02em',marginBottom:'.5rem'}}>{s.name}</div>
+              <div style={{fontFamily:'var(--display)',fontSize:'1.15rem',letterSpacing:'.02em',marginBottom:'.5rem'}}>{s.name}</div>
               <p style={{fontSize:'.85rem',color:'var(--muted)',lineHeight:1.7}}>{s.desc}</p>
             </div>
           ))}
@@ -160,20 +160,20 @@ export default function Home() {
       </section>
 
       {/* ── WHY US ── */}
-      <section ref={rv(1)} className="rv" style={{padding:'5.5rem 4vw',position:'relative',zIndex:1}}>
+      <section ref={rv(1)} className="rv" style={{padding:'2.6rem 1.15rem',position:'relative',zIndex:1}}>
         <p className="s-lbl">Pourquoi Djimmy Prints</p>
         <h2 className="s-ttl">Des chiffres qui <span className="kw">parlent d'eux-mêmes</span></h2>
         <div className="cards-sm" style={{marginTop:'3rem'}}>
           {WHY.map((w, i) => (
             <div key={w.n} ref={rv(20 + i)} className="rv" style={{
-              padding:'1.8rem 1.5rem', border:'1.5px solid var(--cream-border)',
-              borderRadius:'6px', background:'var(--white)', transition:'all .3s',
+              padding:'1.3rem 1.2rem', border:'1.5px solid var(--cream-border)',
+              borderRadius:'16px', background:'var(--white)', transition:'all .3s',
               transitionDelay:`${i*0.08}s`,
             }}
               onMouseOver={e=>{e.currentTarget.style.borderColor='var(--green)';e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='var(--shadow)'}}
               onMouseOut={e=>{e.currentTarget.style.borderColor='var(--cream-border)';e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='none'}}
             >
-              <div style={{fontFamily:'Anton',fontSize:'2.6rem',fontWeight:400,color:'var(--green)',lineHeight:1}}>{w.n}</div>
+              <div style={{fontFamily:'var(--display)',fontSize:'2.6rem',fontWeight:400,color:'var(--green)',lineHeight:1}}>{w.n}</div>
               <div style={{fontWeight:700,fontSize:'.9rem',margin:'.4rem 0',color:'var(--black)'}}>{w.t}</div>
               <p style={{fontSize:'.8rem',color:'var(--muted)',lineHeight:1.7}}>{w.d}</p>
             </div>
@@ -182,7 +182,7 @@ export default function Home() {
       </section>
 
       {/* ── PROCESS ── */}
-      <section ref={rv(4)} className="rv" style={{padding:'5.5rem 4vw',background:'rgba(255,255,255,.5)',backdropFilter:'blur(6px)',position:'relative',zIndex:1}}>
+      <section ref={rv(4)} className="rv" style={{padding:'2.6rem 1.15rem',background:'rgba(255,255,255,.5)',backdropFilter:'blur(6px)',position:'relative',zIndex:1}}>
         <p className="s-lbl">Comment ça marche</p>
         <h2 className="s-ttl">De l'idée à la <span className="kw">livraison</span></h2>
         <p className="s-desc">Trois étapes, zéro surprise. Vous gardez la main à chaque validation.</p>
@@ -190,11 +190,11 @@ export default function Home() {
           {PROCESS.map((s2, i) => (
             <div key={s2.n} ref={rv(40 + i)} className="rv" style={{
               background:'var(--cream)', border:'1.5px solid var(--cream-border)',
-              borderRadius:'6px', padding:'2.2rem 1.8rem',
+              borderRadius:'16px', padding:'1.5rem 1.3rem',
               display:'flex', flexDirection:'column', transitionDelay:`${i * 0.08}s`,
             }}>
-              <div style={{fontFamily:'Anton',fontSize:'2.4rem',color:'var(--gold)',lineHeight:1,marginBottom:'.8rem'}}>{s2.n}</div>
-              <div style={{fontFamily:'Anton',fontSize:'1.15rem',textTransform:'uppercase',letterSpacing:'.02em',marginBottom:'.5rem'}}>{s2.t}</div>
+              <div style={{fontFamily:'var(--display)',fontSize:'2.4rem',color:'var(--gold)',lineHeight:1,marginBottom:'.8rem'}}>{s2.n}</div>
+              <div style={{fontFamily:'var(--display)',fontSize:'1.15rem',letterSpacing:'.02em',marginBottom:'.5rem'}}>{s2.t}</div>
               <p style={{fontSize:'.85rem',color:'var(--muted)',lineHeight:1.7,marginBottom:'1.3rem',flex:1}}>{s2.d}</p>
               <Link href={s2.href} style={{
                 fontSize:'.78rem', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase',
@@ -209,38 +209,38 @@ export default function Home() {
 
       {/* ── CTA BAND ── */}
       <section ref={rv(2)} className="rv" style={{
-        background:'var(--green)', padding:'4rem 4vw',
+        background:'var(--green)', padding:'2.2rem 1.15rem',
         display:'flex', alignItems:'center', justifyContent:'space-between',
         gap:'2rem', flexWrap:'wrap', position:'relative', overflow:'hidden', zIndex:1,
       }}>
-        <div style={{position:'absolute',right:'-1rem',top:'50%',transform:'translateY(-50%)',fontFamily:'Anton',fontSize:'7rem',fontWeight:400,color:'rgba(255,255,255,.07)',whiteSpace:'nowrap',pointerEvents:'none'}}>
+        <div style={{position:'absolute',right:'-1rem',top:'50%',transform:'translateY(-50%)',fontFamily:'var(--display)',fontSize:'7rem',fontWeight:400,color:'rgba(255,255,255,.07)',whiteSpace:'nowrap',pointerEvents:'none'}}>
           DJIMMY PRINTS
         </div>
         <div>
-          <div style={{fontFamily:'Anton',fontWeight:400,fontSize:'clamp(1.6rem,3.5vw,2.5rem)',textTransform:'uppercase',color:'var(--cream)',lineHeight:1}}>
+          <div style={{fontFamily:'var(--display)',fontWeight:400,fontSize:'clamp(1.6rem,3.5vw,2.5rem)',color:'#fff',lineHeight:1}}>
             Prêt à habiller votre équipe ?
           </div>
-          <p style={{fontSize:'.88rem',color:'rgba(245,240,232,.75)',marginTop:'.4rem'}}>
+          <p style={{fontSize:'.88rem',color:'rgba(255,255,255,.75)',marginTop:'.4rem'}}>
             Devis gratuit · Réponse sous 24h · Livraison dans 58 wilayas
           </p>
         </div>
         <div style={{display:'flex',gap:'1rem',flexWrap:'wrap',position:'relative',zIndex:1}}>
           <Link href="/commande" style={{
-            background:'var(--cream)',color:'var(--green)',
+            background:'#fff',color:'#0B0D16',
             padding:'.9rem 2.2rem',fontWeight:700,fontSize:'.85rem',
             letterSpacing:'.07em',textTransform:'uppercase',border:'none',
-            borderRadius:'3px',cursor:'pointer',fontFamily:'Inter',
+            borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',
             transition:'all .2s',textDecoration:'none',display:'inline-block',
           }}>
             Commander
           </Link>
           <a href={`https://wa.me/${WA}?text=${WA_MSG}`} target="_blank" rel="noopener noreferrer"
             style={{
-              background:'transparent',color:'var(--cream)',
+              background:'rgba(255,255,255,.14)',color:'#fff',
               padding:'.9rem 2.2rem',fontWeight:600,fontSize:'.85rem',
               letterSpacing:'.07em',textTransform:'uppercase',
-              border:'1.5px solid rgba(245,240,232,.4)',
-              borderRadius:'3px',cursor:'pointer',fontFamily:'Inter',
+              border:'1.5px solid rgba(255,255,255,.4)',
+              borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',
               transition:'all .2s',textDecoration:'none',display:'inline-block',
             }}>
             💬 WhatsApp
@@ -249,20 +249,20 @@ export default function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section ref={rv(3)} className="rv" style={{padding:'5.5rem 4vw',position:'relative',zIndex:1}}>
+      <section ref={rv(3)} className="rv" style={{padding:'2.6rem 1.15rem',position:'relative',zIndex:1}}>
         <p className="s-lbl">Témoignages</p>
         <h2 className="s-ttl">Ils nous font <span className="kw">confiance</span></h2>
         <div className="cards" style={{marginTop:'3rem'}}>
           {TESTIMONIALS.map((t, i) => (
             <div key={i} ref={rv(30+i)} className="rv" style={{
               background:'var(--white)',border:'1.5px solid var(--cream-border)',
-              borderRadius:'6px',padding:'2rem',transition:'all .3s',
+              borderRadius:'16px',padding:'1.4rem',transition:'all .3s',
               transitionDelay:`${i*0.1}s`,
             }}>
               <div style={{color:'var(--gold)',fontSize:'1.1rem',marginBottom:'1rem'}}>★★★★★</div>
               <p style={{fontSize:'.9rem',color:'var(--black-soft)',lineHeight:1.8,marginBottom:'1.2rem',fontStyle:'italic'}}>"{t.text}"</p>
               <div style={{display:'flex',alignItems:'center',gap:'.8rem'}}>
-                <div style={{width:38,height:38,background:'var(--green)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--white)',fontWeight:700,fontSize:'.9rem',flexShrink:0}}>
+                <div style={{width:38,height:38,background:'var(--grad)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:700,fontSize:'.9rem',flexShrink:0}}>
                   {t.author[0]}
                 </div>
                 <div>

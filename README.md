@@ -45,6 +45,35 @@ npm run start        # sert le build -> http://localhost:3000
 
 ---
 
+## 2 bis. Thème & format
+
+Le site est en **thème sombre « verre dépoli »** : fond quasi noir, cartes
+translucides en relief, dégradés violet → indigo → cyan, coins très arrondis
+et pastilles pleines.
+
+Il est conçu **pour le smartphone** : tout tient dans une colonne unique
+large comme un téléphone (`.app-shell`, max 520px, centrée). Sur un écran large,
+le site s'affiche donc comme une application centrée sur fond sombre — c'est
+voulu, pas un bug de mise en page.
+
+La navigation se fait par la **barre d'onglets fixe en bas** (Accueil,
+Catalogue, Commande, Suivi, Contact). « Devis » vit dans l'en-tête et porte
+son propre état de page courante, puisqu'il n'a pas d'onglet.
+
+Deux points à connaître avant de toucher aux couleurs :
+
+- Les pages utilisent massivement des styles en ligne `style={{}}` qui
+  référencent des `var(--token)`. Les anciens noms (`--cream`, `--white`,
+  `--black`, `--green`…) sont conservés comme **alias** vers la palette
+  sombre, en haut de `styles/globals.css` — changer un token là se répercute
+  partout. `--white` est désormais la **surface des cartes**, pas une couleur
+  de texte : sur un aplat accentué, écrivez `#fff` en dur.
+- La police d'affichage est `Outfit`, via `var(--display)` qui embarque la
+  pile de secours. N'écrivez jamais `fontFamily:'Outfit'` seul : si le
+  webfont ne charge pas, le navigateur retombe sur son serif par défaut.
+
+---
+
 ## 3. Où modifier quoi
 
 Une information = un seul endroit. Ne recopiez pas ces valeurs dans une page.
@@ -56,11 +85,11 @@ Une information = un seul endroit. Ne recopiez pas ces valeurs dans une page.
 | Wilayas, tailles, couleurs, techniques | `lib/constants.js` |
 | Paliers de remise volume | `lib/constants.js` (`VOLUME_DISCOUNTS`) — la règle de calcul est dans `calcTotal()` de `pages/commande.js` |
 | Étapes du suivi de commande | `lib/constants.js` (`ORDER_STAGES`) |
-| Couleurs, polices, ombres | variables CSS en haut de `styles/globals.css` |
-| Grilles responsives | classes `.grid-2`, `.grid-side`, `.cards`, … dans `styles/globals.css` |
+| Couleurs, polices, ombres, dégradés | variables CSS en haut de `styles/globals.css` (`--bg`, `--surface`, `--grad`, `--vio`, `--cya`…) |
+| Grilles, barre d'onglets, shell | classes `.grid-2`, `.cards`, `.tabbar`, `.app-shell` dans `styles/globals.css` |
 | Textes du hero, services, témoignages | `pages/index.js` |
 | FAQ | `pages/contact.js` |
-| Navigation, pied de page | `components/Layout.js` (tableau `NAV`) |
+| Onglets du bas, en-tête, pied de page | `components/Layout.js` (tableaux `TABS` et `I` pour les icônes) |
 
 **Attention aux remises volume :** `VOLUME_DISCOUNTS` sert à l'affichage, mais
 les seuils réels (50 / 100 / 200 pièces) sont codés dans `calcTotal()`. Si vous

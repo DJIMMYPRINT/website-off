@@ -7,7 +7,7 @@ import { findOrder, listOrders, normalizeRef } from '../lib/orders'
 
 const inputStyle = {
   width:'100%', padding:'.85rem 1rem', border:'1.5px solid var(--cream-border)',
-  borderRadius:'4px', fontSize:'1rem', fontFamily:'Inter', letterSpacing:'.08em',
+  borderRadius:'4px', fontSize:'1rem', fontFamily:'inherit', letterSpacing:'.08em',
   background:'var(--white)', color:'var(--black)', outline:'none', textTransform:'uppercase',
 }
 
@@ -55,7 +55,7 @@ export default function Suivi() {
         <meta name="description" content="Suivez l'avancement de votre commande d'uniformes personnalisés Djimmy Prints avec votre référence DP-XXXXXX." />
       </Head>
 
-      <div style={{padding:'9rem 4vw 5rem',position:'relative',zIndex:1}}>
+      <div style={{padding:'1.6rem 1.15rem 2.5rem',position:'relative',zIndex:1}}>
         <p className="s-lbl">Suivi de commande</p>
         <h1 className="s-ttl">Où en est <span className="kw">ma commande ?</span></h1>
         <p className="s-desc">
@@ -83,7 +83,7 @@ export default function Suivi() {
                 <button key={o.ref} onClick={() => search(o.ref)} className="u-mono" style={{
                   fontSize:'.75rem', fontWeight:700, padding:'.28rem .7rem', marginRight:'.4rem', marginTop:'.35rem',
                   border:'1.5px solid var(--cream-border)', background:'var(--white)', color:'var(--green)',
-                  borderRadius:'100px', cursor:'pointer', fontFamily:'Inter',
+                  borderRadius:'100px', cursor:'pointer', fontFamily:'inherit',
                 }}>
                   {o.ref}
                 </button>
@@ -96,10 +96,10 @@ export default function Suivi() {
         {searched && result && (
           <div className="grid-side" style={{marginTop:'3.5rem'}}>
             {/* Timeline */}
-            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'8px',padding:'2rem'}}>
+            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',padding:'2rem'}}>
               <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'.6rem',marginBottom:'2rem'}}>
                 <div>
-                  <div style={{fontFamily:'Anton',fontSize:'1.5rem',textTransform:'uppercase',letterSpacing:'.03em'}} className="u-mono">
+                  <div style={{fontFamily:'var(--display)',fontSize:'1.5rem',letterSpacing:'.03em'}} className="u-mono">
                     {result.ref}
                   </div>
                   <div style={{fontSize:'.8rem',color:'var(--muted)',marginTop:'.2rem'}}>
@@ -109,7 +109,7 @@ export default function Suivi() {
                 <span style={{
                   background:'var(--green-pale)', color:'var(--green)', fontWeight:700,
                   fontSize:'.72rem', letterSpacing:'.08em', textTransform:'uppercase',
-                  padding:'.35rem .9rem', borderRadius:'100px', border:'1px solid rgba(45,90,39,.2)',
+                  padding:'.35rem .9rem', borderRadius:'100px', border:'1px solid rgba(139,92,246,.3)',
                 }}>
                   {ORDER_STAGES[stageIndex].label}
                 </span>
@@ -132,7 +132,7 @@ export default function Suivi() {
                 ))}
               </ul>
 
-              <div style={{marginTop:'1.5rem',padding:'1rem 1.2rem',background:'var(--cream)',borderRadius:'6px',fontSize:'.82rem',color:'var(--muted)',lineHeight:1.7}}>
+              <div style={{marginTop:'1.5rem',padding:'1rem 1.2rem',background:'var(--cream)',borderRadius:'16px',fontSize:'.82rem',color:'var(--muted)',lineHeight:1.7}}>
                 ℹ️ L'étape affichée correspond au dernier état enregistré sur cet appareil.
                 Pour le point exact en atelier, un message WhatsApp reste le plus rapide.
               </div>
@@ -140,8 +140,8 @@ export default function Suivi() {
 
             {/* Order detail */}
             <div className="sticky-side">
-              <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'8px',overflow:'hidden',marginBottom:'1.2rem'}}>
-                <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'Anton',fontSize:'1rem',textTransform:'uppercase',letterSpacing:'.04em'}}>
+              <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden',marginBottom:'1.2rem'}}>
+                <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontSize:'1rem',letterSpacing:'.04em'}}>
                   📦 Détail
                 </div>
                 <div style={{padding:'1.5rem'}}>
@@ -151,7 +151,7 @@ export default function Suivi() {
                       <span style={{fontWeight:600,whiteSpace:'nowrap'}}>{(it.price * it.qty).toLocaleString('fr-DZ')} DA</span>
                     </div>
                   ))}
-                  <div style={{borderTop:'1.5px solid var(--black)',marginTop:'1rem',paddingTop:'.9rem',display:'flex',justifyContent:'space-between',fontFamily:'Anton',fontSize:'1.05rem'}}>
+                  <div style={{borderTop:'1.5px solid var(--black)',marginTop:'1rem',paddingTop:'.9rem',display:'flex',justifyContent:'space-between',fontFamily:'var(--display)',fontSize:'1.05rem'}}>
                     <span>TOTAL</span>
                     <span style={{color:'var(--green)'}}>{Number(result.total || 0).toLocaleString('fr-DZ')} DA</span>
                   </div>
@@ -179,10 +179,10 @@ export default function Suivi() {
         {searched && !result && (
           <div style={{
             marginTop:'2.5rem', maxWidth:640, background:'var(--white)',
-            border:'1.5px solid var(--cream-border)', borderRadius:'8px', padding:'2rem',
+            border:'1.5px solid var(--cream-border)', borderRadius:'20px', padding:'2rem',
           }}>
             <div style={{fontSize:'2rem',marginBottom:'.8rem'}}>🔎</div>
-            <h2 style={{fontFamily:'Anton',fontSize:'1.3rem',textTransform:'uppercase',marginBottom:'.7rem'}}>
+            <h2 style={{fontFamily:'var(--display)',fontSize:'1.3rem',marginBottom:'.7rem'}}>
               Référence introuvable sur cet appareil
             </h2>
             <p style={{fontSize:'.88rem',color:'var(--muted)',lineHeight:1.8,marginBottom:'1.2rem'}}>
@@ -212,13 +212,13 @@ export default function Suivi() {
               {ORDER_STAGES.map((s, i) => (
                 <div key={s.key} style={{
                   background:'var(--white)', border:'1.5px solid var(--cream-border)',
-                  borderRadius:'6px', padding:'1.6rem 1.4rem',
+                  borderRadius:'16px', padding:'1.6rem 1.4rem',
                 }}>
                   <div style={{fontSize:'1.6rem',marginBottom:'.7rem'}}>{s.ic}</div>
                   <div style={{fontSize:'.68rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'var(--green)',marginBottom:'.3rem'}}>
                     Étape {i + 1}
                   </div>
-                  <div style={{fontFamily:'Anton',fontSize:'1.05rem',textTransform:'uppercase',letterSpacing:'.02em',marginBottom:'.4rem'}}>{s.label}</div>
+                  <div style={{fontFamily:'var(--display)',fontSize:'1.05rem',letterSpacing:'.02em',marginBottom:'.4rem'}}>{s.label}</div>
                   <p style={{fontSize:'.82rem',color:'var(--muted)',lineHeight:1.7}}>{s.desc}</p>
                 </div>
               ))}
