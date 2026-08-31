@@ -40,8 +40,15 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET, POST')
     return res.status(405).json({ error: 'Méthode non autorisée.' })
   } catch (err) {
-    // Never surface database internals to the browser.
+    // The full message goes to the server log only. The response carries the
+    // upstream status and PostgREST error code — enough to tell a bad key
+    // (401/403) from a stale schema cache (404/PGRST202) from an argument
+    // mismatch (400), without echoing anything sensitive.
     console.error('[api/orders]', err)
-    return res.status(500).json({ error: 'Erreur serveur.' })
+    return res.status(500).json({
+      error: 'Erreur serveur.',
+      upstream: err.status || null,
+      code: err.pgCode || null,
+    })
   }
 }
