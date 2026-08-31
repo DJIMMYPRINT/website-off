@@ -9,9 +9,12 @@ import { createOrder, getOrder, dbConfigured, dbShape } from '../../lib/db'
 
 const REF = /^DP-[A-Z0-9]{4,12}$/
 
+// Which commit is actually serving this response.
+const BUILD = (process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7)
+
 export default async function handler(req, res) {
   if (!dbConfigured) {
-    return res.status(503).json({ configured: false })
+    return res.status(503).json({ configured: false, build: BUILD })
   }
 
   try {
@@ -26,15 +29,15 @@ export default async function handler(req, res) {
       const row = await createOrder({
         ref: String(ref).toUpperCase(), customer, items, total, technique, notes,
       })
-      return res.status(201).json({ configured: true, order: row })
+      return res.status(201).json({ configured: true, build: BUILD, order: row })
     }
 
     if (req.method === 'GET') {
       const ref = String(req.query.ref || '').toUpperCase().trim()
       if (!REF.test(ref)) return res.status(400).json({ error: 'Référence invalide.' })
       const row = await getOrder(ref)
-      if (!row) return res.status(404).json({ configured: true, order: null })
-      return res.status(200).json({ configured: true, order: row })
+      if (!row) return res.status(404).json({ configured: true, build: BUILD, order: null })
+      return res.status(200).json({ configured: true, build: BUILD, order: row })
     }
 
     res.setHeader('Allow', 'GET, POST')
@@ -47,6 +50,7 @@ export default async function handler(req, res) {
     console.error('[api/orders]', err)
     return res.status(500).json({
       error: 'Erreur serveur.',
+      build: BUILD,
       upstream: err.status || null,
       code: err.pgCode || null,
       errName: err.name || null,
