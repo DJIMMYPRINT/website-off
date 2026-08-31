@@ -144,6 +144,64 @@ proxy (Nginx), avec un gestionnaire de process type `pm2`.
 
 ---
 
+## 5 bis. Base de données (suivi de commande)
+
+Le suivi de commande s'appuie sur le projet Supabase **`dp-erp`**
+(`pmqdltywisvlmuuwcxpb`, région eu-west-3).
+
+### Ce qui a été créé
+
+- Un schéma **`site`** contenant la table `site.orders`.
+  Il est délibérément **hors du schéma `public`** : ce dernier appartient à
+  Prisma (voir `public._prisma_migrations`) côté ERP. Une table ajoutée là
+  dériverait, voire serait supprimée, à la prochaine migration Prisma.
+- Trois fonctions dans `public` (le seul schéma exposé par PostgREST) :
+  `site_order_create`, `site_order_get`, `site_order_set_stage`.
+  Elles sont `SECURITY DEFINER`, avec un `search_path` épinglé, et
+  `EXECUTE` n'est accordé qu'à **`service_role`**.
+- RLS activée sur `site.orders`, sans aucune politique : seul
+  `service_role` peut lire ou écrire.
+
+### Variables d'environnement (à définir dans Vercel)
+
+| Variable | Valeur |
+|---|---|
+| `SUPABASE_URL` | `https://pmqdltywisvlmuuwcxpb.supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | *Supabase → Settings → API → `service_role`* |
+
+Sans ces deux variables, `/api/orders` répond `503 { configured: false }`
+et les pages retombent sur la copie conservée sur l'appareil du client.
+**Une clé absente dégrade le suivi, elle ne casse jamais le site.**
+
+> ⚠️ La clé `service_role` ne doit **jamais** être préfixée
+> `NEXT_PUBLIC_`, ni utilisée hors de `lib/db.js` / `pages/api/`. Elle
+> contourne RLS et donne un accès total à la base.
+
+### Faire avancer une commande
+
+```sql
+select public.site_order_set_stage('DP-XXXXXX', 'production');
+-- étapes : recue | confirmee | production | expediee | livree
+```
+
+### ⚠️ Sécurité : RLS désactivée sur l'ERP
+
+Les **17 tables du schéma `public`** (`Client`, `Devis`, `Commande`,
+`Facture`, `Paiement`, `Produit`, `MouvementStock`…) ont
+**Row Level Security désactivée**. Toute personne disposant de la clé
+`anon` du projet — une clé conçue pour être publique — peut lire et
+modifier chacune de ces lignes.
+
+C'est un problème **antérieur à ce site** et sans rapport avec lui : le
+site ne transmet aucune clé Supabase au navigateur, précisément pour
+cette raison. Il reste à traiter côté ERP.
+
+Ne lancez pas `ENABLE ROW LEVEL SECURITY` à l'aveugle : sans politiques,
+cela coupera tous les accès de votre application ERP. Il faut activer RLS
+**et** définir les politiques adaptées, table par table.
+
+---
+
 ## 6. Analytics
 
 Google Analytics (`G-0HDWJXSBT1`) et Meta Pixel (`1011828568104757`) sont
