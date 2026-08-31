@@ -282,9 +282,9 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 .tabbar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 480;
   max-width: 520px; margin: 0 auto;
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  gap: .4rem;
-  padding: .55rem .7rem calc(.55rem + env(safe-area-inset-bottom, 0px));
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: .15rem;
+  padding: .55rem .45rem calc(.55rem + env(safe-area-inset-bottom, 0px));
   background: rgba(11,13,22,.92);
   backdrop-filter: blur(20px);
   border-top: 1px solid var(--line);
