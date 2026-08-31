@@ -14,7 +14,10 @@ const BUILD = (process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7)
 
 export default async function handler(req, res) {
   if (!dbConfigured) {
-    return res.status(503).json({ configured: false, build: BUILD })
+    // Say *why* it is unconfigured. "configured: false" alone cannot
+    // distinguish a variable that was never set from one that was set after
+    // this deployment was built — and only the second needs a redeploy.
+    return res.status(503).json({ configured: false, build: BUILD, env: dbShape() })
   }
 
   try {
