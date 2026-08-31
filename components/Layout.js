@@ -12,6 +12,7 @@ const I = {
   cmd:  'M4 6h2l2.2 9.5A2 2 0 0 0 10.2 17h7.4a2 2 0 0 0 2-1.6L21 8H7M10 21h.01M17 21h.01',
   suivi:'M3 8.5 12 4l9 4.5v7L12 20l-9-4.5zM3 8.5 12 13l9-4.5M12 13v7',
   ctc:  'M4 5h16v11H8l-4 4z',
+  devis:'M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h4',
 }
 
 const TABS = [
@@ -20,6 +21,7 @@ const TABS = [
   { label: 'Commande',  href: '/commande',  d: I.cmd },
   { label: 'Suivi',     href: '/suivi',     d: I.suivi },
   { label: 'Contact',   href: '/contact',   d: I.ctc },
+  { label: 'Devis',     href: '/devis',     d: I.devis },
 ]
 
 const Icon = ({ d }) => (
@@ -63,17 +65,20 @@ export default function Layout({ children }) {
           </span>
         </Link>
 
-        {/* /devis is reached from here rather than the tab bar, so it carries
-            its own current-page state — otherwise that page shows nothing
-            selected anywhere. */}
-        <Link href="/devis" className="btn-g"
-          aria-current={isActive('/devis') ? 'page' : undefined}
+        {/* Devis has its own tab now, so this slot goes to the channel the
+            business actually runs on. */}
+        <a href={`https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Djimmy Prints, je souhaite un devis.')}`}
+          target="_blank" rel="noopener noreferrer"
+          aria-label="Nous écrire sur WhatsApp"
           style={{
-            padding:'.55rem 1.05rem', fontSize:'.75rem',
-            boxShadow: isActive('/devis') ? '0 0 0 3px rgba(139,92,246,.32)' : '0 4px 14px rgba(99,102,241,.4)',
+            display:'inline-flex', alignItems:'center', gap:'.4rem',
+            background:'#25D366', color:'#04120A', textDecoration:'none',
+            padding:'.5rem .95rem', borderRadius:'100px',
+            fontSize:'.75rem', fontWeight:700,
+            boxShadow:'0 4px 14px rgba(37,211,102,.3)',
           }}>
-          Devis
-        </Link>
+          💬 WhatsApp
+        </a>
       </header>
 
       {/* PAGE CONTENT */}

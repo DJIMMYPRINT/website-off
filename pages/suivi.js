@@ -5,6 +5,21 @@ import { useRouter } from 'next/router'
 import { WA, PHONE_DISPLAY, ORDER_STAGES } from '../lib/constants'
 import { findOrder, listOrders, normalizeRef } from '../lib/orders'
 
+// A row from the database and a copy kept on the device carry the same
+// facts under slightly different names; the page renders one shape.
+function fromRow(row) {
+  if (!row) return null
+  return {
+    ref: row.ref,
+    stage: row.stage || 'recue',
+    items: row.items || [],
+    total: row.total || 0,
+    technique: row.technique || '',
+    wilaya: (row.customer && row.customer.wilaya) || '',
+    date: new Date(row.created_at).toLocaleDateString('fr-DZ', { year:'numeric', month:'long', day:'numeric' }),
+  }
+}
+
 const inputStyle = {
   width:'100%', padding:'.85rem 1rem', border:'1.5px solid var(--cream-border)',
   borderRadius:'4px', fontSize:'1rem', fontFamily:'inherit', letterSpacing:'.08em',
@@ -26,18 +41,34 @@ export default function Suivi() {
   useEffect(() => {
     if (!router.isReady) return
     const q = router.query.ref
-    if (typeof q === 'string' && q) {
-      setRef(normalizeRef(q))
-      setResult(findOrder(q))
-      setSearched(true)
-    }
+    if (typeof q === 'string' && q) search(q)
   }, [router.isReady, router.query.ref])
 
-  const search = (value) => {
-    const target = value ?? ref
-    setRef(normalizeRef(target))
-    setResult(findOrder(target))
+  const [loading, setLoading] = useState(false)
+
+  // Ask the server first — that is the only copy that knows the real stage
+  // and works from a device other than the one that placed the order. The
+  // on-device copy is the fallback when the lookup fails or the database
+  // is not configured.
+  const search = async (value) => {
+    const target = normalizeRef(value ?? ref)
+    setRef(target)
     setSearched(true)
+    if (!target) { setResult(null); return }
+
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/orders?ref=${encodeURIComponent(target)}`)
+      if (res.ok) {
+        const { order } = await res.json()
+        if (order) { setResult(fromRow(order)); return }
+      }
+    } catch {
+      /* offline or unreachable — fall through to the local copy */
+    } finally {
+      setLoading(false)
+    }
+    setResult(findOrder(target))
   }
 
   const stageIndex = result
@@ -73,7 +104,9 @@ export default function Suivi() {
               value={ref}
               onChange={e => setRef(e.target.value)}
             />
-            <button type="submit" className="btn-g">Suivre</button>
+            <button type="submit" className="btn-g" disabled={loading}>
+              {loading ? 'Recherche…' : 'Suivre'}
+            </button>
           </form>
 
           {recent.length > 0 && (
@@ -183,14 +216,13 @@ export default function Suivi() {
           }}>
             <div style={{fontSize:'2rem',marginBottom:'.8rem'}}>🔎</div>
             <h2 style={{fontFamily:'var(--display)',fontSize:'1.3rem',marginBottom:'.7rem'}}>
-              Référence introuvable sur cet appareil
+              Référence introuvable
             </h2>
             <p style={{fontSize:'.88rem',color:'var(--muted)',lineHeight:1.8,marginBottom:'1.2rem'}}>
-              Le détail d'une commande est conservé sur l'appareil qui l'a passée. Si vous
-              avez commandé depuis un autre téléphone ou ordinateur — ou effacé les données
-              de votre navigateur — la référence n'apparaîtra pas ici. Votre commande, elle,
-              reste bien enregistrée chez nous : envoyez-nous la référence sur WhatsApp et
-              nous vous répondons avec l'état exact.
+              Vérifiez la référence : elle figure sur l'écran de confirmation et dans le
+              message WhatsApp envoyé lors de la commande (format DP-XXXXXX). Si elle est
+              correcte et n'apparaît toujours pas, envoyez-la nous sur WhatsApp : nous vous
+              répondons avec l'état exact de votre commande.
             </p>
             <div style={{display:'flex',gap:'.8rem',flexWrap:'wrap'}}>
               <a href={`https://wa.me/${WA}?text=${encodeURIComponent(`Bonjour Djimmy Prints, je souhaite le statut de ma commande ${normalizeRef(ref) || ''}`)}`}

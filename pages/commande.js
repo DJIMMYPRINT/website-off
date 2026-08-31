@@ -100,6 +100,26 @@ export default function Commande() {
       '_djimmyprints.xyz_',
     ].filter(Boolean).join('\n')
 
+    // Record it server-side too, so the customer can track the order from a
+    // different device than the one they ordered on. Fire-and-forget on
+    // purpose: WhatsApp is the real channel, and a database hiccup must
+    // never stop the order from being sent.
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ref,
+        customer: {
+          nom: form.nom, tel: form.tel, entreprise: form.entreprise,
+          email: form.email, wilaya: form.wilaya, adresse: form.adresse,
+        },
+        items: order.prods.map(p => ({ emoji:p.emoji, name:p.name, price:p.price, qty:p.qty, color:p.color })),
+        total: final,
+        technique: order.technique,
+        notes: order.notes,
+      }),
+    }).catch(() => {})
+
     saveOrder({
       ref,
       createdAt: Date.now(),
