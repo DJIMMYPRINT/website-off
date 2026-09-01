@@ -1,4 +1,4 @@
-import { createOrder, getOrder, dbConfigured, dbShape } from '../../lib/db'
+import { createOrder, getOrder, dbConfigured, dbShape, keyClaims } from '../../lib/db'
 
 // POST /api/orders        -> record an order placed through the wizard
 // GET  /api/orders?ref=.. -> look one up by reference, from any device
@@ -58,6 +58,8 @@ export default async function handler(req, res) {
       code: err.pgCode || null,
       errName: err.name || null,
       env: dbShape(),
+      // Only when Supabase rejected the credential outright.
+      claims: err.status === 401 ? keyClaims() : undefined,
     })
   }
 }
