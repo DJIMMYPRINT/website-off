@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useState } from 'react'
 import { PRODUCTS } from '../lib/products'
+import ProductImg from '../components/ProductImg'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS } from '../lib/constants'
 import { newOrderRef, saveOrder } from '../lib/orders'
 
@@ -237,7 +238,7 @@ export default function Commande() {
                       borderColor: selProd.name===p.name ? 'var(--green)' : 'var(--cream-border)',
                       background: selProd.name===p.name ? 'var(--green-pale)' : 'var(--white)',
                     }}>
-                      <div style={{fontSize:'2rem',marginBottom:'.4rem'}}>{p.emoji}</div>
+                      <ProductImg product={p} size={62} radius={12} style={{margin:'0 auto .5rem'}} />
                       <div style={{fontWeight:700,fontSize:'.8rem'}}>{p.name}</div>
                       <div style={{fontSize:'.72rem',color:'var(--green)',fontWeight:600,marginTop:'.2rem'}}>{p.price.toLocaleString()} DA</div>
                     </button>
