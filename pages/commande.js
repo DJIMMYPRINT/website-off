@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PRODUCTS } from '../lib/products'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS } from '../lib/constants'
 import { newOrderRef, saveOrder } from '../lib/orders'
@@ -18,6 +18,43 @@ export default function Commande() {
   const [payMode, setPayMode] = useState('livraison')
   const [done, setDone] = useState(false)
   const [orderRef, setOrderRef] = useState('')
+
+  // Real Yalidine delivery cost for the chosen wilaya, fetched through
+  // /api/shipping (the credentials stay on the server). Three reasons this
+  // stays *beside* the total instead of inside calcTotal():
+  //
+  //   - Yalidine prices a parcel, not an order. Twenty polos travel in one
+  //     parcel, three hundred do not, so a single fee added to the total
+  //     would understate the real cost on exactly the orders that matter.
+  //   - The fee varies by commune inside a wilaya, and the form only asks
+  //     for the wilaya — hence a range rather than one number.
+  //   - calcTotal() feeds the WhatsApp message and the order book; the
+  //     volume-discount rules there are deliberately the only thing that
+  //     moves the total.
+  //
+  // A missing key or a Yalidine outage just hides the block.
+  const [ship, setShip] = useState({ state: 'idle' })
+
+  useEffect(() => {
+    if (!form.wilaya) { setShip({ state: 'idle' }); return }
+    let alive = true
+    setShip({ state: 'loading' })
+    fetch(`/api/shipping?wilaya=${encodeURIComponent(form.wilaya)}`)
+      .then(r => r.json().then(d => ({ ok: r.ok, d })))
+      .then(({ ok, d }) => {
+        if (!alive) return
+        setShip(ok && (d.home || d.desk) ? { state: 'ok', fees: d } : { state: 'off' })
+      })
+      .catch(() => { if (alive) setShip({ state: 'off' }) })
+    return () => { alive = false }
+  }, [form.wilaya])
+
+  // Communes inside a wilaya are not priced alike, so show the span when
+  // there is one rather than passing the cheapest commune off as the price.
+  const fmtFee = (r, loc) => !r ? null
+    : r.min === r.max
+      ? `${r.min.toLocaleString(loc)} DA`
+      : `${r.min.toLocaleString(loc)} – ${r.max.toLocaleString(loc)} DA`
 
   // Add product to order
   const [selProd, setSelProd] = useState(PRODUCTS[0])
@@ -94,6 +131,11 @@ export default function Commande() {
       disRate>0 ? `🏷️ *Remise volume (${disRate*100}%) :* −${volDis.toLocaleString('fr-DZ')} DA` : '',
       payMode!=='livraison' ? `💳 *Remise paiement anticipé :* −${payDis.toLocaleString('fr-DZ')} DA` : '',
       `✅ *TOTAL : ${final.toLocaleString('fr-DZ')} DA*`,
+      // Sent so the workshop sees the same figure the customer saw, and can
+      // quote the delivery without looking it up again.
+      ship.state === 'ok'
+        ? `🚚 *Livraison ${ship.fees.to || form.wilaya} (Yalidine, par colis) :* domicile ${fmtFee(ship.fees.home, 'fr-DZ') || '—'} · stop desk ${fmtFee(ship.fees.desk, 'fr-DZ') || '—'}`
+        : '',
       order.notes ? `\n💬 *Notes :*\n${order.notes}` : '',
       '━━━━━━━━━━━━━━━━━━',
       `📅 ${new Date().toLocaleDateString('fr-DZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`,
@@ -488,6 +530,42 @@ export default function Commande() {
                       </div>
                     </div>
                   </>
+                )}
+
+                {ship.state==='loading' && (
+                  <div style={{marginTop:'1rem',padding:'.7rem',fontSize:'.78rem',color:'var(--muted)',textAlign:'center'}}>
+                    🚚 Calcul du tarif de livraison…
+                  </div>
+                )}
+
+                {ship.state==='ok' && (
+                  <div style={{marginTop:'1rem',padding:'.9rem',background:'var(--cream)',border:'1px solid var(--cream-border)',borderRadius:'4px'}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',gap:'.5rem',marginBottom:'.6rem'}}>
+                      <span style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}}>
+                        🚚 Livraison Yalidine
+                      </span>
+                      {ship.fees.to && <span style={{fontSize:'.72rem',color:'var(--muted)'}}>{ship.fees.to}</span>}
+                    </div>
+
+                    {ship.fees.home && (
+                      <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',marginBottom:'.35rem'}}>
+                        <span>À domicile</span>
+                        <span style={{fontWeight:600}}>{fmtFee(ship.fees.home)}</span>
+                      </div>
+                    )}
+                    {ship.fees.desk && (
+                      <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem'}}>
+                        <span>Au bureau (stop desk)</span>
+                        <span style={{fontWeight:600}}>{fmtFee(ship.fees.desk)}</span>
+                      </div>
+                    )}
+
+                    <p style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.7rem',lineHeight:1.6}}>
+                      Tarif par colis, non compris dans le total ci-dessus.
+                      {ship.fees.oversize ? ` Au-delà du poids inclus : +${ship.fees.oversize.toLocaleString()} DA/kg.` : ''}
+                      {' '}Une commande volumineuse part en plusieurs colis — le montant exact est confirmé sur WhatsApp.
+                    </p>
+                  </div>
                 )}
 
                 {order.technique && (

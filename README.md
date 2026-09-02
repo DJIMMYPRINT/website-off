@@ -85,6 +85,7 @@ Une information = un seul endroit. Ne recopiez pas ces valeurs dans une page.
 | Wilayas, tailles, couleurs, techniques | `lib/constants.js` |
 | Paliers de remise volume | `lib/constants.js` (`VOLUME_DISCOUNTS`) — la règle de calcul est dans `calcTotal()` de `pages/commande.js` |
 | Étapes du suivi de commande | `lib/constants.js` (`ORDER_STAGES`) |
+| Wilaya de départ des colis | `YALIDINE_FROM_WILAYA_ID` (voir §5 ter) — pas dans le code |
 | Couleurs, polices, ombres, dégradés | variables CSS en haut de `styles/globals.css` (`--bg`, `--surface`, `--grad`, `--vio`, `--cya`…) |
 | Grilles, barre d'onglets, shell | classes `.grid-2`, `.cards`, `.tabbar`, `.app-shell` dans `styles/globals.css` |
 | Textes du hero, services, témoignages | `pages/index.js` |
@@ -202,6 +203,70 @@ cela coupera tous les accès de votre application ERP. Il faut activer RLS
 
 ---
 
+## 5 ter. Tarifs de livraison (Yalidine)
+
+`/commande` affiche le tarif Yalidine réel vers la wilaya choisie par le
+client, au lieu de le discuter après coup sur WhatsApp.
+
+### Le chemin
+
+`pages/commande.js` → `GET /api/shipping?wilaya=16 Alger` →
+`lib/yalidine.js` → `https://api.yalidine.app/v1/fees/`.
+
+Comme pour Supabase, **les identifiants ne quittent jamais le serveur** : le
+token Yalidine n'est pas en lecture seule, il permet de créer, modifier et
+supprimer des colis sur le compte.
+
+### Variables d'environnement (à définir dans Vercel)
+
+| Variable | Valeur |
+|---|---|
+| `YALIDINE_API_ID` | *espace Yalidine → « Développement »* |
+| `YALIDINE_API_TOKEN` | *idem* |
+| `YALIDINE_FROM_WILAYA_ID` | `16` (Alger) — facultatif, 16 par défaut |
+
+Sans ces variables, `/api/shipping` répond `503 { configured: false }` et le
+récapitulatif masque simplement le bloc livraison. **Une clé absente retire
+l'estimation, elle ne casse jamais la commande.**
+
+### Pourquoi le tarif n'entre pas dans le TOTAL
+
+Trois raisons, à garder en tête avant de « corriger » ce point :
+
+1. **Yalidine tarife un colis, pas une commande.** 20 polos tiennent dans un
+   colis, 300 non. Ajouter un tarif unique au total sous-estimerait le coût
+   précisément sur les grosses commandes.
+2. **Le tarif varie d'une commune à l'autre** dans une même wilaya, et le
+   formulaire ne demande que la wilaya — d'où une fourchette et non un
+   montant unique.
+3. `calcTotal()` alimente le message WhatsApp et le registre des commandes.
+   Les remises volume y sont volontairement la seule chose qui bouge le
+   total.
+
+Le bloc est donc affiché **à côté** du total, avec la mention « par colis »,
+et repris dans le message WhatsApp pour que l'atelier voie le même chiffre
+que le client.
+
+### Le cache
+
+Les tarifs sont mis en cache 12 h en mémoire (`lib/yalidine.js`) et 12 h au
+niveau du CDN (`Cache-Control` sur la route). Yalidine impose un quota de
+requêtes strict par compte : sans ce cache, une poignée de visiteurs
+suffirait à l'épuiser et à bloquer les appels de création de colis.
+
+### Si la réponse change de forme
+
+La documentation Yalidine vit dans l'espace client et les noms de champs ont
+déjà changé selon l'agent (`yalidine` / `goupex`). `normalise()` accepte donc
+plusieurs orthographes (`express_home`, `home`, `livraison_domicile`…) et
+**lève une erreur explicite** quand il ne reconnaît rien, plutôt que
+d'afficher « 0 DA ». Un prix faux montré à un client est pire qu'un prix
+absent. En cas de doute, `GET /api/shipping?wilaya=31` renvoie
+`unrecognised: true` : comparez alors la réponse réelle de l'API aux clés
+listées en haut de `lib/yalidine.js`.
+
+---
+
 ## 6. Analytics
 
 Google Analytics (`G-0HDWJXSBT1`) et Meta Pixel (`1011828568104757`) sont
@@ -235,6 +300,7 @@ placeholders.
 ```
 components/   Layout (nav, menu mobile, pied de page), Aurora (fond animé)
 lib/          constants.js (faits métier) · products.js (catalogue) · orders.js (suivi local)
+              db.js (Supabase, serveur) · yalidine.js (tarifs livraison, serveur)
 pages/        index · catalogue · commande · devis · suivi · contact · _app · _document
 public/       logo, favicons, robots.txt, sitemap.xml
 styles/       globals.css (design tokens, typographie, boutons, grilles responsives)
