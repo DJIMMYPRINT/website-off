@@ -228,7 +228,7 @@ export default function Catalogue() {
                     }}>Populaire</span>
                   )}
                   <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
-                    <ProductImg product={p} size={54} radius={12} />
+                    <ProductImg product={p} size={104} radius={16} />
                     <div>
                       <div style={{fontFamily:'var(--display)',fontSize:'.95rem',letterSpacing:'.02em',marginBottom:'.2rem'}}>{p.name}</div>
                       <div style={{fontSize:'.75rem',color:'var(--muted)'}}>{p.desc}</div>

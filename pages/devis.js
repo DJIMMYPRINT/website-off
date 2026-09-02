@@ -121,12 +121,12 @@ export default function Devis() {
                   const on = picked.includes(p.name)
                   return (
                     <button key={p.name} type="button" onClick={() => toggle(p.name)} style={{
-                      padding:'.9rem .7rem', border:'1.5px solid', borderRadius:'16px', cursor:'pointer',
+                      padding:'.55rem .55rem .75rem', border:'1.5px solid', borderRadius:'16px', cursor:'pointer',
                       fontFamily:'inherit', textAlign:'center', transition:'all .2s',
                       borderColor: on ? 'var(--green)' : 'var(--cream-border)',
                       background: on ? 'var(--green-pale)' : 'var(--white)',
                     }}>
-                      <ProductImg product={p} size={54} radius={12} style={{margin:'0 auto .4rem'}} />
+                      <ProductImg product={p} fill radius={12} style={{marginBottom:'.5rem'}} />
                       <div style={{fontWeight:700,fontSize:'.78rem',lineHeight:1.3}}>{p.name}</div>
                       <div style={{fontSize:'.7rem',color:'var(--green)',fontWeight:600,marginTop:'.2rem'}}>
                         {p.price.toLocaleString('fr-DZ')} DA

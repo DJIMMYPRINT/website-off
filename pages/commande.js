@@ -233,12 +233,12 @@ export default function Commande() {
                 <div className="pick-grid" style={{marginBottom:'1.5rem'}}>
                   {PRODUCTS.map(p => (
                     <button key={p.name} onClick={()=>setSelProd(p)} style={{
-                      padding:'1rem .8rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',
+                      padding:'.6rem .6rem .8rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',
                       fontFamily:'inherit',textAlign:'center',transition:'all .2s',
                       borderColor: selProd.name===p.name ? 'var(--green)' : 'var(--cream-border)',
                       background: selProd.name===p.name ? 'var(--green-pale)' : 'var(--white)',
                     }}>
-                      <ProductImg product={p} size={62} radius={12} style={{margin:'0 auto .5rem'}} />
+                      <ProductImg product={p} fill radius={12} style={{marginBottom:'.55rem'}} />
                       <div style={{fontWeight:700,fontSize:'.8rem'}}>{p.name}</div>
                       <div style={{fontSize:'.72rem',color:'var(--green)',fontWeight:600,marginTop:'.2rem'}}>{p.price.toLocaleString()} DA</div>
                     </button>
