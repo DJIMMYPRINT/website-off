@@ -42,6 +42,7 @@ npm run start        # sert le build -> http://localhost:3000
 | `/devis` | **Demande de devis gratuit** : produits, quantité, technique, délai + estimation de budget indicative |
 | `/suivi` | **Suivi de commande** par référence `DP-XXXXXX`, avec la frise des 5 étapes |
 | `/contact` | Coordonnées, horaires, FAQ |
+| `/auto-reponses` | **Page interne** (hors barre d'onglets, `noindex`) : console des réponses automatiques aux messages et commentaires des réseaux sociaux — voir §8 |
 
 ---
 
@@ -90,6 +91,7 @@ Une information = un seul endroit. Ne recopiez pas ces valeurs dans une page.
 | Textes du hero, services, témoignages | `pages/index.js` |
 | FAQ | `pages/contact.js` |
 | Onglets du bas, en-tête, pied de page | `components/Layout.js` (tableaux `TABS` et `I` pour les icônes) |
+| Textes et mots-clés des réponses automatiques | `lib/autoreply.js` (tableau `RULES`) — voir §8 |
 
 **Attention aux remises volume :** `VOLUME_DISCOUNTS` sert à l'affichage, mais
 les seuils réels (50 / 100 / 200 pièces) sont codés dans `calcTotal()`. Si vous
@@ -227,15 +229,105 @@ placeholders.
   `apple-touch-icon.png`). Remplacez-les si vous avez une version dédiée.
 - **Suivi de commande côté serveur**, si vous voulez pouvoir faire avancer les
   étapes vous-même (voir §4).
+- **Réponses automatiques : TikTok et LinkedIn.** Seuls Instagram et Facebook
+  ont un webhook branché (§8). Pour les autres réseaux, `/auto-reponses` sert
+  de presse-papier : on colle le message reçu, on copie la réponse.
 
 ---
 
-## 8. Structure
+## 8. Réponses automatiques (Instagram / Facebook)
+
+Les messages privés et les commentaires reçus sur la Page Facebook et le
+compte Instagram professionnel reçoivent une **réponse immédiate**, puis sont
+renvoyés vers WhatsApp. L'objectif est de tenir les premières minutes — pas de
+remplacer la conversation : aucune réponse ne conclut une vente, toutes
+proposent WhatsApp.
+
+### Les trois pièces
+
+| Fichier | Rôle |
+|---|---|
+| `lib/autoreply.js` | Le cerveau. Reconnaît l'intention (prix, délai, minimum, livraison, technique, suivi…) et rédige la réponse. Ne connaît aucun réseau : c'est du texte qui entre, du texte qui sort. |
+| `lib/meta.js` | L'API Graph : vérification de signature, envoi des messages et des réponses aux commentaires. **Serveur uniquement.** |
+| `pages/api/social/webhook.js` | Le point d'entrée déclaré chez Meta. |
+| `/auto-reponses` | La console : état du webhook, testeur de réponses, liste des règles. Page interne, `noindex`, absente de la barre d'onglets. |
+
+Les prix, le minimum de commande, les techniques et les horaires cités dans les
+réponses viennent de `lib/constants.js` et `lib/products.js` — **les mêmes
+sources que les pages**. Une remise ou un tarif modifié là se retrouve
+automatiquement dans les réponses.
+
+### Variables d'environnement (à définir dans Vercel)
+
+| Variable | Où la trouver |
+|---|---|
+| `META_VERIFY_TOKEN` | Une chaîne que **vous inventez**, recopiée à l'identique dans Meta au moment de déclarer le webhook |
+| `META_APP_SECRET` | Meta for Developers → votre app → Paramètres → Général → *Clé secrète* |
+| `META_PAGE_ACCESS_TOKEN` | Jeton d'accès de la Page (permissions `pages_messaging`, `pages_manage_engagement`, `instagram_manage_messages`, `instagram_manage_comments`) — prenez un jeton **permanent** |
+| `META_PAGE_ID` / `META_IG_ID` | Facultatifs mais recommandés : ils évitent que le robot réponde à ses propres commentaires |
+| `SOCIAL_AUTOREPLY` | `off` = **mode simulation** : les réponses sont calculées et tracées dans les logs, rien n'est publié |
+
+Sans `META_APP_SECRET` et `META_PAGE_ACCESS_TOKEN`, le webhook répond
+`503 { configured: false }` et n'envoie rien. **Une variable absente désactive
+les réponses automatiques, elle ne casse jamais le site.**
+
+> ⚠️ Ces valeurs sont des secrets, au même titre que la clé Supabase : jamais
+> de préfixe `NEXT_PUBLIC_`, jamais d'usage hors de `pages/api/`.
+
+### Brancher le webhook
+
+1. Déployez d'abord avec `SOCIAL_AUTOREPLY=off` (mode simulation).
+2. Meta for Developers → votre app → **Webhooks** → *Instagram* puis *Page*.
+3. URL de rappel : `https://djimmyprints.xyz/api/social/webhook`
+   Jeton de vérification : la valeur de `META_VERIFY_TOKEN`.
+   Meta appelle l'URL en `GET` et attend le renvoi de son `hub.challenge` ;
+   si la vérification échoue, contrôlez d'abord que la variable est bien
+   présente **dans le déploiement en cours** (une variable ajoutée après coup
+   exige un redéploiement).
+4. Abonnez-vous aux champs `messages` et `comments` (Instagram), `messages` et
+   `feed` (Page Facebook).
+5. Ouvrez `/auto-reponses` : la pastille doit afficher « simulation ».
+6. Écrivez-vous un message depuis un autre compte, relisez ce que le robot
+   *aurait* répondu dans les logs Vercel, puis retirez `SOCIAL_AUTOREPLY=off`
+   pour passer en « actif ».
+
+### Ce que le webhook refuse de faire
+
+- **Répondre sans signature valide.** Chaque évènement est vérifié avec
+  `META_APP_SECRET` (HMAC SHA-256, comparaison à temps constant). Sans
+  signature correcte : `401`, rien n'est envoyé. Un webhook public non vérifié,
+  c'est n'importe qui qui fait écrire votre page.
+- **Répondre deux fois.** Meta rejoue les évènements ; les identifiants déjà
+  traités sont mémorisés 15 minutes.
+- **Se répondre à lui-même.** Les commentaires venant de la Page ou du compte
+  Instagram, et les échos de messages, sont ignorés — sinon la réponse du robot
+  déclenche un nouvel évènement, en boucle.
+- **Spammer.** Un même interlocuteur ne reçoit pas plus d'une réponse
+  automatique par minute, et un commentaire vide, une simple mention ou une
+  suite d'emoji ne déclenchent aucune réponse.
+
+### Modifier les réponses
+
+Tout est dans le tableau `RULES` de `lib/autoreply.js` : une règle = une clé,
+une liste de mots-clés (français, arabe, derja latinisée) et deux textes —
+`dm` (message privé, complet) et `comment` (réponse publique, courte). La règle
+qui reconnaît le plus de mots-clés l'emporte ; une expression de plusieurs mots
+pèse plus qu'un mot isolé (« combien de temps » l'emporte sur « combien »).
+Si rien ne correspond, `FALLBACK` répond sans rien inventer et renvoie vers
+WhatsApp.
+
+Après modification, vérifiez le rendu sur `/auto-reponses` avant de déployer.
+
+---
+
+## 9. Structure
 
 ```
 components/   Layout (nav, menu mobile, pied de page), Aurora (fond animé)
 lib/          constants.js (faits métier) · products.js (catalogue) · orders.js (suivi local)
-pages/        index · catalogue · commande · devis · suivi · contact · _app · _document
+              db.js (Supabase, serveur) · autoreply.js (réponses réseaux sociaux) · meta.js (API Graph, serveur)
+pages/        index · catalogue · commande · devis · suivi · contact · auto-reponses · _app · _document
+pages/api/    orders.js (suivi de commande) · social/webhook.js (messages et commentaires Meta)
 public/       logo, favicons, robots.txt, sitemap.xml
 styles/       globals.css (design tokens, typographie, boutons, grilles responsives)
 ```

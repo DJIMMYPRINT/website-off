@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /auto-reponses
 
 Sitemap: https://djimmyprints.xyz/sitemap.xml
