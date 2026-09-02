@@ -220,7 +220,7 @@ export default function Commande() {
           ))}
         </div>
 
-        <div className="grid-side">
+        <div className="grid-side rv">
           {/* LEFT — Wizard steps */}
           <div>
 

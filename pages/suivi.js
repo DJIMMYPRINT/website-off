@@ -240,7 +240,7 @@ export default function Suivi() {
             <h2 className="s-ttl" style={{fontSize:'clamp(1.5rem,3vw,2.1rem)',marginBottom:'2rem'}}>
               Les <span className="kw">5 étapes</span> d'une commande
             </h2>
-            <div className="cards-sm">
+            <div className="cards-sm rv">
               {ORDER_STAGES.map((s, i) => (
                 <div key={s.key} style={{
                   background:'var(--white)', border:'1.5px solid var(--cream-border)',

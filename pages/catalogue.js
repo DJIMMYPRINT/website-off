@@ -69,7 +69,7 @@ export default function Catalogue() {
       </Head>
 
       {/* PAGE HEADER */}
-      <div style={{padding:'1.6rem 1.15rem 1.2rem',position:'relative',zIndex:1}}>
+      <div className="rv" style={{padding:'1.6rem 1.15rem 1.2rem',position:'relative',zIndex:1}}>
         <p className="s-lbl">Configurateur visuel</p>
         <h1 className="s-ttl">Placez votre <span className="kw">logo</span> vous-même</h1>
         <p className="s-desc">Choisissez un produit, uploadez votre logo, glissez-le où vous voulez. Téléchargez l'aperçu ou commandez directement.</p>
@@ -77,7 +77,7 @@ export default function Catalogue() {
 
       {/* CATALOGUE LAYOUT */}
       <div style={{padding:'0 1.15rem 2.5rem',position:'relative',zIndex:1}}>
-        <div className="grid-2">
+        <div className="grid-2 rv">
 
           {/* ── CONFIGURATEUR ── */}
           <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden'}}>

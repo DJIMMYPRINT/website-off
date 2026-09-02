@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import Aurora from './Aurora'
+import Backdrop from './Backdrop'
+import PromoModal from './PromoModal'
 import { WA, PHONE_DISPLAY, EMAIL, ADDRESS, SITE_URL } from '../lib/constants'
 
 // Line icons rather than emoji: the tab bar is chrome, and coloured emoji
@@ -41,11 +42,29 @@ export default function Layout({ children }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Scroll reveals for the whole site. Living here rather than in each page
+  // means every route gets them, and re-running on navigation picks up the
+  // elements the next page just mounted. Elements already revealed are
+  // skipped so nothing re-animates on the way back.
+  useEffect(() => {
+    const targets = document.querySelectorAll('.rv:not(.in)')
+    if (!targets.length) return
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target) }
+      }),
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    )
+    targets.forEach(el => obs.observe(el))
+    return () => obs.disconnect()
+  }, [router.asPath])
+
   const isActive = (path) => router.pathname === path
 
   return (
     <div className="app-shell">
-      <Aurora />
+      <Backdrop />
+      <PromoModal />
 
       {/* PROMO STRIP */}
       <div className="promo-strip" onClick={() => router.push('/commande')}>

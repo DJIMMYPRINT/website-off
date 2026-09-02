@@ -22,7 +22,7 @@ export default function Contact() {
         <p className="s-lbl">Contact & FAQ</p>
         <h1 className="s-ttl">On est là pour <span className="kw">vous aider</span></h1>
 
-        <div className="grid-2" style={{gap:'5rem',marginTop:'4rem'}}>
+        <div className="grid-2 rv" style={{gap:'5rem',marginTop:'4rem'}}>
           {/* LEFT — Contact */}
           <div>
             <h2 style={{fontFamily:'var(--display)',fontSize:'1.4rem',marginBottom:'2rem'}}>Nous contacter</h2>

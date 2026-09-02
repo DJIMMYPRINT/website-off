@@ -110,7 +110,7 @@ export default function Devis() {
           un devis détaillé sous 24h ouvrables — sans engagement.
         </p>
 
-        <div className="grid-side" style={{marginTop:'3rem'}}>
+        <div className="grid-side rv" style={{marginTop:'3rem'}}>
           {/* ── FORM ── */}
           <div>
             {/* Produits */}

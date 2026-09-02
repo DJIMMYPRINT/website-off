@@ -12,36 +12,50 @@
    ══════════════════════════════════════════════════════════ */
 
 :root {
-  /* Ground & surfaces — page is darkest, cards lift, wells recess */
-  --bg:          #07080F;
-  --bg-2:        #0B0D16;
-  --surface:     #141827;
-  --surface-2:   #1B2033;
-  --well:        #0E1018;
-  --line:        rgba(255,255,255,.08);
-  --line-strong: rgba(255,255,255,.16);
+  /* ── Palette dérivée du logo ──────────────────────────────
+     Sampled from public/djimmy-logo.png: olive green #43553B and
+     aged gold #71684C on a cream ground. Both are muted on the
+     physical mark, so the UI ramps brighten them to stay legible
+     on a dark background while still reading as the brand.
+     The ground is a warm green-tinted charcoal rather than the
+     near-black it replaces — the previous #07080F read as heavy.
+     ──────────────────────────────────────────────────────── */
 
-  /* Type */
-  --txt:         #FFFFFF;
-  --txt-soft:    rgba(255,255,255,.86);
-  --muted:       rgba(255,255,255,.52);
-  --muted-light: rgba(255,255,255,.34);
+  /* Ground & surfaces — each step clearly lighter than the last */
+  --bg:          #151C16;
+  --bg-2:        #1B241C;
+  --surface:     #242E25;
+  --surface-2:   #2E3A2F;
+  --well:        #111710;
+  --line:        rgba(201,168,76,.16);
+  --line-strong: rgba(201,168,76,.34);
+
+  /* Type — the logo's cream, warmer and softer than pure white */
+  --txt:         #F5F0E8;
+  --txt-soft:    rgba(245,240,232,.88);
+  --muted:       rgba(245,240,232,.62);
+  --muted-light: rgba(245,240,232,.40);
   --display: 'Outfit', 'Inter', system-ui, sans-serif;
 
-  /* Accents */
-  --vio:  #A855F7;
-  --ind:  #6366F1;
-  --blu:  #3B82F6;
-  --cya:  #22D3EE;
-  --ok:   #22C55E;
-  --warn: #FF6B6B;
-  --grad:      linear-gradient(135deg, #A855F7 0%, #6366F1 52%, #22D3EE 100%);
-  --grad-soft: linear-gradient(135deg, rgba(168,85,247,.18), rgba(34,211,238,.14));
+  /* Accents — logo green and gold, brightened for dark ground */
+  --green-d: #43553B;   /* logo green, unmodified */
+  --green:   #6FAF52;
+  --green-l: #93D172;
+  --gold-d:  #71684C;   /* logo gold, unmodified */
+  --gold:    #C9A84C;
+  --gold-l:  #E3C46A;
+  --ok:      #6FAF52;
+  --warn:    #E8927C;
+  --grad:      linear-gradient(135deg, #43553B 0%, #6FAF52 46%, #C9A84C 100%);
+  /* Same ramp minus the dark olive start: as a fill that dark end is fine,
+     but as TEXT it sits too close to the ground and the first word fades. */
+  --grad-text: linear-gradient(100deg, #93D172 0%, #6FAF52 35%, #E3C46A 100%);
+  --grad-soft: linear-gradient(135deg, rgba(111,175,82,.20), rgba(201,168,76,.16));
 
-  --shadow:    0 6px 24px rgba(0,0,0,.45);
-  --shadow-md: 0 16px 48px rgba(0,0,0,.6);
-  --r:  22px;   /* card radius  */
-  --r-s: 14px;  /* control radius */
+  --shadow:    0 6px 24px rgba(0,0,0,.42);
+  --shadow-md: 0 16px 48px rgba(0,0,0,.55);
+  --r:  22px;
+  --r-s: 14px;
 
   /* ── Legacy aliases ── */
   --cream:        var(--well);
@@ -50,10 +64,11 @@
   --black:        var(--txt);
   --black-soft:   var(--txt-soft);
   --white:        var(--surface);
-  --green:        #8B5CF6;
-  --green-l:      #A78BFA;
-  --green-pale:   rgba(139,92,246,.16);
-  --gold:         #22D3EE;
+  --green-pale:   rgba(111,175,82,.18);
+  --vio: var(--green);
+  --ind: var(--green-l);
+  --blu: var(--gold);
+  --cya: var(--gold-l);
 }
 
 html { scroll-behavior: smooth; }
@@ -79,7 +94,7 @@ body {
   box-shadow: 0 0 90px rgba(0,0,0,.75);
 }
 @media (min-width: 560px) {
-  body { background: #050609; }
+  body { background: #0C110C; }
 }
 
 /* ══ TYPE SYSTEM ══ */
@@ -88,13 +103,13 @@ body {
   font-weight: 600;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--cya);
+  color: var(--gold-l);
   margin-bottom: .6rem;
   display: flex;
   align-items: center;
   gap: .5rem;
 }
-.s-lbl::before { content: ""; width: 16px; height: 1.5px; background: var(--cya); }
+.s-lbl::before { content: ""; width: 16px; height: 1.5px; background: var(--gold); }
 
 .s-ttl {
   font-family: var(--display);
@@ -105,7 +120,7 @@ body {
   color: var(--txt);
 }
 .s-ttl .kw {
-  background: var(--grad);
+  background: var(--grad-text);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -130,10 +145,10 @@ body {
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   transition: transform .2s, box-shadow .2s, filter .2s;
-  box-shadow: 0 6px 20px rgba(99,102,241,.34);
+  box-shadow: 0 6px 20px rgba(111,175,82,.30);
   text-decoration: none;
 }
-.btn-g:hover { transform: translateY(-1px); filter: brightness(1.08); box-shadow: 0 10px 28px rgba(99,102,241,.45); }
+.btn-g:hover { transform: translateY(-1px); filter: brightness(1.08); box-shadow: 0 10px 28px rgba(111,175,82,.42); }
 .btn-g:active { transform: translateY(0); }
 
 .btn-outline {
@@ -153,7 +168,7 @@ body {
   transition: all .2s;
   text-decoration: none;
 }
-.btn-outline:hover { background: rgba(255,255,255,.09); border-color: var(--vio); }
+.btn-outline:hover { background: rgba(245,240,232,.09); border-color: var(--gold); }
 
 /* ══ GLASS CARD ══ */
 .glass {
@@ -177,7 +192,12 @@ select option { background: #12141F; color: #fff; }
 input[type=range] { accent-color: var(--vio); background: transparent !important; }
 
 /* ══ REVEAL ══ */
-.rv { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+.rv {
+  opacity: 0;
+  transform: translateY(26px) scale(.985);
+  transition: opacity .7s cubic-bezier(.22,.7,.3,1), transform .7s cubic-bezier(.22,.7,.3,1);
+  will-change: opacity, transform;
+}
 .rv.in { opacity: 1; transform: none; }
 
 /* ══ MARQUEE ══ */
@@ -198,18 +218,71 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 }
 .mqd { width: 4px; height: 4px; background: rgba(255,255,255,.55); border-radius: 50%; display: inline-block; }
 
-/* ══ AURORA ══ */
-.aurora-wrap { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-.aurora-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .5; animation: auroraFloat 26s ease-in-out infinite; }
-.ab1 { width: 70vw; max-width: 460px; aspect-ratio: 1; background: radial-gradient(circle, rgba(168,85,247,.55), transparent 70%); top: -8%; left: -18%; animation-duration: 28s; }
-.ab2 { width: 60vw; max-width: 400px; aspect-ratio: 1; background: radial-gradient(circle, rgba(34,211,238,.4), transparent 70%); bottom: 6%; right: -20%; animation-duration: 32s; animation-delay: -8s; }
-.ab3 { width: 50vw; max-width: 340px; aspect-ratio: 1; background: radial-gradient(circle, rgba(59,130,246,.4), transparent 70%); top: 42%; left: 40%; animation-duration: 24s; animation-delay: -14s; }
+/* ══ BACKDROP : grille + formes + halos ══════════════════
+   Three stacked layers behind every page. Fixed, never
+   interactive, and animated only on transform/opacity.
+   ═══════════════════════════════════════════════════════ */
+.backdrop { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+
+/* ── Grille lumineuse ── */
+.bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.075) 1px, transparent 1px);
+  background-size: 46px 46px;
+  /* Fades the grid out at the edges so it reads as texture, not a table */
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 35%, transparent 100%);
+          mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 35%, transparent 100%);
+}
+.bg-grid::after {
+  content: ""; position: absolute; inset: -30%;
+  background: radial-gradient(circle at 50% 50%, rgba(111,175,82,.28), transparent 42%);
+  animation: gridSweep 20s ease-in-out infinite;
+}
+@keyframes gridSweep {
+  0%,100% { transform: translate(-18%, -12%); }
+  50%     { transform: translate( 20%,  16%); }
+}
+
+/* ── Formes géométriques flottantes ── */
+.bg-shapes { position: absolute; inset: 0; }
+.shape {
+  position: absolute; display: block;
+  border: 1.5px solid rgba(201,168,76,.30);
+  opacity: .5;
+  animation-name: floatUp;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+.shape.sq { border-radius: 8px; }
+.shape.ci { border-radius: 50%; border-color: rgba(111,175,82,.34); }
+.shape.tri {
+  border: none;
+  background: linear-gradient(135deg, rgba(111,175,82,.22), rgba(201,168,76,.14));
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+@keyframes floatUp {
+  0%,100% { transform: translateY(0)      rotate(0deg)   scale(1);   }
+  33%     { transform: translateY(-26px)  rotate(120deg) scale(1.08); }
+  66%     { transform: translateY(14px)   rotate(240deg) scale(.94);  }
+}
+
+/* ── Halos de couleur ── */
+.aurora-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .42; animation: auroraFloat 26s ease-in-out infinite; }
+.ab1 { width: 70vw; max-width: 460px; aspect-ratio: 1; background: radial-gradient(circle, rgba(111,175,82,.55), transparent 70%); top: -8%; left: -18%; animation-duration: 28s; }
+.ab2 { width: 60vw; max-width: 400px; aspect-ratio: 1; background: radial-gradient(circle, rgba(201,168,76,.42), transparent 70%); bottom: 6%; right: -20%; animation-duration: 32s; animation-delay: -8s; }
+.ab3 { width: 50vw; max-width: 340px; aspect-ratio: 1; background: radial-gradient(circle, rgba(67,85,59,.60), transparent 70%);  top: 42%; left: 40%; animation-duration: 24s; animation-delay: -14s; }
 @keyframes auroraFloat {
   0%, 100% { transform: translate(0,0) scale(1); }
   33% { transform: translate(5%,7%) scale(1.1); }
   66% { transform: translate(-4%,-5%) scale(.94); }
 }
-@media (prefers-reduced-motion: reduce) { .aurora-blob { animation: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob, .shape, .bg-grid::after { animation: none; }
+  .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
 
 /* ══ PROMO STRIP ══ */
 .promo-strip {
@@ -246,7 +319,7 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
   position: sticky; top: 0; z-index: 500;
   display: flex; align-items: center; justify-content: space-between;
   padding: .75rem 1.15rem;
-  background: rgba(7,8,15,.82);
+  background: rgba(21,28,22,.85);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid transparent;
   transition: border-color .3s, background .3s;
@@ -265,7 +338,7 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 .mobile-panel {
   position: fixed; left: 0; right: 0; z-index: 490;
   max-width: 520px; margin: 0 auto;
-  background: rgba(11,13,22,.97);
+  background: rgba(27,36,28,.97);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--line);
   box-shadow: var(--shadow-md);
@@ -285,7 +358,7 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
   display: grid; grid-template-columns: repeat(6, 1fr);
   gap: .15rem;
   padding: .55rem .45rem calc(.55rem + env(safe-area-inset-bottom, 0px));
-  background: rgba(11,13,22,.92);
+  background: rgba(27,36,28,.92);
   backdrop-filter: blur(20px);
   border-top: 1px solid var(--line);
 }
@@ -310,7 +383,7 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 .tab.active .tab-ic {
   background: var(--grad);
   border-color: transparent;
-  box-shadow: 0 6px 18px rgba(99,102,241,.45);
+  box-shadow: 0 6px 18px rgba(111,175,82,.42);
 }
 /* The bar floats over the page — reserve room so the footer clears it. */
 .tab-spacer { height: 92px; }
@@ -325,10 +398,10 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
   font-size: .95rem; border: 1px solid var(--line);
   background: rgba(255,255,255,.05); color: var(--muted-light);
 }
-.tl-item.done .tl-dot { background: var(--ok); border-color: transparent; color: #04140A; }
+.tl-item.done .tl-dot { background: var(--ok); border-color: transparent; color: #10190C; }
 .tl-item.current .tl-dot {
   background: var(--grad); border-color: transparent; color: #fff;
-  box-shadow: 0 0 0 5px rgba(139,92,246,.18);
+  box-shadow: 0 0 0 5px rgba(111,175,82,.20);
 }
 .tl-line { width: 2px; flex: 1; min-height: 24px; background: var(--line); }
 .tl-item.done .tl-line { background: var(--ok); }
@@ -341,3 +414,91 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 .c-card .c-act { white-space: normal; }
 
 .u-mono { font-variant-numeric: tabular-nums; letter-spacing: .06em; }
+
+/* ══ POP-UP D'ACCUEIL — Pack Entreprises ══════════════════
+   Shown once per visit, 1.5s after the page paints, with a
+   two-minute countdown that closes the dialog when it runs
+   out. Sits above the tab bar (z 480) and the header (500).
+   ═══════════════════════════════════════════════════════ */
+.promo-ov {
+  position: fixed; inset: 0; z-index: 900;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.2rem;
+  background: rgba(8,12,8,.72);
+  backdrop-filter: blur(6px);
+  animation: promoFade .35s ease both;
+}
+.promo-box {
+  position: relative;
+  width: 100%; max-width: 380px;
+  padding: 2.1rem 1.5rem 1.5rem;
+  text-align: center;
+  border-radius: 26px;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    var(--grad) border-box;
+  border: 1.5px solid transparent;      /* the gradient shows through here */
+  box-shadow: 0 24px 70px rgba(0,0,0,.6);
+  animation: promoIn .45s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes promoFade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes promoIn {
+  from { opacity: 0; transform: translateY(22px) scale(.94); }
+  to   { opacity: 1; transform: none; }
+}
+
+.promo-x {
+  position: absolute; top: .7rem; right: .7rem;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(245,240,232,.07);
+  border: 1px solid var(--line);
+  color: var(--muted); font-size: .85rem; cursor: pointer;
+}
+.promo-x:hover { background: rgba(245,240,232,.14); color: var(--txt); }
+
+.promo-badge {
+  display: inline-block;
+  font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+  color: #10190C; background: var(--gold);
+  padding: .3rem .8rem; border-radius: 100px; margin-bottom: 1rem;
+}
+.promo-title {
+  font-family: var(--display); font-weight: 700;
+  font-size: 1.5rem; letter-spacing: -.01em; color: var(--txt);
+}
+.promo-off {
+  font-family: var(--display); font-weight: 800;
+  font-size: 4.1rem; line-height: 1; margin: .2rem 0 .6rem;
+  background: var(--grad-text);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.promo-off span { font-size: 2.1rem; }
+.promo-txt { font-size: .87rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.3rem; }
+.promo-txt strong { color: var(--txt); }
+
+.promo-timer {
+  display: flex; flex-direction: column; align-items: center; gap: .25rem;
+  padding: .8rem; margin-bottom: 1.2rem;
+  border-radius: 14px;
+  background: rgba(201,168,76,.10);
+  border: 1px solid var(--line);
+}
+.promo-timer-lbl { font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.promo-clock {
+  font-family: var(--display); font-weight: 700;
+  font-size: 1.9rem; color: var(--gold-l); line-height: 1;
+}
+
+.promo-cta { width: 100%; justify-content: center; }
+.promo-later {
+  display: block; width: 100%; margin-top: .6rem; padding: .6rem;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: .82rem; font-family: inherit;
+}
+.promo-later:hover { color: var(--txt); }
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-ov, .promo-box { animation: none; }
+}
