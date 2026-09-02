@@ -210,7 +210,9 @@ client, au lieu de le discuter après coup sur WhatsApp.
 
 ### Le chemin
 
-`pages/commande.js` → `GET /api/shipping?wilaya=16 Alger` →
+`pages/commande.js` et `pages/devis.js` → `lib/useShipping.js` (le hook
+partagé : requête, repli et formatage au même endroit, pour que les deux
+pages ne divergent pas) → `GET /api/shipping?wilaya=16 Alger` →
 `lib/yalidine.js` → `https://api.yalidine.app/v1/fees/`.
 
 Comme pour Supabase, **les identifiants ne quittent jamais le serveur** : le
@@ -236,9 +238,7 @@ Trois raisons, à garder en tête avant de « corriger » ce point :
 1. **Yalidine tarife un colis, pas une commande.** 20 polos tiennent dans un
    colis, 300 non. Ajouter un tarif unique au total sous-estimerait le coût
    précisément sur les grosses commandes.
-2. **Le tarif varie d'une commune à l'autre** dans une même wilaya, et le
-   formulaire ne demande que la wilaya — d'où une fourchette et non un
-   montant unique.
+2. **Le tarif varie d'une commune à l'autre** dans une même wilaya.
 3. `calcTotal()` alimente le message WhatsApp et le registre des commandes.
    Les remises volume y sont volontairement la seule chose qui bouge le
    total.
@@ -246,6 +246,25 @@ Trois raisons, à garder en tête avant de « corriger » ce point :
 Le bloc est donc affiché **à côté** du total, avec la mention « par colis »,
 et repris dans le message WhatsApp pour que l'atelier voie le même chiffre
 que le client.
+
+### Commune et mode de livraison
+
+Le sélecteur de commune de `/commande` est **rempli par l'API**, pas par une
+liste en dur : c'est la grille de livraison de Yalidine qui fait foi, et elle
+change sans prévenir. Il n'apparaît donc qu'une fois la réponse reçue, et
+reste facultatif.
+
+- **Commune choisie** → tarif exact (`850 DA`).
+- **Commune non choisie** → fourchette sur la wilaya (`700 – 850 DA`), avec
+  la mention explicite qu'il s'agit d'une fourchette.
+
+Le client choisit ensuite **à domicile** ou **au bureau (stop desk)** ; le
+mode retenu et son tarif partent dans le message WhatsApp, avec la commune.
+
+`/devis` affiche la fourchette au niveau de la wilaya seulement, sans
+sélecteur de commune : un devis est volontairement grossier (voir le
+commentaire sur `DELAIS`), demander la commune y serait de la fausse
+précision.
 
 ### Le cache
 
@@ -301,6 +320,7 @@ placeholders.
 components/   Layout (nav, menu mobile, pied de page), Aurora (fond animé)
 lib/          constants.js (faits métier) · products.js (catalogue) · orders.js (suivi local)
               db.js (Supabase, serveur) · yalidine.js (tarifs livraison, serveur)
+              useShipping.js (hook livraison, partagé commande + devis)
 pages/        index · catalogue · commande · devis · suivi · contact · _app · _document
 public/       logo, favicons, robots.txt, sitemap.xml
 styles/       globals.css (design tokens, typographie, boutons, grilles responsives)

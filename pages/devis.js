@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { PRODUCTS } from '../lib/products'
 import { WA, TECHNIQUES, WILAYAS, EMAIL, PHONE_DISPLAY, MIN_ORDER } from '../lib/constants'
+import { useShipping, fmtFee } from '../lib/useShipping'
 
 // Deadlines are coarse on purpose — the exact date is settled on WhatsApp once
 // the artwork is in hand, so asking for a precise one here would be false
@@ -27,6 +28,12 @@ export default function Devis() {
   const [form, setForm] = useState({ nom:'', tel:'', entreprise:'', email:'', wilaya:'', notes:'' })
   const [err, setErr] = useState('')
   const [sent, setSent] = useState(false)
+
+  // Yalidine's span for the chosen wilaya. Deliberately a span and not an
+  // exact fee: a quote is coarse by design (see DELAIS above), so asking for
+  // the commune here would be the same false precision. The order wizard,
+  // where the commune matters, asks for it.
+  const ship = useShipping(form.wilaya)
 
   const toggle = (name) =>
     setPicked(p => p.includes(name) ? p.filter(x => x !== name) : [...p, name])
@@ -58,6 +65,9 @@ export default function Devis() {
       `📞 *Tél :* +213${form.tel}`,
       form.email ? `📧 *Email :* ${form.email}` : '',
       form.wilaya ? `📍 *Wilaya :* ${form.wilaya}` : '',
+      ship.state === 'ok' && ship.fees.home
+        ? `🚚 *Livraison indicative :* ${fmtFee(ship.fees.home, 'fr-DZ')} à domicile (Yalidine, par colis)`
+        : '',
       '━━━━━━━━━━━━━━━━━━',
       `👕 *Produits :* ${picked.join(', ')}`,
       `🔢 *Quantité estimée :* ${n} pièces`,
@@ -205,6 +215,13 @@ export default function Devis() {
                 <option value="">Sélectionnez votre wilaya</option>
                 {WILAYAS.map(w => <option key={w} value={w}>{w}</option>)}
               </select>
+              {ship.state === 'ok' && ship.fees.home && (
+                <p style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.45rem',lineHeight:1.6}}>
+                  🚚 Livraison Yalidine vers {ship.fees.to || 'cette wilaya'} :
+                  {' '}<strong style={{color:'var(--green)'}}>{fmtFee(ship.fees.home)}</strong> à domicile
+                  {ship.fees.desk ? `, ${fmtFee(ship.fees.desk)} au bureau` : ''} — par colis, hors budget ci-dessus.
+                </p>
+              )}
             </div>
             <div style={{marginBottom:'1.5rem'}}>
               <label style={labelStyle}>Précisions</label>
