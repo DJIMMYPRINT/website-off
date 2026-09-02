@@ -5,6 +5,7 @@ import { PRODUCTS } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS } from '../lib/constants'
 import { newOrderRef, saveOrder } from '../lib/orders'
+import { useShipping, fmtFee } from '../lib/useShipping'
 
 export default function Commande() {
   const [step, setStep] = useState(1)
@@ -19,6 +20,31 @@ export default function Commande() {
   const [payMode, setPayMode] = useState('livraison')
   const [done, setDone] = useState(false)
   const [orderRef, setOrderRef] = useState('')
+
+  // Real Yalidine delivery cost for the chosen wilaya. Three reasons it stays
+  // *beside* the total instead of inside calcTotal():
+  //
+  //   - Yalidine prices a parcel, not an order. Twenty polos travel in one
+  //     parcel, three hundred do not, so a single fee added to the total
+  //     would understate the real cost on exactly the orders that matter.
+  //   - The fee varies by commune, so it is only exact once the customer
+  //     picks one — before that it is a span across the wilaya.
+  //   - calcTotal() feeds the WhatsApp message and the order book; the
+  //     volume-discount rules there are deliberately the only thing that
+  //     moves the total.
+  //
+  // A missing key or a Yalidine outage leaves `state: 'off'` and hides it all.
+  const ship = useShipping(form.wilaya)
+  const [commune, setCommune] = useState('')
+  const [livMode, setLivMode] = useState('domicile')
+
+  const communes = ship.state === 'ok' ? (ship.fees.communes || []) : []
+  const selCommune = commune ? communes.find(c => c.name === commune) : null
+
+  // Exact once a commune is known, a span across the wilaya until then.
+  const homeFee = selCommune ? selCommune.home : (ship.state === 'ok' ? ship.fees.home : null)
+  const deskFee = selCommune ? selCommune.desk : (ship.state === 'ok' ? ship.fees.desk : null)
+  const chosenFee = livMode === 'stopdesk' ? deskFee : homeFee
 
   // Add product to order
   const [selProd, setSelProd] = useState(PRODUCTS[0])
@@ -82,6 +108,7 @@ export default function Commande() {
       `📞 *Tél :* +213${form.tel}`,
       form.email ? `📧 *Email :* ${form.email}` : '',
       `📍 *Wilaya :* ${form.wilaya}`,
+      commune ? `🏘️ *Commune :* ${commune}` : '',
       `🏠 *Adresse :* ${form.adresse}`,
       '━━━━━━━━━━━━━━━━━━',
       '📦 *PRODUITS :*',
@@ -95,6 +122,11 @@ export default function Commande() {
       disRate>0 ? `🏷️ *Remise volume (${disRate*100}%) :* −${volDis.toLocaleString('fr-DZ')} DA` : '',
       payMode!=='livraison' ? `💳 *Remise paiement anticipé :* −${payDis.toLocaleString('fr-DZ')} DA` : '',
       `✅ *TOTAL : ${final.toLocaleString('fr-DZ')} DA*`,
+      // Sent so the workshop sees the same figure the customer saw, and can
+      // quote the delivery without looking it up again.
+      ship.state === 'ok' && chosenFee
+        ? `🚚 *Livraison ${livMode === 'stopdesk' ? 'au bureau (stop desk)' : 'à domicile'} :* ${fmtFee(chosenFee, 'fr-DZ')}${selCommune ? '' : ' (fourchette wilaya)'} — Yalidine, par colis`
+        : '',
       order.notes ? `\n💬 *Notes :*\n${order.notes}` : '',
       '━━━━━━━━━━━━━━━━━━',
       `📅 ${new Date().toLocaleDateString('fr-DZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`,
@@ -402,17 +434,59 @@ export default function Commande() {
 
                 <div style={{marginBottom:'1rem'}}>
                   <label style={labelStyle}>Wilaya *</label>
-                  <select style={inputStyle} value={form.wilaya} onChange={e=>setForm(f=>({...f,wilaya:e.target.value}))}>
+                  <select style={inputStyle} value={form.wilaya}
+                    onChange={e=>{setForm(f=>({...f,wilaya:e.target.value})); setCommune('')}}>
                     <option value="">Sélectionnez votre wilaya</option>
                     {WILAYAS.map(w=><option key={w} value={w}>{w}</option>)}
                   </select>
                 </div>
+
+                {/* Commune — only once Yalidine has answered, because the list
+                    comes from its own delivery grid. Optional: without it the
+                    estimate is the wilaya-wide span instead of an exact fee. */}
+                {communes.length > 0 && (
+                  <div style={{marginBottom:'1rem'}}>
+                    <label style={labelStyle}>Commune</label>
+                    <select style={inputStyle} value={commune} onChange={e=>setCommune(e.target.value)}>
+                      <option value="">Toutes communes — tarif indicatif</option>
+                      {communes.map(c=><option key={c.name} value={c.name}>{c.name}</option>)}
+                    </select>
+                    <p style={{fontSize:'.72rem',color:'var(--muted)',marginTop:'.4rem'}}>
+                      Précisez la commune pour connaître le tarif de livraison exact.
+                    </p>
+                  </div>
+                )}
 
                 <div style={{marginBottom:'2rem'}}>
                   <label style={labelStyle}>Adresse de livraison *</label>
                   <textarea rows={2} style={{...inputStyle,resize:'vertical'}} placeholder="Rue, quartier, code postal..."
                     value={form.adresse} onChange={e=>setForm(f=>({...f,adresse:e.target.value}))} />
                 </div>
+
+                {/* Mode de livraison — shown only when Yalidine answered, since
+                    the two options are priced from its grid. */}
+                {ship.state==='ok' && (homeFee || deskFee) && (
+                  <div style={{marginBottom:'2rem'}}>
+                    <label style={labelStyle}>Mode de livraison</label>
+                    <div className="pay-grid">
+                      {[
+                        {key:'domicile',label:'À domicile',ic:'🏠',fee:homeFee},
+                        {key:'stopdesk',label:'Au bureau',ic:'🏢',fee:deskFee},
+                      ].filter(m=>m.fee).map(m=>(
+                        <button key={m.key} onClick={()=>setLivMode(m.key)} style={{
+                          padding:'1rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',fontFamily:'inherit',textAlign:'center',
+                          borderColor:livMode===m.key?'var(--green)':'var(--cream-border)',
+                          background:livMode===m.key?'var(--green-pale)':'var(--white)',
+                          transition:'all .2s',
+                        }}>
+                          <div style={{fontSize:'1.5rem',marginBottom:'.3rem'}}>{m.ic}</div>
+                          <div style={{fontWeight:700,fontSize:'.8rem',marginBottom:'.2rem'}}>{m.label}</div>
+                          <div style={{fontSize:'.7rem',color:livMode===m.key?'var(--green)':'var(--muted)'}}>{fmtFee(m.fee)}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Mode paiement */}
                 <div style={{marginBottom:'2rem'}}>
@@ -489,6 +563,48 @@ export default function Commande() {
                       </div>
                     </div>
                   </>
+                )}
+
+                {ship.state==='loading' && (
+                  <div style={{marginTop:'1rem',padding:'.7rem',fontSize:'.78rem',color:'var(--muted)',textAlign:'center'}}>
+                    🚚 Calcul du tarif de livraison…
+                  </div>
+                )}
+
+                {ship.state==='ok' && (homeFee || deskFee) && (
+                  <div style={{marginTop:'1rem',padding:'.9rem',background:'var(--cream)',border:'1px solid var(--cream-border)',borderRadius:'4px'}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',gap:'.5rem',marginBottom:'.6rem'}}>
+                      <span style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}}>
+                        🚚 Livraison Yalidine
+                      </span>
+                      <span style={{fontSize:'.72rem',color:'var(--muted)'}}>
+                        {selCommune ? selCommune.name : (ship.fees.to || '')}
+                      </span>
+                    </div>
+
+                    {homeFee && (
+                      <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',marginBottom:'.35rem',
+                        color:livMode==='domicile'?'var(--green)':'inherit'}}>
+                        <span>{livMode==='domicile' ? '● ' : ''}À domicile</span>
+                        <span style={{fontWeight:600}}>{fmtFee(homeFee)}</span>
+                      </div>
+                    )}
+                    {deskFee && (
+                      <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',
+                        color:livMode==='stopdesk'?'var(--green)':'inherit'}}>
+                        <span>{livMode==='stopdesk' ? '● ' : ''}Au bureau (stop desk)</span>
+                        <span style={{fontWeight:600}}>{fmtFee(deskFee)}</span>
+                      </div>
+                    )}
+
+                    <p style={{fontSize:'.7rem',color:'var(--muted)',marginTop:'.7rem',lineHeight:1.6}}>
+                      {selCommune
+                        ? 'Tarif par colis, non compris dans le total ci-dessus.'
+                        : 'Fourchette sur la wilaya — précisez la commune pour le tarif exact. Par colis, non compris dans le total ci-dessus.'}
+                      {ship.fees.oversize ? ` Au-delà du poids inclus : +${ship.fees.oversize.toLocaleString()} DA/kg.` : ''}
+                      {' '}Une commande volumineuse part en plusieurs colis — le montant exact est confirmé sur WhatsApp.
+                    </p>
+                  </div>
                 )}
 
                 {order.technique && (
