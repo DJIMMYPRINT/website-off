@@ -40,6 +40,7 @@ npm run start        # sert le build -> http://localhost:3000
 | `/catalogue` | Catalogue complet + **configurateur de logo** (upload, glisser-déposer, redimensionnement, export PNG) |
 | `/commande` | **Assistant de commande en 3 étapes** : produits & tailles → technique & logo → livraison & paiement |
 | `/devis` | **Demande de devis gratuit** : produits, quantité, technique, délai + estimation de budget indicative |
+| `/guide` | **Guide gratuit** : vêtement par métier, techniques, logo, budget, tailles — la ressource envoyée par les campagnes réseaux sociaux |
 | `/suivi` | **Suivi de commande** par référence `DP-XXXXXX`, avec la frise des 5 étapes |
 | `/contact` | Coordonnées, horaires, FAQ |
 | `/bot` | *(interne, `noindex`)* Console de test des **automatismes réseaux sociaux** (DM et campagnes) |
@@ -238,6 +239,10 @@ curl "http://localhost:3000/api/social/preview?text=GUIDE&mode=comment&account=a
 réception, écrit dans les logs la réponse qu'il aurait envoyée, et n'envoie
 rien — comme `/api/orders` sans clé Supabase.
 
+Les campagnes livrées envoient toutes une ressource qui existe réellement sur
+le site — `/guide` en tête, écrit pour ça. Aucune campagne ne promet un lien
+qui n'existe pas.
+
 Deux limites imposées par Meta, à connaître avant de promettre un cadeau en
 vidéo : **un seul message privé par commentaire**, et **7 jours maximum**
 après le commentaire.
@@ -289,7 +294,7 @@ components/   Layout (nav, menu mobile, pied de page), Aurora (fond animé)
 docs/         AUTO-REPONSES.md (répondeur réseaux sociaux : mise en service)
 lib/          constants.js (faits métier) · products.js (catalogue) · orders.js (suivi local)
               db.js (Supabase) · autoreply.js (répondeur DM) · campaigns.js (comptes & campagnes)
-pages/        index · catalogue · commande · devis · suivi · contact · bot · _app · _document
+pages/        index · catalogue · commande · devis · guide · suivi · contact · bot · _app · _document
 pages/api/    orders.js · social/webhook.js (Meta) · social/preview.js
 public/       logo, favicons, robots.txt, sitemap.xml
 styles/       globals.css (design tokens, typographie, boutons, grilles responsives)

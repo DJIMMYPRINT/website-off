@@ -113,7 +113,7 @@ export default function Layout({ children }) {
           <div>
             <p style={{fontSize:'.66rem',fontWeight:700,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--muted-light)',marginBottom:'.8rem'}}>Navigation</p>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.1rem .8rem'}}>
-              {[['Accueil','/'],['Catalogue','/catalogue'],['Commander','/commande'],['Devis gratuit','/devis'],['Suivre ma commande','/suivi'],['Contact','/contact']].map(([label,href]) => (
+              {[['Accueil','/'],['Catalogue','/catalogue'],['Commander','/commande'],['Devis gratuit','/devis'],['Guide gratuit','/guide'],['Suivre ma commande','/suivi'],['Contact','/contact']].map(([label,href]) => (
                 <Link key={href} href={href} style={{fontSize:'.83rem',color:'var(--muted)',textDecoration:'none',padding:'.3rem 0',display:'block'}}>
                   {label}
                 </Link>

@@ -265,7 +265,9 @@ async function handleComment(account, evt) {
   if (!campaign) {
     // Un commentaire ordinaire n'est pas une demande : on le laisse à
     // l'humain plutôt que de répondre à côté sous une publication publique.
-    console.log(`[social] ${account.key}/${evt.channel} commentaire sans mot-clé « ${evt.text.slice(0, 60)} »`)
+    // L'identifiant de publication est logué ici : c'est ainsi qu'on le
+    // récupère pour cibler une campagne sur une seule vidéo (media: [...]).
+    console.log(`[social] ${account.key}/${evt.channel} commentaire sans mot-clé « ${evt.text.slice(0, 60)} » (publication ${evt.mediaId || '?'})`)
     return { skipped: 'aucune campagne' }
   }
 

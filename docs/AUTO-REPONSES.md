@@ -125,6 +125,26 @@ L'identifiant apparaît dans les logs du webhook dès le premier commentaire
 reçu sur cette publication (`[social] amouri/instagram commentaire sans
 mot-clé …`), ou via l'API Graph (`/me/media`).
 
+### Les campagnes déjà en place
+
+| Compte | Mots-clés | Ce qui part en DM |
+|---|---|---|
+| Amouri Djameleddine | `GUIDE` | Le guide gratuit `/guide` |
+| Amouri Djameleddine | `PRIX` `TARIF` | Le catalogue avec les prix |
+| Amouri Djameleddine | `TECHNIQUE` `BRODERIE` `SERIGRAPHIE` | Le comparatif des 5 techniques |
+| Amouri Djameleddine | `LOGO` `MAQUETTE` | Le configurateur + les formats acceptés |
+| Amouri Djameleddine | `INFO` `CONTACT` | WhatsApp et email |
+| Djimmy Prints | `CATALOGUE` `PRIX` `TARIF` | Le catalogue |
+| Djimmy Prints | `DEVIS` | Le formulaire de devis |
+| Djimmy Prints | `GUIDE` | Le guide gratuit |
+| Djimmy Prints | `COMMANDE` `COMMANDER` | L'assistant de commande |
+| Djimmy Prints | `SUIVI` | Le suivi par référence |
+
+Chaque lien pointe vers une page réelle du site : `/guide` a été écrit
+exactement pour être la ressource offerte en vidéo (vêtement par métier,
+comparatif des techniques, préparation du logo, budget chiffré, répartition
+des tailles). Rien à héberger ailleurs, rien à envoyer en pièce jointe.
+
 ### Ce qu'il faut dire en vidéo
 
 > « Commente le mot **GUIDE** — juste le mot — et je t'envoie ça en message
