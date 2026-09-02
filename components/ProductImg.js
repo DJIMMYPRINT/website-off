@@ -30,6 +30,13 @@ export default function ProductImg({ product, size = 56, radius = 12, fill = fal
     background: 'rgba(245,240,232,.05)', overflow: 'hidden', flexShrink: 0,
     ...style,
   }
+  // A photo starting with "/" is served from this site's own public folder;
+  // anything else is a filename in the Supabase IMAGE bucket. Keeping both
+  // lets photos move over one at a time instead of in one risky sweep.
+  const src = product.photo && product.photo.startsWith('/')
+    ? product.photo
+    : `${SUPABASE_IMG_BASE}/${product.photo}`
+
   if (!product.photo || failed) {
     const glyph = fill ? '3.2rem' : (typeof size === 'number' ? size * 0.5 : '7rem')
     return <div style={box}><span style={{ fontSize: glyph }}>{product.emoji}</span></div>
@@ -38,7 +45,7 @@ export default function ProductImg({ product, size = 56, radius = 12, fill = fal
     <div style={box}>
       <img
         ref={imgRef}
-        src={`${SUPABASE_IMG_BASE}/${product.photo}`}
+        src={src}
         alt={product.name}
         onError={() => setFailed(true)}
         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
