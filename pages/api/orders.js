@@ -1,4 +1,4 @@
-import { createOrder, getOrder, dbConfigured, dbShape, keyClaims } from '../../lib/db'
+import { createOrder, getOrder, dbConfigured } from '../../lib/db'
 
 // POST /api/orders        -> record an order placed through the wizard
 // GET  /api/orders?ref=.. -> look one up by reference, from any device
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     // Say *why* it is unconfigured. "configured: false" alone cannot
     // distinguish a variable that was never set from one that was set after
     // this deployment was built — and only the second needs a redeploy.
-    return res.status(503).json({ configured: false, build: BUILD, env: dbShape() })
+    return res.status(503).json({ configured: false, build: BUILD })
   }
 
   try {
@@ -46,20 +46,15 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET, POST')
     return res.status(405).json({ error: 'Méthode non autorisée.' })
   } catch (err) {
-    // The full message goes to the server log only. The response carries the
-    // upstream status and PostgREST error code — enough to tell a bad key
-    // (401/403) from a stale schema cache (404/PGRST202) from an argument
-    // mismatch (400), without echoing anything sensitive.
+    // The full message goes to the server log only. The response keeps just
+    // the upstream status and PostgREST code — enough to triage from the
+    // outside, with nothing sensitive in it.
     console.error('[api/orders]', err)
     return res.status(500).json({
       error: 'Erreur serveur.',
       build: BUILD,
       upstream: err.status || null,
       code: err.pgCode || null,
-      errName: err.name || null,
-      env: dbShape(),
-      // Only when Supabase rejected the credential outright.
-      claims: err.status === 401 ? keyClaims() : undefined,
     })
   }
 }
