@@ -1,11 +1,14 @@
-# Réponses automatiques sur les réseaux sociaux
+# Automatismes réseaux sociaux
 
-Objectif : ne plus laisser un message sans réponse sur **WhatsApp, Messenger
-et Instagram**, sans rien payer.
+Deux automatismes, un seul déploiement, plusieurs comptes :
 
-Il y a deux façons de faire, et elles se complètent — commencez par la 1,
-elle prend 20 minutes et ne demande aucun code. La 2 est le bot livré avec ce
-dépôt, qui répond avec **vos vrais prix** et **vos vraies règles**.
+1. **Réponse aux messages privés** — WhatsApp, Messenger, Instagram DM.
+2. **Campagnes « commente un mot → reçois le lien en privé »** — le levier
+   d'engagement : chaque commentaire compte pour l'algorithme, et chaque DM
+   ouvre une conversation réelle.
+
+Comptes gérés : **Djimmy Prints** (ton commercial, catalogue et prix) et
+**Amouri Djameleddine** (marque personnelle : campagnes + relais humain).
 
 ---
 
@@ -14,157 +17,242 @@ dépôt, qui répond avec **vos vrais prix** et **vos vraies règles**.
 ### Meta Business Suite (Facebook + Instagram) — gratuit, inclus
 
 Sur [business.facebook.com](https://business.facebook.com) →
-**Boîte de réception → Automatisations** :
+**Boîte de réception → Automatisations** : réponse instantanée, message
+d'absence, questions fréquentes, réponses aux commentaires, mots-clés.
 
-| Automatisation | Ce qu'elle fait |
-|---|---|
-| Réponse instantanée | Message envoyé automatiquement au tout premier message |
-| Message d'absence | Réponse hors horaires (à régler sur dim.–jeu. 8h–18h, ven. 8h–12h) |
-| Questions fréquentes | Jusqu'à 4 questions cliquables avec leur réponse |
-| Réponse aux commentaires | Répond en commentaire et/ou en privé sous vos publications |
-| Mots-clés | Réponse déclenchée par un mot précis (« prix », « catalogue »…) |
-
-C'est **le meilleur rapport effort/résultat**, et c'est la seule solution qui
-répond aussi aux **commentaires** sous les publications — ce que le bot du §2
-ne fait pas.
+C'est le meilleur rapport effort/résultat pour démarrer, et cela peut
+cohabiter avec le bot ci-dessous. Attention à une chose : si vous activez une
+règle Meta sur les mêmes mots-clés que vos campagnes, l'abonné recevra
+**deux** réponses. Choisissez : soit Meta, soit le bot, mot-clé par mot-clé.
 
 ### Application WhatsApp Business — gratuite
 
-Dans l'app (Réglages → Outils de l'entreprise) :
-
-- **Message d'accueil** : envoyé au premier contact.
-- **Message d'absence** : envoyé hors horaires.
-- **Réponses rapides** : vous tapez `/prix` et le texte complet s'insère.
-- **Catalogue** : vos produits avec photos et prix, directement dans WhatsApp.
-
-Limite : ces messages sont **fixes**. Ils ne savent pas répondre « le polo est
-à 1 200 DA » quand on demande le prix du polo.
-
-### Ce que ces outils ne savent pas faire
-
-- Donner un prix précis par produit, et appliquer la remise volume.
-- Reconnaître une référence `DP-XXXXXX` et parler du suivi.
-- Comprendre la darija écrite en lettres latines (« chhal », « kadech »).
-- Utiliser **le même jeu de réponses** sur les trois canaux.
-
-C'est exactement ce que fait le bot ci-dessous.
+Message d'accueil, message d'absence, réponses rapides (`/prix`), catalogue.
+Ces messages sont **fixes** : ils ne savent pas dire « le polo est à
+1 200 DA » ni reconnaître une référence `DP-XXXXXX`.
 
 ---
 
-## 2. Le bot du site (dans ce dépôt)
-
-Trois fichiers, aucune dépendance ajoutée, aucun serveur à louer :
+## 2. Le bot du site
 
 | Fichier | Rôle |
 |---|---|
-| `lib/autoreply.js` | Le cerveau : mots-clés → réponse. Lit les prix dans `lib/products.js` et les règles dans `lib/constants.js`, donc **une réponse ne peut pas contredire le site**. |
-| `pages/api/social/webhook.js` | L'oreille : reçoit les messages Meta (Messenger, Instagram, WhatsApp) et envoie la réponse. |
-| `pages/bot.js` | Le banc d'essai : `https://djimmyprints.xyz/bot` (page interne, non référencée). |
+| `lib/campaigns.js` | **Les comptes et les campagnes** — le fichier à modifier chaque semaine |
+| `lib/autoreply.js` | Le répondeur commercial Djimmy Prints (prix, délais, remises…) |
+| `pages/api/social/webhook.js` | Webhook Meta : messages *et* commentaires, tous comptes |
+| `pages/api/social/preview.js` | Banc d'essai en ligne de commande |
+| `pages/bot.js` | Console de test `/bot` — page interne, `noindex`, hors navigation |
 
-### Ce qu'il sait traiter
+Le webhook reconnaît le compte destinataire grâce à l'identifiant envoyé par
+Meta (`entry.id`), et utilise **le jeton, les campagnes et le ton de ce
+compte**. Un seul déploiement suffit pour les deux marques.
 
-Prix (global ou par produit) · catalogue · minimum de commande · remises
-volume · délais · livraison · paiement · techniques de marquage · format du
-logo · échantillons · contrats annuels · devis · comment commander ·
-horaires · adresse · coordonnées · suivi et référence `DP-XXXXXX` ·
-salutations et remerciements · demande de parler à un humain.
-
-Tout le reste reçoit une réponse honnête (« je n'ai pas su répondre, je
-transmets ») marquée **à reprendre par un humain** — le bot n'invente jamais
-un prix ou un délai.
-
-Chaque réponse se termine par `🤖 Réponse automatique · Djimmy Prints`, et
-indique si l'atelier est ouvert ou à quelle heure un humain répondra.
-
-### Le tester tout de suite, sans rien brancher
-
-- Page de test : **`/bot`** (tapez un message comme un client le ferait).
-- En ligne de commande :
-
-```bash
-curl "https://djimmyprints.xyz/api/social/preview?text=chhal%20le%20polo"
-```
-
-### Combien ça coûte
-
-| Poste | Coût |
-|---|---|
-| Hébergement | 0 DA — le webhook tourne dans le site Next.js déjà déployé sur Vercel |
-| Messenger / Instagram | Gratuit |
-| WhatsApp Cloud API | Les conversations **initiées par le client** (service) sont gratuites. Seuls les messages *modèles* envoyés par l'entreprise (marketing, relances) sont facturés — le bot n'en envoie aucun. |
-
-> Les paliers gratuits des plateformes changent : vérifiez la page tarifaire
-> Meta avant de compter dessus pour un gros volume.
+Coût : **0 DA**. Le webhook tourne dans le site Next.js déjà déployé sur
+Vercel ; Messenger et Instagram sont gratuits ; sur WhatsApp seules les
+conversations initiées par l'entreprise (messages *modèles*) sont facturées,
+et le bot n'en envoie aucun.
 
 ---
 
-## 3. Brancher le bot sur vos comptes
+## 3. Campagnes « commente MOT → reçois le lien en DM »
 
-### Étape 1 — Créer l'application Meta
+### Comment ça marche
+
+1. En vidéo : *« commente **GUIDE** et je t'envoie ça en privé »*.
+2. Un abonné commente `GUIDE`.
+3. Le bot répond **publiquement** sous son commentaire
+   (« Je viens de te l'envoyer en message privé 📩 »).
+4. Le bot lui envoie le **message privé** de la campagne.
+
+Vous récupérez un commentaire, une réponse publique, et une conversation
+privée ouverte — les trois signaux que les plateformes valorisent.
+
+### Les deux limites imposées par Meta
+
+> - **Un seul message privé par commentaire.** Jamais deux. Toute la
+>   campagne doit tenir dans un message.
+> - **7 jours maximum** après le commentaire. Passé ce délai, plus rien ne
+>   part — c'est Meta qui bloque, pas le bot.
+
+Conséquences pratiques : un mot-clé **différent par sujet** (sinon vous ne
+saurez pas quelle vidéo convertit), et pas de relance automatique. Une vieille
+vidéo qui reçoit un commentaire au bout de 8 jours ne déclenchera rien : c'est
+normal.
+
+### Créer une campagne
+
+Tout est dans `lib/campaigns.js`, tableau `CAMPAIGNS` :
+
+```js
+{
+  id: 'tunnel',                       // identifiant court, visible dans les logs
+  account: 'amouri',                  // 'amouri' ou 'djimmy'
+  keywords: ['TUNNEL', 'TUNEL'],      // prévoyez les fautes de frappe courantes
+  media: 'all',                       // ou ['17933258556187263'] pour une seule vidéo
+  active: true,                       // false = en pause, sans supprimer
+  publicReply: [                      // variantes tirées au hasard
+    'Envoyé en privé {prenom} 📩',
+    'Regarde tes DM 📩',
+  ],
+  dm: [                               // assemblé en UN message pour un commentaire
+    'Salut {prenom} 👋 Merci pour ton commentaire !',
+    'Voici le lien : https://…',
+  ],
+}
+```
+
+- `{prenom}` est remplacé par le prénom ou le pseudo du commentateur.
+- `keywords` est insensible aux accents et à la casse : `GUIDE`, `guide` et
+  `Guide` déclenchent la même campagne. Le mot doit être **isolé** dans le
+  commentaire (« guide » oui, « guidez-moi » non).
+- Ajoutez toujours **une ou deux variantes mal orthographiées** du mot-clé :
+  c'est ce qui fait la différence sur le volume.
+
+Puis : vérifiez sur **`/bot`** (onglet *Commentaire sous une publication*),
+lancez `npm run build`, déployez.
+
+### Cibler une seule vidéo
+
+`media: 'all'` fait vivre la campagne sur **toutes** les publications du
+compte — pratique pour un mot-clé permanent (`UNIFORME`, `DEVIS`). Pour un
+mot-clé réservé à une vidéo précise, mettez l'identifiant de la publication :
+
+```js
+media: ['17933258556187263'],
+```
+
+L'identifiant apparaît dans les logs du webhook dès le premier commentaire
+reçu sur cette publication (`[social] amouri/instagram commentaire sans
+mot-clé …`), ou via l'API Graph (`/me/media`).
+
+### Ce qu'il faut dire en vidéo
+
+> « Commente le mot **GUIDE** — juste le mot — et je t'envoie ça en message
+> privé tout de suite. Si tu ne me suis pas encore, abonne-toi, sinon
+> Instagram peut bloquer mon message. »
+
+La dernière phrase compte : un compte qui a bloqué les messages de votre page
+ne recevra rien, et vous ne pouvez rien y faire.
+
+### Un commentaire sans mot-clé
+
+Le bot **ne répond pas**. Il logue le commentaire et le laisse à un humain :
+répondre automatiquement à côté sous une publication publique fait plus de
+dégâts qu'un silence.
+
+---
+
+## 4. Brancher les comptes
+
+### Étape 1 — Une application Meta
 
 1. [developers.facebook.com](https://developers.facebook.com) → *Mes applications* → **Créer une application** → type **Entreprise**.
-2. Ajoutez les produits dont vous avez besoin : **Messenger**, **Instagram**, **WhatsApp**.
+2. Ajoutez les produits : **Messenger**, **Instagram**, et **WhatsApp** si vous l'utilisez.
+3. Les deux comptes (Page Djimmy Prints et compte Instagram professionnel de
+   la marque personnelle) peuvent vivre dans **la même application** — c'est
+   le plus simple. Chaque compte Instagram doit être **professionnel** et
+   **lié à une Page Facebook**.
 
-### Étape 2 — Récupérer les jetons
+### Étape 2 — Les jetons
 
-- **Messenger** : produit Messenger → *Paramètres* → sélectionnez la Page → **Générer un jeton** (jeton d'accès de Page).
-- **Instagram** : le compte Instagram doit être **professionnel** et **lié à la Page Facebook**. Le jeton de Page suffit alors.
-- **WhatsApp** : produit WhatsApp → *Configuration de l'API* → notez le **jeton d'accès** et l'**identifiant du numéro de téléphone** (`phone_number_id`).
+- **Page / Messenger** : produit Messenger → *Paramètres* → sélectionnez la Page → **Générer un jeton**.
+- **Instagram** : le jeton de la Page liée suffit.
+- **WhatsApp** : *Configuration de l'API* → jeton d'accès + `phone_number_id`.
 
-Permissions à demander : `pages_messaging`, `pages_manage_metadata`,
-`instagram_manage_messages`, `whatsapp_business_messaging`.
+Permissions à demander :
 
-### Étape 3 — Déclarer les variables sur Vercel
+| Permission | Pour quoi |
+|---|---|
+| `pages_messaging` | Répondre en DM sur Messenger, réponses privées aux commentaires Facebook |
+| `pages_manage_engagement` | Répondre publiquement sous un commentaire Facebook |
+| `pages_read_engagement` | Recevoir les commentaires de la Page |
+| `instagram_manage_messages` | DM Instagram et réponses privées aux commentaires |
+| `instagram_manage_comments` | Lire et répondre aux commentaires Instagram |
+| `whatsapp_business_messaging` | WhatsApp (facultatif) |
+
+### Étape 3 — Les variables sur Vercel
 
 *Project → Settings → Environment Variables*, puis **redéployez** (les
 variables ne sont lues qu'au déploiement) :
 
 | Variable | Obligatoire | Valeur |
 |---|---|---|
-| `META_VERIFY_TOKEN` | oui | Une phrase que vous inventez (ex. `djimmy-2026-verif`). À retaper à l'identique côté Meta. |
-| `META_APP_SECRET` | fortement conseillé | *Paramètres → Général → Clé secrète de l'application*. Sans elle, la signature des messages entrants n'est pas vérifiée. |
-| `META_PAGE_TOKEN` | pour Messenger / Instagram | Jeton d'accès de Page |
-| `META_IG_TOKEN` | non | Seulement si le compte Instagram utilise un jeton distinct |
+| `META_VERIFY_TOKEN` | oui | Une phrase que vous inventez (ex. `djimmy-2026-verif`), à retaper à l'identique côté Meta |
+| `META_APP_SECRET` | fortement conseillé | *Paramètres → Général → Clé secrète de l'application* |
+| `META_PAGE_TOKEN` | oui | Jeton par défaut, utilisé par les comptes sans jeton propre |
+| `SOCIAL_IDS_DJIMMY` | dès 2 comptes | Identifiants de la Page **et** du compte Instagram Djimmy Prints, séparés par une virgule |
+| `META_TOKEN_DJIMMY` | non | Jeton propre à ce compte (sinon `META_PAGE_TOKEN`) |
+| `SOCIAL_IDS_AMOURI` | dès 2 comptes | Identifiants de la Page / compte Instagram de la marque personnelle |
+| `META_TOKEN_AMOURI` | oui pour ce compte | Jeton propre à ce compte |
 | `WHATSAPP_TOKEN` | pour WhatsApp | Jeton d'accès WhatsApp |
 | `WHATSAPP_PHONE_ID` | pour WhatsApp | Identifiant du numéro de téléphone |
-| `AUTOREPLY_ENABLED` | non | `false` coupe toutes les réponses sans toucher au code |
+| `AUTOREPLY_ENABLED` | non | `false` coupe toutes les réponses |
+| `COMMENT_PUBLIC_REPLY` | non | `false` garde le DM mais arrête les réponses publiques |
 | `META_GRAPH_VERSION` | non | Par défaut `v21.0` |
 
-Tant qu'un jeton manque, le canal correspondant est simplement **inerte** :
-le webhook répond `200`, écrit dans les logs la réponse qu'il aurait envoyée,
-et n'envoie rien. Rien ne casse.
+> **Tant que `SOCIAL_IDS_*` n'est pas renseigné**, tout ce qui arrive est
+> traité comme le premier compte (Djimmy Prints). C'est voulu : avec un seul
+> compte branché, rien à configurer. Dès que le deuxième compte arrive, les
+> deux `SOCIAL_IDS_*` deviennent nécessaires, sinon la marque personnelle
+> répondrait avec le catalogue d'uniformes.
 
-### Étape 4 — Déclarer le webhook côté Meta
+Un identifiant de Page se lit dans *Paramètres de la Page → À propos* ; celui
+d'un compte Instagram professionnel s'obtient via l'API Graph
+(`/me/accounts?fields=instagram_business_account`) — ou simplement dans les
+logs Vercel au premier événement reçu.
 
-Dans chaque produit (Messenger, Instagram, WhatsApp) → **Webhooks** :
+### Étape 4 — Le webhook
+
+Dans chaque produit → **Webhooks** :
 
 - **URL de rappel** : `https://djimmyprints.xyz/api/social/webhook`
 - **Jeton de vérification** : la valeur de `META_VERIFY_TOKEN`
-- **Champs à souscrire** : `messages` (et `messaging_postbacks` pour Messenger)
+- **Champs à souscrire** :
+  - Messenger : `messages`, `messaging_postbacks`, **`feed`** (commentaires de la Page)
+  - Instagram : `messages`, **`comments`**
+  - WhatsApp : `messages`
 
-Meta appelle l'URL en `GET` pour la vérifier ; elle doit répondre
-immédiatement. Vous pouvez le tester vous-même :
+Sans le champ `comments` (Instagram) ou `feed` (Page), **les campagnes ne se
+déclenchent jamais** — c'est l'oubli le plus fréquent.
+
+Vérification manuelle :
 
 ```bash
 curl "https://djimmyprints.xyz/api/social/webhook?hub.mode=subscribe&hub.verify_token=VOTRE_TOKEN&hub.challenge=42"
 # doit afficher : 42
 ```
 
-Enfin, **abonnez la Page à l'application** (Messenger → Paramètres →
-*Webhooks* → sélectionner la Page).
+Enfin, **abonnez chaque Page à l'application** (Messenger → Paramètres → Webhooks → sélectionner la Page).
 
 ### Étape 5 — Passer en production
 
 Tant que l'application est en mode **Développement**, seuls les
-administrateurs et testeurs déclarés reçoivent les réponses. Pour tous vos
-clients : passez l'application en **Live** et faites valider les permissions
-(*App Review*). Comptez quelques jours de vérification côté Meta.
+administrateurs et testeurs déclarés reçoivent les réponses — pratique pour
+tester avec votre propre compte. Pour tous vos abonnés : application en
+**Live** + validation des permissions (*App Review*).
 
 ---
 
-## 4. Modifier les réponses
+## 5. Tester sans rien envoyer
 
-Tout est dans **`lib/autoreply.js`**, dans le tableau `RULES` :
+- Console : **`/bot`** — choisissez le compte, puis *Message privé* ou
+  *Commentaire sous une publication*.
+- Ligne de commande :
+
+```bash
+curl "https://djimmyprints.xyz/api/social/preview?text=chhal%20le%20polo"
+curl "https://djimmyprints.xyz/api/social/preview?text=GUIDE&mode=comment&account=amouri"
+curl "https://djimmyprints.xyz/api/social/preview"      # comptes, campagnes, intentions
+```
+
+**Sans jeton, le webhook est inerte** : il accuse réception, écrit dans les
+logs Vercel la réponse qu'il aurait envoyée, et n'envoie rien.
+
+---
+
+## 6. Modifier les réponses commerciales
+
+`lib/autoreply.js`, tableau `RULES` (compte Djimmy Prints uniquement) :
 
 ```js
 {
@@ -176,47 +264,46 @@ Tout est dans **`lib/autoreply.js`**, dans le tableau `RULES` :
 }
 ```
 
-- Ajouter un mot-clé : complétez `keywords` (en minuscules, sans accents —
-  le texte reçu est normalisé avant comparaison).
-- Ajouter une réponse : copiez un bloc au-dessus.
-- Changer un prix : **ne touchez pas à ce fichier**, éditez `lib/products.js`.
-  Le bot lit le catalogue.
-- Vérifiez ensuite sur `/bot`, puis `npm run build` avant de déployer.
+Pour changer un prix : **ne touchez pas à ce fichier**, éditez
+`lib/products.js`. Le bot lit le catalogue.
+
+Le compte personnel n'a volontairement **pas** de répondeur bavard : il livre
+la ressource si le mot-clé arrive en DM, sinon il dit qu'il transmet. Un bot
+qui improvise au nom d'une personne réelle abîme la marque.
 
 ---
 
-## 5. Garde-fous en place
+## 7. Garde-fous en place
 
-- **Signature vérifiée** (`X-Hub-Signature-256`) : un tiers ne peut pas faire
-  parler le bot en imitant Meta, dès lors que `META_APP_SECRET` est défini.
-- **Anti-doublon** : un même message n'est traité qu'une fois (Meta réessaie
-  en cas d'erreur).
-- **Quota** : 12 réponses maximum par interlocuteur et par heure — évite
-  qu'un bot en face déclenche une boucle infinie.
-- **Échos ignorés** : le bot ne se répond jamais à lui-même.
-- **Texte uniquement** : photos, audios et réactions sont laissés à un humain.
-- **Interrupteur** : `AUTOREPLY_ENABLED=false` coupe tout.
+- **Signature vérifiée** (`X-Hub-Signature-256`) dès que `META_APP_SECRET` est défini.
+- **Anti-doublon** : un même message ou commentaire n'est traité qu'une fois.
+- **Quota** : 12 réponses maximum par interlocuteur et par heure.
+- **Nos propres commentaires sont ignorés** : la réponse publique du bot
+  revient par le webhook, elle ne doit pas relancer la machine.
+- **Pas de réponse publique si le DM a échoué** : promettre un message privé
+  qui n'arrive jamais est pire que se taire.
+- **Texte uniquement** : photos, audios et réactions restent pour un humain.
+- **Interrupteurs** : `AUTOREPLY_ENABLED=false`, `COMMENT_PUBLIC_REPLY=false`.
 
-Ce qu'il ne fait **pas** : répondre aux commentaires publics et aux mentions
-en story (utilisez pour cela les automatisations gratuites de Meta Business
-Suite, §1), ni envoyer de message en premier.
-
-> Fenêtre des 24 h : Meta n'autorise une réponse libre que dans les 24 heures
-> suivant le dernier message du client. Au-delà, seul un message *modèle*
-> approuvé passe — donc si le bot ne répond pas à un vieux message, c'est
+> Fenêtre des 24 h : Meta n'autorise une réponse libre en DM que dans les
+> 24 heures suivant le dernier message de la personne. Au-delà, seul un
+> message *modèle* approuvé passe. Un vieux message sans réponse, c'est
 > normal, pas une panne.
 
+Ce que le bot ne fait **pas** : envoyer un message en premier, relancer,
+répondre aux stories, ni répondre aux commentaires sans mot-clé.
+
 ---
 
-## 6. Si vous préférez ne rien héberger
+## 8. Si vous préférez ne rien héberger
 
 | Outil | Palier gratuit | Remarque |
 |---|---|---|
 | **Meta Business Suite** | Illimité | Le plus simple, voir §1 |
-| **ManyChat** | Oui, limité en contacts | Interface visuelle, Instagram/Messenger ; WhatsApp souvent payant |
-| **Chatwoot** (open source) | Gratuit si auto-hébergé | Boîte de réception multi-canal, plutôt un outil d'agent |
-| **Typebot / n8n** (open source) | Gratuits si auto-hébergés | Scénarios visuels, mais il faut un serveur — donc plus de travail que le bot déjà présent ici |
+| **ManyChat** | Oui, limité en contacts | La référence du « commente X → DM » ; WhatsApp souvent payant |
+| **Chatwoot** (open source) | Gratuit si auto-hébergé | Boîte multi-canal, plutôt un outil d'agent |
+| **Typebot / n8n** (open source) | Gratuits si auto-hébergés | Scénarios visuels, mais il faut un serveur |
 
-Les paliers gratuits de ces services changent régulièrement : vérifiez avant
-de vous engager. Le bot de ce dépôt a l'avantage de n'avoir **aucun
-intermédiaire** entre vos clients et vous.
+Les paliers gratuits changent régulièrement : vérifiez avant de vous engager.
+L'avantage du bot de ce dépôt : **aucun intermédiaire** entre vos abonnés et
+vous, et aucune limite de contacts.

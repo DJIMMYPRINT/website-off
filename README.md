@@ -42,7 +42,7 @@ npm run start        # sert le build -> http://localhost:3000
 | `/devis` | **Demande de devis gratuit** : produits, quantité, technique, délai + estimation de budget indicative |
 | `/suivi` | **Suivi de commande** par référence `DP-XXXXXX`, avec la frise des 5 étapes |
 | `/contact` | Coordonnées, horaires, FAQ |
-| `/bot` | *(interne, `noindex`)* Console de test du **répondeur automatique** des réseaux sociaux |
+| `/bot` | *(interne, `noindex`)* Console de test des **automatismes réseaux sociaux** (DM et campagnes) |
 
 ---
 
@@ -203,40 +203,54 @@ cela coupera tous les accès de votre application ERP. Il faut activer RLS
 
 ---
 
-## 5 ter. Réponses automatiques sur les réseaux sociaux
+## 5 ter. Automatismes réseaux sociaux
 
-Un répondeur automatique commun à **Messenger, Instagram DM et WhatsApp**,
-qui répond avec les vrais prix du catalogue, les vraies remises et les vrais
-horaires — parce qu'il lit `lib/products.js` et `lib/constants.js`.
+Deux automatismes, un seul déploiement, plusieurs comptes
+(**Djimmy Prints** et la marque personnelle **Amouri Djameleddine**) :
+
+1. **Réponse aux messages privés** — WhatsApp, Messenger, Instagram DM. Le
+   répondeur Djimmy Prints lit `lib/products.js` et `lib/constants.js`, donc
+   il ne peut pas contredire les prix, remises et horaires affichés.
+2. **Campagnes « commente un mot → reçois le lien en privé »** — réponse
+   publique sous le commentaire + message privé, pour faire monter
+   l'engagement des publications.
 
 | Fichier | Rôle |
 |---|---|
-| `lib/autoreply.js` | Le cerveau : mots-clés (français, darija latine, arabe) → réponse |
-| `pages/api/social/webhook.js` | Webhook Meta : reçoit les messages, envoie la réponse |
-| `pages/api/social/preview.js` | Banc d'essai : `?text=...` renvoie la réponse en JSON |
+| `lib/campaigns.js` | **Comptes et campagnes** — le fichier à modifier pour lancer un mot-clé |
+| `lib/autoreply.js` | Répondeur commercial Djimmy Prints (mots-clés → réponse) |
+| `pages/api/social/webhook.js` | Webhook Meta : messages *et* commentaires, tous comptes |
+| `pages/api/social/preview.js` | Banc d'essai : `?text=...[&mode=comment][&account=amouri]` |
 | `pages/bot.js` | Console de test `/bot` — page interne, `noindex`, hors navigation |
+
+Le compte destinataire est reconnu par l'identifiant envoyé par Meta
+(`entry.id`) : chaque compte a son jeton, ses campagnes et son ton.
 
 Le tester sans rien brancher :
 
 ```bash
 npm run dev   # puis http://localhost:3000/bot
 curl "http://localhost:3000/api/social/preview?text=chhal%20le%20polo"
+curl "http://localhost:3000/api/social/preview?text=GUIDE&mode=comment&account=amouri"
 ```
 
 **Sans variables d'environnement, le webhook est inerte** : il accuse
 réception, écrit dans les logs la réponse qu'il aurait envoyée, et n'envoie
 rien — comme `/api/orders` sans clé Supabase.
 
+Deux limites imposées par Meta, à connaître avant de promettre un cadeau en
+vidéo : **un seul message privé par commentaire**, et **7 jours maximum**
+après le commentaire.
+
 Variables (Vercel) : `META_VERIFY_TOKEN`, `META_APP_SECRET`,
-`META_PAGE_TOKEN`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`,
-et `AUTOREPLY_ENABLED=false` pour tout couper.
+`META_PAGE_TOKEN`, `SOCIAL_IDS_DJIMMY`, `SOCIAL_IDS_AMOURI`,
+`META_TOKEN_AMOURI`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, plus
+`AUTOREPLY_ENABLED=false` et `COMMENT_PUBLIC_REPLY=false` comme
+interrupteurs.
 
-> Procédure complète (application Meta, jetons, webhook, mise en production),
-> outils gratuits sans code, et façon de modifier les réponses :
-> **[`docs/AUTO-REPONSES.md`](docs/AUTO-REPONSES.md)**.
-
-Pour modifier une réponse, éditez le tableau `RULES` de `lib/autoreply.js`.
-Pour changer un prix, éditez `lib/products.js` : le bot le lit.
+> Procédure complète (application Meta, permissions, champs `comments` et
+> `feed` du webhook, mise en production), outils gratuits sans code, et façon
+> de créer une campagne : **[`docs/AUTO-REPONSES.md`](docs/AUTO-REPONSES.md)**.
 
 ---
 
@@ -274,7 +288,7 @@ placeholders.
 components/   Layout (nav, menu mobile, pied de page), Aurora (fond animé)
 docs/         AUTO-REPONSES.md (répondeur réseaux sociaux : mise en service)
 lib/          constants.js (faits métier) · products.js (catalogue) · orders.js (suivi local)
-              db.js (Supabase) · autoreply.js (moteur de réponses automatiques)
+              db.js (Supabase) · autoreply.js (répondeur DM) · campaigns.js (comptes & campagnes)
 pages/        index · catalogue · commande · devis · suivi · contact · bot · _app · _document
 pages/api/    orders.js · social/webhook.js (Meta) · social/preview.js
 public/       logo, favicons, robots.txt, sitemap.xml
