@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useState } from 'react'
 import { PRODUCTS } from '../lib/products'
+import ProductImg from '../components/ProductImg'
 import { WA, TECHNIQUES, WILAYAS, EMAIL, PHONE_DISPLAY, MIN_ORDER } from '../lib/constants'
 import { useShipping, fmtFee } from '../lib/useShipping'
 
@@ -135,7 +136,7 @@ export default function Devis() {
                       borderColor: on ? 'var(--green)' : 'var(--cream-border)',
                       background: on ? 'var(--green-pale)' : 'var(--white)',
                     }}>
-                      <div style={{fontSize:'1.7rem',marginBottom:'.3rem'}}>{p.emoji}</div>
+                      <ProductImg product={p} size={54} radius={12} style={{margin:'0 auto .4rem'}} />
                       <div style={{fontWeight:700,fontSize:'.78rem',lineHeight:1.3}}>{p.name}</div>
                       <div style={{fontSize:'.7rem',color:'var(--green)',fontWeight:600,marginTop:'.2rem'}}>
                         {p.price.toLocaleString('fr-DZ')} DA

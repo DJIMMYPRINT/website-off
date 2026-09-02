@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { PRODUCTS } from '../lib/products'
+import ProductImg from '../components/ProductImg'
 import { VOLUME_DISCOUNTS } from '../lib/constants'
 
 export default function Catalogue() {
@@ -107,7 +108,7 @@ export default function Catalogue() {
                   color: activeProduct.name===p.name ? '#fff' : 'var(--black)',
                   transition:'all .2s',
                 }}>
-                  {p.emoji} {p.name}
+                  {p.name}
                 </button>
               ))}
             </div>
@@ -127,7 +128,8 @@ export default function Catalogue() {
               onMouseUp={handleCanvasMouseUp}
               onMouseLeave={handleCanvasMouseUp}
             >
-              <span style={{fontSize:'12rem',userSelect:'none',pointerEvents:'none'}}>{activeProduct.emoji}</span>
+              <ProductImg product={activeProduct} size="100%" radius={0}
+                style={{position:'absolute',inset:0,background:'transparent',pointerEvents:'none'}} />
               {logoSrc && (
                 <img src={logoSrc} alt="Logo" style={{
                   position:'absolute',
@@ -226,7 +228,7 @@ export default function Catalogue() {
                     }}>Populaire</span>
                   )}
                   <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
-                    <span style={{fontSize:'1.8rem'}}>{p.emoji}</span>
+                    <ProductImg product={p} size={54} radius={12} />
                     <div>
                       <div style={{fontFamily:'var(--display)',fontSize:'.95rem',letterSpacing:'.02em',marginBottom:'.2rem'}}>{p.name}</div>
                       <div style={{fontSize:'.75rem',color:'var(--muted)'}}>{p.desc}</div>
