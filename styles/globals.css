@@ -71,7 +71,13 @@
   --cya: var(--gold-l);
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* The tab bar is fixed over the bottom of the viewport, so anything the
+     browser scrolls into view — an anchor, a focused field, an element
+     reached by keyboard — would otherwise land underneath it. */
+  scroll-padding-bottom: 104px;
+}
 
 body {
   background: var(--bg);
@@ -502,3 +508,113 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 @media (prefers-reduced-motion: reduce) {
   .promo-ov, .promo-box { animation: none; }
 }
+
+/* ══ FICHE PRODUIT (bas d'écran) ══════════════════════════
+   Opened by tapping a product in the order grid. Slides up,
+   scrolls internally, and keeps the running total and the
+   add button pinned to the bottom so they stay reachable
+   with a thumb however long the size list gets.
+   ═══════════════════════════════════════════════════════ */
+.sheet-ov {
+  position: fixed; inset: 0; z-index: 950;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(8,12,8,.72); backdrop-filter: blur(6px);
+  animation: promoFade .28s ease both;
+}
+.sheet {
+  position: relative;
+  width: 100%; max-width: 520px;
+  max-height: 90vh; display: flex; flex-direction: column;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 26px 26px 0 0;
+  box-shadow: 0 -20px 60px rgba(0,0,0,.6);
+  animation: sheetUp .38s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+
+.sheet-grip {
+  width: 42px; height: 4px; border-radius: 100px;
+  background: rgba(245,240,232,.22);
+  margin: .7rem auto .2rem; flex-shrink: 0;
+}
+.sheet-x {
+  position: absolute; top: .7rem; right: .8rem;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(245,240,232,.07); border: 1px solid var(--line);
+  color: var(--muted); font-size: .8rem; cursor: pointer;
+}
+.sheet-body { overflow-y: auto; padding: .6rem 1.15rem 1rem; -webkit-overflow-scrolling: touch; }
+
+.sheet-head { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+.sheet-name { font-family: var(--display); font-weight: 700; font-size: 1.25rem; line-height: 1.15; }
+.sheet-price { font-family: var(--display); font-weight: 700; font-size: 1.5rem; color: var(--green-l); margin-top: .15rem; }
+.sheet-price span { font-family: 'Inter', sans-serif; font-size: .74rem; font-weight: 500; color: var(--muted); }
+.sheet-tags { display: flex; gap: .3rem; flex-wrap: wrap; margin-top: .5rem; }
+.sheet-tag {
+  font-size: .64rem; font-weight: 600; padding: .2rem .55rem; border-radius: 100px;
+  background: var(--green-pale); color: var(--green-l);
+}
+.sheet-desc { font-size: .87rem; color: var(--muted); line-height: 1.7; margin-bottom: 1rem; }
+
+.sheet-specs { list-style: none; margin: 0 0 1.4rem; padding: 0; border-top: 1px solid var(--line); }
+.sheet-specs li {
+  display: flex; justify-content: space-between; gap: 1rem;
+  padding: .6rem .1rem; border-bottom: 1px solid var(--line); font-size: .82rem;
+}
+.sheet-specs span { color: var(--muted); }
+.sheet-specs strong { color: var(--txt); font-weight: 600; text-align: right; }
+
+.sheet-lbl {
+  font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold-l); margin: 0 0 .7rem;
+}
+.sheet-colors { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
+.sheet-chip {
+  padding: .45rem .85rem; font-size: .78rem; font-weight: 600; cursor: pointer;
+  border: 1.5px solid var(--line); border-radius: 100px;
+  background: rgba(245,240,232,.04); color: var(--txt); font-family: inherit;
+  transition: all .18s;
+}
+.sheet-chip.on { background: var(--grad); border-color: transparent; color: #fff; }
+
+.sheet-sizes { display: flex; flex-direction: column; gap: .45rem; }
+.sheet-row {
+  display: grid; grid-template-columns: 3rem 42px 1fr 42px;
+  align-items: center; gap: .5rem;
+  padding: .35rem .6rem; border-radius: 12px;
+  border: 1.5px solid var(--line); background: rgba(245,240,232,.03);
+  transition: border-color .18s, background .18s;
+}
+.sheet-row.on { border-color: var(--green); background: var(--green-pale); }
+.sheet-size { font-weight: 700; font-size: .85rem; }
+.sheet-row button {
+  width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--line); background: rgba(245,240,232,.06);
+  color: var(--txt); font-size: 1.15rem; line-height: 1; font-family: inherit;
+}
+.sheet-row button:disabled { opacity: .35; cursor: default; }
+.sheet-row button:active:not(:disabled) { background: var(--green); border-color: transparent; }
+.sheet-row input {
+  width: 100%; text-align: center; padding: .55rem .2rem;
+  border: 1px solid var(--line) !important; border-radius: 10px;
+  font-size: .95rem; font-weight: 600;
+}
+/* Steppers do the job; the browser's own spinners just add clutter */
+.sheet-row input::-webkit-outer-spin-button,
+.sheet-row input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.sheet-row input[type=number] { -moz-appearance: textfield; }
+
+.sheet-foot {
+  flex-shrink: 0; padding: .9rem 1.15rem calc(.9rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line); background: var(--surface);
+}
+.sheet-sum { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .7rem; }
+.sheet-sum span { font-size: .82rem; color: var(--muted); }
+.sheet-sum strong { font-family: var(--display); font-size: 1.25rem; color: var(--green-l); }
+.sheet-add { width: 100%; }
+.sheet-add:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; filter: none; }
+
+@media (prefers-reduced-motion: reduce) { .sheet, .sheet-ov { animation: none; } }

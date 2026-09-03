@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { PRODUCTS } from '../lib/products'
 import ProductImg from '../components/ProductImg'
+import ProductSheet from '../components/ProductSheet'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS } from '../lib/constants'
 import { newOrderRef, saveOrder } from '../lib/orders'
 
@@ -20,20 +21,12 @@ export default function Commande() {
   const [done, setDone] = useState(false)
   const [orderRef, setOrderRef] = useState('')
 
-  // Add product to order
-  const [selProd, setSelProd] = useState(PRODUCTS[0])
-  const [selColor, setSelColor] = useState('Blanc')
-  const [selSizes, setSelSizes] = useState({})
+  // Which product's sheet is open. Colour and per-size quantities live
+  // inside the sheet, so the wizard no longer carries a half-filled
+  // selection around between products.
+  const [sheetProduct, setSheetProduct] = useState(null)
 
-  const addProduct = () => {
-    const totalQty = Object.values(selSizes).reduce((a,b)=>a+(+b||0),0)
-    if(totalQty === 0) { alert('Ajoutez au moins 1 pièce.'); return }
-    setOrder(o => ({
-      ...o,
-      prods: [...o.prods, { ...selProd, qty: totalQty, color: selColor, sizes: {...selSizes} }]
-    }))
-    setSelSizes({})
-  }
+  const addProduct = (item) => setOrder(o => ({ ...o, prods: [...o.prods, item] }))
 
   const removeProduct = (i) => setOrder(o=>({...o,prods:o.prods.filter((_,idx)=>idx!==i)}))
 
@@ -227,74 +220,67 @@ export default function Commande() {
             {/* ── STEP 1 : PRODUITS ── */}
             {step===1 && (
               <div>
-                <h3 style={{fontFamily:'var(--display)',fontSize:'1.2rem',marginBottom:'1.5rem'}}>1. Choisissez vos produits</h3>
+                <h3 style={{fontFamily:'var(--display)',fontSize:'1.2rem',marginBottom:'.4rem'}}>1. Choisissez vos produits</h3>
+                <p style={{fontSize:'.84rem',color:'var(--muted)',marginBottom:'1.3rem',lineHeight:1.6}}>
+                  Touchez un article pour voir son détail et choisir couleur, tailles et quantités.
+                </p>
 
-                {/* Product picker */}
-                <div className="pick-grid" style={{marginBottom:'1.5rem'}}>
-                  {PRODUCTS.map(p => (
-                    <button key={p.name} onClick={()=>setSelProd(p)} style={{
-                      padding:'.6rem .6rem .8rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',
-                      fontFamily:'inherit',textAlign:'center',transition:'all .2s',
-                      borderColor: selProd.name===p.name ? 'var(--green)' : 'var(--cream-border)',
-                      background: selProd.name===p.name ? 'var(--green-pale)' : 'var(--white)',
-                    }}>
-                      <ProductImg product={p} fill radius={12} style={{marginBottom:'.55rem'}} />
-                      <div style={{fontWeight:700,fontSize:'.8rem'}}>{p.name}</div>
-                      <div style={{fontSize:'.72rem',color:'var(--green)',fontWeight:600,marginTop:'.2rem'}}>{p.price.toLocaleString()} DA</div>
-                    </button>
-                  ))}
+                <div className="pick-grid" style={{marginBottom:'1.8rem'}}>
+                  {PRODUCTS.map(p => {
+                    const inCart = order.prods.reduce((n,x)=> x.name===p.name ? n + x.qty : n, 0)
+                    return (
+                      <button key={p.name} onClick={()=>setSheetProduct(p)} style={{
+                        position:'relative',
+                        padding:'.6rem .6rem .8rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',
+                        fontFamily:'inherit',textAlign:'center',transition:'all .2s',
+                        borderColor: inCart ? 'var(--green)' : 'var(--cream-border)',
+                        background: inCart ? 'var(--green-pale)' : 'var(--white)',
+                      }}>
+                        {inCart > 0 && (
+                          <span style={{
+                            position:'absolute',top:-9,right:-6,zIndex:2,
+                            background:'var(--grad)',color:'#fff',
+                            fontSize:'.66rem',fontWeight:700,
+                            padding:'.18rem .5rem',borderRadius:'100px',
+                            boxShadow:'0 3px 10px rgba(0,0,0,.4)',
+                          }}>{inCart} pcs</span>
+                        )}
+                        <ProductImg product={p} fill radius={12} style={{marginBottom:'.55rem'}} />
+                        <div style={{fontWeight:700,fontSize:'.8rem'}}>{p.name}</div>
+                        <div style={{fontSize:'.72rem',color:'var(--green-l)',fontWeight:600,marginTop:'.2rem'}}>{p.price.toLocaleString('fr-DZ')} DA</div>
+                      </button>
+                    )
+                  })}
                 </div>
 
-                {/* Color */}
-                <div style={{marginBottom:'1.2rem'}}>
-                  <label style={labelStyle}>Couleur</label>
-                  <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
-                    {COLORS.map(c=>(
-                      <button key={c} onClick={()=>setSelColor(c)} style={{
-                        padding:'.3rem .8rem',fontSize:'.75rem',border:'1.5px solid',borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',fontWeight:500,
-                        borderColor:selColor===c?'var(--green)':'var(--cream-border)',
-                        background:selColor===c?'var(--green)':'var(--cream)',
-                        color:selColor===c?'#fff':'var(--black)',
-                      }}>{c}</button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Sizes */}
-                <div style={{marginBottom:'1.5rem'}}>
-                  <label style={labelStyle}>Quantités par taille</label>
-                  <div className="sizes-grid">
-                    {SIZES.map(s=>(
-                      <div key={s} style={{textAlign:'center'}}>
-                        <div style={{fontSize:'.7rem',fontWeight:700,color:'var(--muted)',marginBottom:'.3rem'}}>{s}</div>
-                        <input type="number" min="0" max="9999" value={selSizes[s]||''} placeholder="0"
-                          onChange={e=>setSelSizes(sz=>({...sz,[s]:+e.target.value||0}))}
-                          style={{...inputStyle,padding:'.5rem',textAlign:'center',fontSize:'.85rem'}} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <button onClick={addProduct} className="btn-outline" style={{marginBottom:'2rem'}}>
-                  + Ajouter au panier
-                </button>
-
-                {/* Added products */}
+                {/* Panier */}
                 {order.prods.length>0 && (
-                  <div style={{marginBottom:'2rem'}}>
-                    <label style={labelStyle}>Produits ajoutés</label>
-                    {order.prods.map((p,i)=>(
-                      <div key={i} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'.8rem 1rem',background:'var(--white)',border:'1px solid var(--cream-border)',borderRadius:'4px',marginBottom:'.5rem'}}>
-                        <div>
-                          <span style={{marginLeft:'.5rem',fontWeight:600}}>{p.emoji} {p.name}</span>
-                          <span style={{fontSize:'.75rem',color:'var(--muted)',marginRight:'.5rem'}}> · {p.color} · {p.qty} pcs</span>
+                  <div style={{marginBottom:'1.8rem'}}>
+                    <label style={labelStyle}>Votre panier</label>
+                    {order.prods.map((p,i)=>{
+                      const detail = Object.entries(p.sizes).filter(([,v])=>+v>0).map(([s,v])=>`${s}×${v}`).join('  ')
+                      return (
+                        <div key={i} style={{
+                          display:'flex',alignItems:'center',gap:'.8rem',
+                          padding:'.7rem',marginBottom:'.6rem',
+                          background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'14px',
+                        }}>
+                          <ProductImg product={p} size={54} radius={10} />
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontWeight:700,fontSize:'.86rem'}}>{p.name}</div>
+                            <div style={{fontSize:'.74rem',color:'var(--muted)',marginTop:'.1rem'}}>{p.color} · {p.qty} pcs</div>
+                            {detail && <div style={{fontSize:'.7rem',color:'var(--muted-light)',marginTop:'.15rem'}}>{detail}</div>}
+                          </div>
+                          <div style={{textAlign:'right',flexShrink:0}}>
+                            <div style={{color:'var(--green-l)',fontWeight:700,fontSize:'.88rem'}}>{(p.price*p.qty).toLocaleString('fr-DZ')} DA</div>
+                            <button onClick={()=>removeProduct(i)} aria-label={`Retirer ${p.name}`}
+                              style={{border:'none',background:'none',cursor:'pointer',color:'var(--muted)',fontSize:'.95rem',padding:'.2rem .1rem 0'}}>
+                              Retirer
+                            </button>
+                          </div>
                         </div>
-                        <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
-                          <span style={{color:'var(--green)',fontWeight:700}}>{(p.price*p.qty).toLocaleString()} DA</span>
-                          <button onClick={()=>removeProduct(i)} style={{border:'none',background:'none',cursor:'pointer',color:'var(--muted)',fontSize:'1.1rem'}}>✕</button>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
 
@@ -506,6 +492,12 @@ export default function Commande() {
           </div>
         </div>
       </div>
+
+      <ProductSheet
+        product={sheetProduct}
+        onAdd={addProduct}
+        onClose={() => setSheetProduct(null)}
+      />
     </>
   )
 }
