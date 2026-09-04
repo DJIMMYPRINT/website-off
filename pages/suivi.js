@@ -142,7 +142,7 @@ export default function Suivi() {
                 <span style={{
                   background:'var(--green-pale)', color:'var(--green)', fontWeight:700,
                   fontSize:'.72rem', letterSpacing:'.08em', textTransform:'uppercase',
-                  padding:'.35rem .9rem', borderRadius:'100px', border:'1px solid rgba(139,92,246,.3)',
+                  padding:'.35rem .9rem', borderRadius:'100px', border:'1px solid rgba(111,175,82,.3)',
                 }}>
                   {ORDER_STAGES[stageIndex].label}
                 </span>

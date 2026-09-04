@@ -262,7 +262,7 @@ export default function Devis() {
               </div>
             </div>
 
-            <div style={{background:'var(--green-pale)',border:'1.5px solid rgba(139,92,246,.3)',borderRadius:'20px',padding:'1.3rem'}}>
+            <div style={{background:'var(--green-pale)',border:'1.5px solid rgba(111,175,82,.3)',borderRadius:'20px',padding:'1.3rem'}}>
               <div style={{fontWeight:700,fontSize:'.88rem',marginBottom:'.5rem'}}>⏱️ Réponse sous 24h</div>
               <p style={{fontSize:'.8rem',color:'var(--muted)',lineHeight:1.7,marginBottom:'1rem'}}>
                 Vous savez déjà exactement ce que vous voulez, tailles comprises ?

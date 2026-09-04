@@ -69,7 +69,7 @@ export default function Home() {
           {/* Badge */}
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '.6rem',
-            background: 'var(--green-pale)', border: '1px solid rgba(139,92,246,.3)',
+            background: 'var(--green-pale)', border: '1px solid rgba(111,175,82,.3)',
             padding: '.4rem 1rem', borderRadius: '100px',
             fontSize: '.72rem', fontWeight: 600, letterSpacing: '.12em',
             textTransform: 'uppercase', color: 'var(--green)', marginBottom: '2rem',

@@ -7,7 +7,6 @@ import { VOLUME_DISCOUNTS } from '../lib/constants'
 
 export default function Catalogue() {
   const [activeProduct, setActiveProduct] = useState(PRODUCTS[0])
-  const [vizMode, setVizMode] = useState('visitor') // visitor | client
   const [logoSrc, setLogoSrc] = useState(null)
   const [logoPos, setLogoPos] = useState({ x: 50, y: 40 })
   const [logoSize, setLogoSize] = useState(80)
@@ -116,18 +115,6 @@ export default function Catalogue() {
             {/* Header */}
             <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
               <div style={{fontFamily:'var(--display)',fontSize:'1rem',letterSpacing:'.04em'}}>🎨 Studio logo</div>
-              <div style={{display:'flex',background:'var(--cream)',borderRadius:'3px',overflow:'hidden',border:'1px solid var(--cream-border)'}}>
-                {['visitor','client'].map(m => (
-                  <button key={m} onClick={()=>setVizMode(m)} style={{
-                    padding:'.35rem .8rem',fontSize:'.72rem',fontWeight:600,border:'none',cursor:'pointer',fontFamily:'inherit',
-                    background: vizMode===m ? 'var(--green)' : 'transparent',
-                    color: vizMode===m ? '#fff' : 'var(--muted)',
-                    textTransform:'capitalize',transition:'all .2s',
-                  }}>
-                    {m === 'visitor' ? 'Visiteur' : 'Client'}
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Product selector */}
@@ -171,7 +158,7 @@ export default function Catalogue() {
                   objectFit:'contain',
                   transform:'translate(-50%,-50%)',
                   pointerEvents:'none',
-                  border: vizMode==='client' ? 'none' : '2px dashed rgba(139,92,246,.55)',
+                  border: '2px dashed rgba(111,175,82,.6)',
                   borderRadius: '4px',
                   padding: '4px',
                 }} />
