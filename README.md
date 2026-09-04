@@ -316,7 +316,15 @@ pèse plus qu'un mot isolé (« combien de temps » l'emporte sur « combien »)
 Si rien ne correspond, `FALLBACK` répond sans rien inventer et renvoie vers
 WhatsApp.
 
-Après modification, vérifiez le rendu sur `/auto-reponses` avant de déployer.
+Une règle peut aussi porter une liste `strong` : des mots sans ambiguïté
+(« devis », « échantillon ») qui pèsent quatre fois, pour qu'une tournure
+générique d'une autre règle (« je voudrais… ») ne passe pas devant le mot qui
+dit vraiment ce que le client demande.
+
+Après modification, lancez **`npm test`** — `scripts/autoreply.test.mjs`, sans
+aucune dépendance (lanceur intégré de Node), vérifie qu'une vingtaine de
+messages types tombent toujours sur la bonne règle — puis contrôlez le rendu
+sur `/auto-reponses`.
 
 ---
 
