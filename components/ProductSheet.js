@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import ProductImg from './ProductImg'
-import { COLORS, SIZES, MIN_ORDER } from '../lib/constants'
+import { COLORS, SIZES, MIN_ORDER, PRODUCT_PITCH } from '../lib/constants'
 
 // Product sheet that slides up from the bottom of the screen.
 //
@@ -75,6 +75,7 @@ export default function ProductSheet({ product, onAdd, onClose }) {
             </div>
           </div>
 
+          <p className="sheet-pitch">✓ {PRODUCT_PITCH}</p>
           <p className="sheet-desc">{product.desc}</p>
 
           <ul className="sheet-specs">

@@ -618,3 +618,10 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 .sheet-add:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; filter: none; }
 
 @media (prefers-reduced-motion: reduce) { .sheet, .sheet-ov { animation: none; } }
+
+/* Argument de gamme, mis en avant au-dessus des spécificités techniques */
+.sheet-pitch {
+  display: flex; gap: .5rem; align-items: baseline;
+  font-size: .85rem; font-weight: 600; color: var(--green-l);
+  line-height: 1.6; margin-bottom: .6rem;
+}

@@ -11,28 +11,60 @@ export default function Catalogue() {
   const [logoSrc, setLogoSrc] = useState(null)
   const [logoPos, setLogoPos] = useState({ x: 50, y: 40 })
   const [logoSize, setLogoSize] = useState(80)
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState(null)
+  // Drag bookkeeping lives in refs, not state. A finger fires pointermove
+  // dozens of times a second; re-rendering the whole configurator on each one
+  // is wasted work, and state updates are batched — so a move landing in the
+  // same tick as the press would read a stale `isDragging` and be dropped.
+  const draggingRef = useRef(false)
+  const dragStartRef = useRef(null)
+  const [isDragging, setIsDragging] = useState(false)   // cursor feedback only
   const [dragOver, setDragOver] = useState(false)
   const canvasRef = useRef(null)
 
-  // Logo drag inside canvas
-  const handleCanvasMouseDown = (e) => {
+  // Logo drag inside canvas.
+  //
+  // Pointer events, not mouse events: the previous handlers listened only for
+  // onMouseDown/Move/Up, which a phone never fires — so the logo could be
+  // uploaded and resized but never moved, on the very devices most visitors
+  // use. Pointer events cover mouse, finger and stylus with one code path.
+  const pointToPercent = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect()
+    return {
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    }
+  }
+
+  const handlePointerDown = (e) => {
     if (!logoSrc) return
-    const rect = canvasRef.current.getBoundingClientRect()
-    const cx = ((e.clientX - rect.left) / rect.width) * 100
-    const cy = ((e.clientY - rect.top) / rect.height) * 100
+    const { x, y } = pointToPercent(e)
+    // Capture keeps the drag alive when the finger strays outside the canvas.
+    // Guarded: setPointerCapture throws if the id is not a live pointer, and
+    // an exception here would abort the handler before the drag even starts.
+    try { e.currentTarget.setPointerCapture?.(e.pointerId) } catch { /* non bloquant */ }
+    draggingRef.current = true
+    dragStartRef.current = { x: x - logoPos.x, y: y - logoPos.y }
     setIsDragging(true)
-    setDragStart({ x: cx - logoPos.x, y: cy - logoPos.y })
   }
-  const handleCanvasMouseMove = (e) => {
-    if (!isDragging || !dragStart) return
-    const rect = canvasRef.current.getBoundingClientRect()
-    const cx = ((e.clientX - rect.left) / rect.width) * 100
-    const cy = ((e.clientY - rect.top) / rect.height) * 100
-    setLogoPos({ x: Math.min(85, Math.max(5, cx - dragStart.x)), y: Math.min(85, Math.max(5, cy - dragStart.y)) })
+
+  const handlePointerMove = (e) => {
+    if (!draggingRef.current || !dragStartRef.current) return
+    // Without this the browser treats the gesture as a page scroll.
+    e.preventDefault()
+    const { x, y } = pointToPercent(e)
+    const start = dragStartRef.current
+    setLogoPos({
+      x: Math.min(85, Math.max(5, x - start.x)),
+      y: Math.min(85, Math.max(5, y - start.y)),
+    })
   }
-  const handleCanvasMouseUp = () => { setIsDragging(false); setDragStart(null) }
+
+  const handlePointerUp = (e) => {
+    try { e.currentTarget?.releasePointerCapture?.(e.pointerId) } catch { /* non bloquant */ }
+    draggingRef.current = false
+    dragStartRef.current = null
+    setIsDragging(false)
+  }
 
   const handleFileInput = (files) => {
     const f = files[0]
@@ -120,13 +152,14 @@ export default function Catalogue() {
                 position:'relative', aspectRatio:'1',
                 background: 'linear-gradient(135deg, #141827 0%, #0E1018 100%)',
                 display:'flex', alignItems:'center', justifyContent:'center',
-                cursor: logoSrc ? 'grab' : 'default',
+                cursor: logoSrc ? (isDragging ? 'grabbing' : 'grab') : 'default',
                 userSelect:'none',
+                touchAction: 'none',
               }}
-              onMouseDown={handleCanvasMouseDown}
-              onMouseMove={handleCanvasMouseMove}
-              onMouseUp={handleCanvasMouseUp}
-              onMouseLeave={handleCanvasMouseUp}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
             >
               <ProductImg product={activeProduct} size="100%" radius={0}
                 style={{position:'absolute',inset:0,background:'transparent',pointerEvents:'none'}} />
