@@ -48,8 +48,31 @@ const outAbs = path.join(__dirname, '..', 'public', 'produits', `${slug}.jpg`)
   const sharp = require('sharp')
   fs.mkdirSync(path.dirname(outAbs), { recursive: true })
   const meta = await sharp(src).metadata()
-  await sharp(src).resize(800, 800, { fit: 'cover', position: 'centre' })
-    .jpeg({ quality: 82, mozjpeg: true }).toFile(outAbs)
+  const ratio = meta.width / meta.height
+
+  // A garment shot is usually taller than it is wide. Cropping it to a
+  // square would cut the collar and the hem — the two things that show what
+  // the product actually is. So anything far from square is fitted inside
+  // the square instead, padded with the photo's own background colour so the
+  // padding is invisible.
+  const square = Math.abs(ratio - 1) <= 0.15
+  let mode = 'cover'
+  if (square) {
+    await sharp(src).resize(800, 800, { fit: 'cover', position: 'centre' })
+      .jpeg({ quality: 82, mozjpeg: true }).toFile(outAbs)
+  } else {
+    mode = 'contain'
+    // Sample the four corners; a product photo's background lives there.
+    const { data } = await sharp(src).resize(3, 3, { fit: 'cover' })
+      .removeAlpha().raw().toBuffer({ resolveWithObject: true })
+    const corners = [0, 2, 6, 8]
+    const bg = [0, 1, 2].map(c =>
+      Math.round(corners.reduce((sum, i) => sum + data[i * 3 + c], 0) / corners.length))
+    await sharp(src)
+      .resize(800, 800, { fit: 'contain', background: { r: bg[0], g: bg[1], b: bg[2] } })
+      .flatten({ background: { r: bg[0], g: bg[1], b: bg[2] } })
+      .jpeg({ quality: 82, mozjpeg: true }).toFile(outAbs)
+  }
 
   // Rewrite only this product's photo field, leaving the rest of the line
   // (price, description, techniques) untouched.
@@ -63,5 +86,5 @@ const outAbs = path.join(__dirname, '..', 'public', 'produits', `${slug}.jpg`)
   const kb = n => Math.round(fs.statSync(n).size / 1024)
   console.log(`✅ ${name}`)
   console.log(`   source  : ${meta.width}x${meta.height}, ${kb(src)} Ko`)
-  console.log(`   publiée : ${outRel} — 800x800, ${kb(outAbs)} Ko`)
+  console.log(`   publiée : ${outRel} — 800x800 (${mode === 'cover' ? 'recadrée' : 'ajustée, fond complété'}), ${kb(outAbs)} Ko`)
 })().catch(e => { console.error(e.message); process.exit(1) })
