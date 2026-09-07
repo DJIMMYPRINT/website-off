@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "photo": "node scripts/add-photo.js"
+    "photo": "node scripts/add-photo.js",
+    "sheet": "node scripts/split-sheet.js"
   },
   "dependencies": {
     "next": "^14.2.35",

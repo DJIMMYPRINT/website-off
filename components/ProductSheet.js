@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import ProductImg from './ProductImg'
+import ColorGallery from './ColorGallery'
 import { COLORS, SIZES, MIN_ORDER, PRODUCT_PITCH } from '../lib/constants'
 
 // Product sheet that slides up from the bottom of the screen.
@@ -14,6 +15,10 @@ import { COLORS, SIZES, MIN_ORDER, PRODUCT_PITCH } from '../lib/constants'
 // pleasant for small runs, but this is a bulk business — nobody wants to tap
 // "+" sixty times.
 export default function ProductSheet({ product, onAdd, onClose }) {
+  // Products photographed shade by shade carry their own colour list; the
+  // rest fall back to the generic one, which has no photos behind it.
+  const shades = product?.colors || null
+  const [shade, setShade] = useState(0)
   const [color, setColor] = useState(COLORS[0])
   const [sizes, setSizes] = useState({})
   const [mounted, setMounted] = useState(false)
@@ -27,7 +32,11 @@ export default function ProductSheet({ product, onAdd, onClose }) {
 
   // Reset whenever a different product is opened, otherwise the previous
   // product's quantities carry over into the next one.
-  useEffect(() => { setColor(COLORS[0]); setSizes({}) }, [product?.name])
+  useEffect(() => {
+    setShade(0)
+    setColor(product?.colors ? product.colors[0].name : COLORS[0])
+    setSizes({})
+  }, [product?.name])
 
   useEffect(() => {
     if (!product) return
@@ -65,7 +74,10 @@ export default function ProductSheet({ product, onAdd, onClose }) {
 
         <div className="sheet-body">
           <div className="sheet-head">
-            <ProductImg product={product} size={112} radius={16} />
+            {/* The gallery below carries the photo when the product has one
+                per colour; a second, smaller copy of the same shot here would
+                only push the colours further down the sheet. */}
+            {!shades && <ProductImg product={product} size={112} radius={16} />}
             <div style={{minWidth:0}}>
               <h3 className="sheet-name">{product.name}</h3>
               <div className="sheet-price">{product.price.toLocaleString('fr-DZ')} <span>DA / pièce</span></div>
@@ -74,6 +86,20 @@ export default function ProductSheet({ product, onAdd, onClose }) {
               </div>
             </div>
           </div>
+
+          {/* Colours come before the copy: the shade is what a visitor opens
+              the sheet to see, and burying it under the spec table meant
+              scrolling past four rows to find out the polo exists in red. */}
+          {shades && (
+            <>
+              <div className="sheet-lbl">Coloris disponibles · {shades.length}</div>
+              <ColorGallery
+                colors={shades}
+                index={shade}
+                onIndex={i => { setShade(i); setColor(shades[i].name) }}
+              />
+            </>
+          )}
 
           <p className="sheet-pitch">✓ {PRODUCT_PITCH}</p>
           <p className="sheet-desc">{product.desc}</p>
@@ -85,13 +111,17 @@ export default function ProductSheet({ product, onAdd, onClose }) {
             <li><span>Livraison</span><strong>58 wilayas</strong></li>
           </ul>
 
-          <div className="sheet-lbl">Couleur</div>
-          <div className="sheet-colors">
-            {COLORS.map(c => (
-              <button key={c} onClick={() => setColor(c)}
-                      className={`sheet-chip${color === c ? ' on' : ''}`}>{c}</button>
-            ))}
-          </div>
+          {!shades && (
+            <>
+              <div className="sheet-lbl">Couleur</div>
+              <div className="sheet-colors">
+                {COLORS.map(c => (
+                  <button key={c} onClick={() => setColor(c)}
+                          className={`sheet-chip${color === c ? ' on' : ''}`}>{c}</button>
+                ))}
+              </div>
+            </>
+          )}
 
           <div className="sheet-lbl">Quantité par taille</div>
           <div className="sheet-sizes">

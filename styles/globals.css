@@ -580,6 +580,56 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 }
 .sheet-chip.on { background: var(--grad); border-color: transparent; color: #fff; }
 
+/* --- Colour gallery (components/ColorGallery.js) ------------------------ */
+/* Native scroll-snap, so the swipe keeps the platform's own momentum and
+   the track stays usable with a keyboard and a trackpad. */
+.cg { margin-bottom: 1.4rem; }
+.cg-track {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+  border-radius: 16px; background: #fff;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  /* The slides are square. Bounding the track by the height budget rather
+     than cropping the photo keeps every garment whole — some of these shots
+     are portraits squared off with a blurred surround, and cropping them
+     top-and-bottom cut the collar off the vest. */
+  width: min(100%, 38vh); margin: 0 auto;
+}
+.cg-track::-webkit-scrollbar { display: none; }
+.cg-slide { flex: 0 0 100%; scroll-snap-align: center; }
+.cg-slide img {
+  display: block; width: 100%; aspect-ratio: 1; object-fit: cover;
+  -webkit-user-select: none; user-select: none;
+}
+
+.cg-dots { display: flex; justify-content: center; gap: .3rem; margin: .6rem 0 .5rem; }
+.cg-dots i {
+  width: 5px; height: 5px; border-radius: 100px;
+  background: rgba(245,240,232,.22); transition: all .2s;
+}
+.cg-dots i.on { width: 16px; background: var(--green-l); }
+
+.cg-name { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: .6rem; }
+.cg-name span { font-size: .78rem; color: var(--muted); }
+.cg-name strong { font-size: .9rem; font-weight: 700; color: var(--txt); }
+
+.cg-row {
+  display: flex; gap: .5rem; overflow-x: auto; padding: .25rem .15rem .4rem;
+  scrollbar-width: none;
+}
+.cg-row::-webkit-scrollbar { display: none; }
+.cg-sw {
+  flex: 0 0 auto; width: 30px; height: 30px; padding: 0; cursor: pointer;
+  border-radius: 100px; background: var(--sw);
+  border: 2px solid rgba(245,240,232,.18);
+  box-shadow: 0 1px 4px rgba(0,0,0,.35);
+  transition: transform .18s, border-color .18s, box-shadow .18s;
+}
+.cg-sw.on {
+  border-color: var(--green-l); transform: scale(1.12);
+  box-shadow: 0 0 0 3px rgba(111,175,82,.22);
+}
+
 .sheet-sizes { display: flex; flex-direction: column; gap: .45rem; }
 .sheet-row {
   display: grid; grid-template-columns: 3rem 42px 1fr 42px;
