@@ -632,14 +632,17 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 
 .sheet-sizes { display: flex; flex-direction: column; gap: .45rem; }
 .sheet-row {
-  display: grid; grid-template-columns: 3rem 42px 1fr 42px;
+  display: grid; grid-template-columns: 4.4rem 42px 1fr 42px;
   align-items: center; gap: .5rem;
   padding: .35rem .6rem; border-radius: 12px;
   border: 1.5px solid var(--line); background: rgba(245,240,232,.03);
   transition: border-color .18s, background .18s;
 }
 .sheet-row.on { border-color: var(--green); background: var(--green-pale); }
-.sheet-size { font-weight: 700; font-size: .85rem; }
+.sheet-size { font-weight: 700; font-size: .85rem; display: flex; flex-direction: column; }
+/* Per-size price, shown only for products with a price grid. */
+.sheet-size em { font-style: normal; font-weight: 500; font-size: .68rem; color: var(--muted); }
+.sheet-from { font-family: 'Inter', sans-serif; font-size: .8rem; font-weight: 600; color: var(--muted); }
 .sheet-row button {
   width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
   border: 1px solid var(--line); background: rgba(245,240,232,.06);

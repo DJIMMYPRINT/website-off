@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import ProductImg from './ProductImg'
 import ColorGallery from './ColorGallery'
 import { COLORS, SIZES, MIN_ORDER, PRODUCT_PITCH } from '../lib/constants'
+import { unitPrice, hasPriceGrid, priceRange } from '../lib/products'
 
 // Product sheet that slides up from the bottom of the screen.
 //
@@ -47,10 +48,22 @@ export default function ProductSheet({ product, onAdd, onClose }) {
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prev }
   }, [product, onClose])
 
+  const runs = product ? (product.sizes || SIZES) : SIZES
+  const graded = product ? hasPriceGrid(product) : false
+
   const total = useMemo(
     () => Object.values(sizes).reduce((a, b) => a + (+b || 0), 0),
     [sizes]
   )
+
+  // Priced size by size, not quantity times one number: the tote bag costs
+  // 200 DA in écru small and 350 in black large, so a flat multiplication
+  // would quote the customer a figure the business cannot honour.
+  const amount = useMemo(() => {
+    if (!product) return 0
+    return Object.entries(sizes).reduce(
+      (a, [sz, q]) => a + (+q || 0) * unitPrice(product, color, sz), 0)
+  }, [sizes, product, color])
 
   if (!product) return null
 
@@ -59,7 +72,7 @@ export default function ProductSheet({ product, onAdd, onClose }) {
 
   const add = () => {
     if (total === 0) return
-    onAdd({ ...product, qty: total, color, sizes: { ...sizes } })
+    onAdd({ ...product, qty: total, color, sizes: { ...sizes }, amount })
     onClose()
   }
 
@@ -80,7 +93,10 @@ export default function ProductSheet({ product, onAdd, onClose }) {
             {!shades && <ProductImg product={product} size={112} radius={16} />}
             <div style={{minWidth:0}}>
               <h3 className="sheet-name">{product.name}</h3>
-              <div className="sheet-price">{product.price.toLocaleString('fr-DZ')} <span>DA / pièce</span></div>
+              <div className="sheet-price">
+                {graded && <span className="sheet-from">dès </span>}
+                {priceRange(product)[0].toLocaleString('fr-DZ')} <span>DA / pièce</span>
+              </div>
               <div className="sheet-tags">
                 {product.techniques.map(t => <span key={t} className="sheet-tag">{t}</span>)}
               </div>
@@ -101,12 +117,14 @@ export default function ProductSheet({ product, onAdd, onClose }) {
             </>
           )}
 
-          <p className="sheet-pitch">✓ {PRODUCT_PITCH}</p>
+          {/* PRODUCT_PITCH is written for workwear; an item that is not a
+              garment can say why it sells in its own words. */}
+          <p className="sheet-pitch">✓ {product.pitch || PRODUCT_PITCH}</p>
           <p className="sheet-desc">{product.desc}</p>
 
           <ul className="sheet-specs">
             <li><span>Marquage</span><strong>{product.techniques.join(' · ')}</strong></li>
-            <li><span>Tailles</span><strong>{SIZES[0]} → {SIZES[SIZES.length - 1]}</strong></li>
+            <li><span>Tailles</span><strong>{product.sizes ? product.sizes.join(' · ') : `${SIZES[0]} → ${SIZES[SIZES.length - 1]}`}</strong></li>
             <li><span>Minimum</span><strong>{MIN_ORDER} pièces</strong></li>
             <li><span>Livraison</span><strong>58 wilayas</strong></li>
           </ul>
@@ -125,11 +143,17 @@ export default function ProductSheet({ product, onAdd, onClose }) {
 
           <div className="sheet-lbl">Quantité par taille</div>
           <div className="sheet-sizes">
-            {SIZES.map(s => {
+            {runs.map(s => {
               const q = +sizes[s] || 0
               return (
                 <div key={s} className={`sheet-row${q > 0 ? ' on' : ''}`}>
-                  <span className="sheet-size">{s}</span>
+                  <span className="sheet-size">
+                    {s}
+                    {/* The per-size price is shown only where it varies —
+                        repeating one identical figure down seven rows is
+                        noise on the garments. */}
+                    {graded && <em>{unitPrice(product, color, s).toLocaleString('fr-DZ')} DA</em>}
+                  </span>
                   <button onClick={() => bump(s, -1)} disabled={q === 0} aria-label={`Retirer un ${s}`}>−</button>
                   <input type="number" inputMode="numeric" min="0" max="9999"
                          value={q === 0 ? '' : q} placeholder="0"
@@ -144,7 +168,7 @@ export default function ProductSheet({ product, onAdd, onClose }) {
         <div className="sheet-foot">
           <div className="sheet-sum">
             <span>{total} pièce{total > 1 ? 's' : ''}</span>
-            <strong>{(product.price * total).toLocaleString('fr-DZ')} DA</strong>
+            <strong>{amount.toLocaleString('fr-DZ')} DA</strong>
           </div>
           <button className="btn-g sheet-add" onClick={add} disabled={total === 0}>
             {total === 0 ? 'Choisissez une quantité' : 'Ajouter au panier'}

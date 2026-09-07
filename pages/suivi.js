@@ -181,7 +181,7 @@ export default function Suivi() {
                   {(result.items || []).map((it, i) => (
                     <div key={i} style={{display:'flex',justifyContent:'space-between',gap:'1rem',marginBottom:'.7rem',fontSize:'.85rem'}}>
                       <span>{it.emoji} {it.name} × {it.qty}</span>
-                      <span style={{fontWeight:600,whiteSpace:'nowrap'}}>{(it.price * it.qty).toLocaleString('fr-DZ')} DA</span>
+                      <span style={{fontWeight:600,whiteSpace:'nowrap'}}>{(typeof it.amount==='number' ? it.amount : it.price * it.qty).toLocaleString('fr-DZ')} DA</span>
                     </div>
                   ))}
                   <div style={{borderTop:'1.5px solid var(--black)',marginTop:'1rem',paddingTop:'.9rem',display:'flex',justifyContent:'space-between',fontFamily:'var(--display)',fontSize:'1.05rem'}}>

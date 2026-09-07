@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
-import { PRODUCTS } from '../lib/products'
+import { PRODUCTS , hasPriceGrid, priceRange } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import { VOLUME_DISCOUNTS } from '../lib/constants'
 
@@ -260,7 +260,7 @@ export default function Catalogue() {
                     </div>
                   </div>
                   <div style={{textAlign:'right',flexShrink:0}}>
-                    <div style={{fontFamily:'var(--display)',fontSize:'1.4rem',color:'var(--green)',lineHeight:1}}>{p.price.toLocaleString('fr-DZ')}</div>
+                    <div style={{fontFamily:'var(--display)',fontSize:'1.4rem',color:'var(--green)',lineHeight:1}}>{hasPriceGrid(p) ? `dès ${priceRange(p)[0].toLocaleString('fr-DZ')}` : p.price.toLocaleString('fr-DZ')}</div>
                     <div style={{fontSize:'.7rem',color:'var(--muted)'}}>DA / pièce</div>
                   </div>
                 </div>

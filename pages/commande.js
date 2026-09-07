@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
-import { PRODUCTS } from '../lib/products'
+import { PRODUCTS, hasPriceGrid, priceRange } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import ProductSheet from '../components/ProductSheet'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS } from '../lib/constants'
@@ -10,7 +10,10 @@ import { newOrderRef, saveOrder } from '../lib/orders'
 export default function Commande() {
   const [step, setStep] = useState(1)
   const [order, setOrder] = useState({
-    prods: [],          // [{name, emoji, price, qty, color, sizes:{S:2,M:3,...}}]
+    // [{name, emoji, price, qty, color, sizes:{S:2,...}, amount}]
+    // `amount` is the line total the sheet computed. Products priced per
+    // size (the tote bag) cannot be re-derived from price × qty here.
+    prods: [],
     technique: '',
     logo: null,
     logoName: '',
@@ -42,7 +45,8 @@ export default function Commande() {
   const removeProduct = (i) => setOrder(o=>({...o,prods:o.prods.filter((_,idx)=>idx!==i)}))
 
   const calcTotal = () => {
-    const sub = order.prods.reduce((a,p)=>a+p.price*p.qty,0)
+    const lineTotal = p => typeof p.amount === 'number' ? p.amount : p.price * p.qty
+    const sub = order.prods.reduce((a,p)=>a+lineTotal(p),0)
     const totalQty = order.prods.reduce((a,p)=>a+p.qty,0)
     let disRate = 0
     if(totalQty>=200) disRate=.15
@@ -74,7 +78,8 @@ export default function Commande() {
 
     const prodLines = order.prods.map(p => {
       const szLine = Object.entries(p.sizes).filter(([,v])=>+v>0).map(([s,v])=>`${s}:${v}`).join(' | ')
-      return `${p.emoji} *${p.name}* (${p.color}) — ${p.qty} pcs × ${p.price.toLocaleString('fr-DZ')} DA${szLine?' → '+szLine:''}`
+      const line = typeof p.amount === 'number' ? p.amount : p.price * p.qty
+      return `${p.emoji} *${p.name}* (${p.color}) — ${p.qty} pcs = ${line.toLocaleString('fr-DZ')} DA${szLine?' → '+szLine:''}`
     }).join('\n')
 
     const msg = [
@@ -118,7 +123,7 @@ export default function Commande() {
           nom: form.nom, tel: form.tel, entreprise: form.entreprise,
           email: form.email, wilaya: form.wilaya, adresse: form.adresse,
         },
-        items: order.prods.map(p => ({ emoji:p.emoji, name:p.name, price:p.price, qty:p.qty, color:p.color })),
+        items: order.prods.map(p => ({ emoji:p.emoji, name:p.name, price:p.price, qty:p.qty, color:p.color, amount:p.amount })),
         total: final,
         technique: order.technique,
         notes: order.notes,
@@ -130,7 +135,7 @@ export default function Commande() {
       createdAt: Date.now(),
       date: new Date().toLocaleDateString('fr-DZ', { year:'numeric', month:'long', day:'numeric' }),
       stage: 'recue',
-      items: order.prods.map(p => ({ emoji:p.emoji, name:p.name, price:p.price, qty:p.qty, color:p.color })),
+      items: order.prods.map(p => ({ emoji:p.emoji, name:p.name, price:p.price, qty:p.qty, color:p.color, amount:p.amount })),
       total: final,
       technique: order.technique,
       wilaya: form.wilaya,
@@ -258,7 +263,9 @@ export default function Commande() {
                         )}
                         <ProductImg product={p} fill radius={12} style={{marginBottom:'.55rem'}} />
                         <div style={{fontWeight:700,fontSize:'.8rem'}}>{p.name}</div>
-                        <div style={{fontSize:'.72rem',color:'var(--green-l)',fontWeight:600,marginTop:'.2rem'}}>{p.price.toLocaleString('fr-DZ')} DA</div>
+                        <div style={{fontSize:'.72rem',color:'var(--green-l)',fontWeight:600,marginTop:'.2rem'}}>
+                          {hasPriceGrid(p) ? `dès ${priceRange(p)[0].toLocaleString('fr-DZ')}` : p.price.toLocaleString('fr-DZ')} DA
+                        </div>
                       </button>
                     )
                   })}
@@ -283,7 +290,7 @@ export default function Commande() {
                             {detail && <div style={{fontSize:'.7rem',color:'var(--muted-light)',marginTop:'.15rem'}}>{detail}</div>}
                           </div>
                           <div style={{textAlign:'right',flexShrink:0}}>
-                            <div style={{color:'var(--green-l)',fontWeight:700,fontSize:'.88rem'}}>{(p.price*p.qty).toLocaleString('fr-DZ')} DA</div>
+                            <div style={{color:'var(--green-l)',fontWeight:700,fontSize:'.88rem'}}>{(typeof p.amount==='number'?p.amount:p.price*p.qty).toLocaleString('fr-DZ')} DA</div>
                             <button onClick={()=>removeProduct(i)} aria-label={`Retirer ${p.name}`}
                               style={{border:'none',background:'none',cursor:'pointer',color:'var(--muted)',fontSize:'.95rem',padding:'.2rem .1rem 0'}}>
                               Retirer
@@ -460,7 +467,7 @@ export default function Commande() {
                     {order.prods.map((p,i)=>(
                       <div key={i} style={{display:'flex',justifyContent:'space-between',marginBottom:'.7rem',fontSize:'.85rem'}}>
                         <span>{p.emoji} {p.name} × {p.qty}</span>
-                        <span style={{fontWeight:600}}>{(p.price*p.qty).toLocaleString()} DA</span>
+                        <span style={{fontWeight:600}}>{(typeof p.amount==='number'?p.amount:p.price*p.qty).toLocaleString()} DA</span>
                       </div>
                     ))}
                     <div style={{borderTop:'1px solid var(--cream-border)',marginTop:'1rem',paddingTop:'1rem'}}>

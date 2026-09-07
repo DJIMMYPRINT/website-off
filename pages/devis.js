@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState } from 'react'
-import { PRODUCTS } from '../lib/products'
+import { PRODUCTS , hasPriceGrid, priceRange } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import { WA, TECHNIQUES, WILAYAS, EMAIL, PHONE_DISPLAY, MIN_ORDER } from '../lib/constants'
 
@@ -37,9 +37,11 @@ export default function Devis() {
   const estimate = () => {
     const n = parseInt(qty, 10)
     if (!n || picked.length === 0) return null
-    const prices = PRODUCTS.filter(p => picked.includes(p.name)).map(p => p.price)
-    const lo = Math.min(...prices) * n
-    const hi = Math.max(...prices) * n
+    // Both ends of the estimate come from the real range, so a product with
+    // a price grid cannot make the high end look cheaper than it is.
+    const ranges = PRODUCTS.filter(p => picked.includes(p.name)).map(priceRange)
+    const lo = Math.min(...ranges.map(r => r[0])) * n
+    const hi = Math.max(...ranges.map(r => r[1])) * n
     return { lo, hi, n }
   }
 
@@ -129,7 +131,7 @@ export default function Devis() {
                       <ProductImg product={p} fill radius={12} style={{marginBottom:'.5rem'}} />
                       <div style={{fontWeight:700,fontSize:'.78rem',lineHeight:1.3}}>{p.name}</div>
                       <div style={{fontSize:'.7rem',color:'var(--green)',fontWeight:600,marginTop:'.2rem'}}>
-                        {p.price.toLocaleString('fr-DZ')} DA
+                        {hasPriceGrid(p) ? `dès ${priceRange(p)[0].toLocaleString('fr-DZ')}` : p.price.toLocaleString('fr-DZ')} DA
                       </div>
                     </button>
                   )
