@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { PRODUCTS } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import ProductSheet from '../components/ProductSheet'
@@ -25,6 +25,17 @@ export default function Commande() {
   // inside the sheet, so the wizard no longer carries a half-filled
   // selection around between products.
   const [sheetProduct, setSheetProduct] = useState(null)
+
+  // Each step is a full page of its own, so changing step while scrolled
+  // halfway down dropped the visitor into the middle of the next one — the
+  // heading, and often the first fields, were already above the fold. Done
+  // here rather than at the six call sites so the step indicator and the
+  // "Retour" buttons behave the same as "Continuer".
+  const first = useRef(true)
+  useEffect(() => {
+    if (first.current) { first.current = false; return }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [step, done])
 
   const addProduct = (item) => setOrder(o => ({ ...o, prods: [...o.prods, item] }))
 
