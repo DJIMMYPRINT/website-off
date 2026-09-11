@@ -42,6 +42,7 @@ npm run start        # sert le build -> http://localhost:3000
 | `/devis` | **Demande de devis gratuit** : produits, quantité, technique, délai + estimation de budget indicative |
 | `/suivi` | **Suivi de commande** par référence `DP-XXXXXX`, avec la frise des 5 étapes |
 | `/contact` | Coordonnées, horaires, FAQ |
+| `/atelier` | **Poste de travail interne** : dictée vocale, agent qui structure les notes en checklist priorisée, calendrier (voir §6 bis). Pas d'authentification, `noindex`. |
 
 ---
 
@@ -215,6 +216,96 @@ placeholders.
 
 ---
 
+## 6 bis. L'atelier — assistant commercial vocal (`/atelier`)
+
+Un poste de travail interne, séparé du site public : vous dictez vos notes
+entre deux rendez-vous, elles reviennent en checklist classée par urgence et
+posée sur le bon jour.
+
+### La chaîne, de la voix à la checklist
+
+```
+🎙  micro (MediaRecorder)
+ →  /api/voice/transcribe   audio → texte      (Whisper)
+ →  /api/voice/structure    texte → actions    (Claude, sortie JSON stricte)
+ →  lib/atelier/priority.js actions → rang     (code, pas le modèle)
+ →  localStorage + Supabase → checklist du jour
+```
+
+**Le modèle extrait des faits ; il ne décide pas de ce qui est urgent.** Le
+classement est calculé dans `lib/atelier/priority.js` : étape de production +
+pression de l'échéance + montant de la commande, avec des seuils lisibles en
+bas du fichier. C'est délibéré — un modèle à qui l'on demande deux fois de
+classer la même liste ne se donne pas raison à lui-même, et un rang qu'on ne
+peut pas expliquer est un rang auquel on ne se fie pas. Le volet de droite
+affiche d'ailleurs *pourquoi* chaque ligne est classée là.
+
+Une action que l'agent n'a pas su rattacher avec certitude (confiance < 0,6)
+part dans **« À vérifier »** au lieu d'entrer seule dans la liste du jour.
+
+### Ce qu'il faut configurer
+
+| Variable | Sans elle |
+|---|---|
+| `ANTHROPIC_API_KEY` | l'agent répond 503 ; la dictée est conservée et affichée |
+| `TRANSCRIBE_API_KEY` | le micro ne mène à rien ; la saisie clavier reste disponible |
+| `SUPABASE_SERVICE_ROLE_KEY` | les tâches vivent sur l'appareil, sans synchro entre téléphone et ordinateur |
+
+Aucune n'est requise pour que la page s'ouvre et fonctionne : **une clé
+absente dégrade une fonction, elle ne casse jamais la checklist.** La pastille
+en haut à droite indique laquelle des deux situations vous êtes.
+
+La base : exécutez `scripts/atelier-schema.sql` une fois dans Supabase →
+SQL Editor. Il crée `site.voice_notes` et `site.tasks` dans le schéma `site`
+(jamais `public`, qui appartient à Prisma côté ERP) avec RLS activée sans
+politique, et cinq fonctions `SECURITY DEFINER` réservées à `service_role`.
+
+### Transcription : pourquoi pas la reconnaissance du navigateur
+
+`webkitSpeechRecognition` est gratuit et sans serveur, mais il se force sur
+une seule locale et décroche dès qu'on alterne français et arabe algérien —
+c'est-à-dire à peu près tout le temps ici. Whisper gère l'alternance, et on
+peut lui souffler le vocabulaire du métier (voir `VOCAB` dans
+`pages/api/voice/transcribe.js`), sans quoi « sérigraphie » ressort en
+« série graphie ».
+
+N'importe quel point d'entrée compatible convient : `TRANSCRIBE_URL` pointe
+sur OpenAI par défaut, Groq (`whisper-large-v3`) revient moins cher et répond
+plus vite.
+
+### Trois choses à savoir
+
+- **Le micro exige https.** Il fonctionne sur `djimmyprints.xyz` et en
+  `localhost`, mais pas sur une adresse IP locale en clair. Si l'accès
+  échoue, le bandeau d'erreur dit laquelle des trois causes s'applique
+  (permission refusée, pas de micro, connexion non sécurisée).
+- **Le format d'enregistrement diffère selon le téléphone.** Chrome Android
+  produit du webm, Safari iOS du mp4. Le type réellement utilisé est sondé,
+  puis transmis à la transcription — ne le codez pas en dur.
+- **⚠ Il n'y a pas d'authentification, par choix.** La page affiche des noms
+  de clients, des montants et des échéances à qui connaît l'adresse. Elle
+  porte `noindex` et un `Disallow` dans `robots.txt`, ce qui l'empêche d'être
+  indexée mais n'empêche personne de l'ouvrir. Un code PIN partagé
+  représenterait une vingtaine de lignes le jour où vous le voudrez.
+
+### Raccourcis clavier
+
+`/` rechercher · `m` démarrer ou arrêter la dictée · `j` / `k` descendre et
+monter dans la liste · `x` cocher la ligne sélectionnée · `Échap` fermer.
+
+### Où modifier quoi
+
+| Vous voulez changer… | Fichier |
+|---|---|
+| Les règles de priorité (seuils, poids des étapes) | `lib/atelier/priority.js` |
+| Ce que l'agent doit extraire, et ses consignes | `lib/atelier/model.js` |
+| Le vocabulaire soufflé à la transcription | `pages/api/voice/transcribe.js` (`VOCAB`) |
+| Le modèle Claude, l'effort de raisonnement | `pages/api/voice/structure.js` |
+| Les couleurs de priorité, la mise en page à trois volets | `styles/atelier.css` |
+| La semaine ouvrée (dimanche → jeudi), les jours fériés | `lib/atelier/dates.js` |
+
+---
+
 ## 7. Points à traiter plus tard
 
 - **Photos produits.** Le catalogue utilise des emoji comme visuels
@@ -233,9 +324,14 @@ placeholders.
 ## 8. Structure
 
 ```
-components/   Layout (nav, menu mobile, pied de page), Aurora (fond animé)
-lib/          constants.js (faits métier) · products.js (catalogue) · orders.js (suivi local)
-pages/        index · catalogue · commande · devis · suivi · contact · _app · _document
-public/       logo, favicons, robots.txt, sitemap.xml
-styles/       globals.css (design tokens, typographie, boutons, grilles responsives)
+components/         Layout (nav, onglets, pied de page), Backdrop (fond animé), fiches produit
+components/atelier/ MicOrb · TaskRow · WeekStrip · MiniCalendar · DetailPane · icons
+lib/                constants.js (faits métier) · products.js (catalogue) · orders.js (suivi local) · db.js (Supabase)
+lib/atelier/        priority.js (le classement) · model.js (schéma + consignes de l'agent) · dates.js (semaine algérienne)
+                    useRecorder.js (micro) · store.js (localStorage + miroir serveur) · demo.js (jeu d'exemple)
+pages/              index · catalogue · commande · devis · suivi · contact · atelier · _app · _document
+pages/api/          orders · tasks · voice/transcribe · voice/structure
+scripts/            add-photo.js · split-sheet.js · atelier-schema.sql
+public/             logo, favicons, robots.txt, sitemap.xml
+styles/             globals.css (jetons, typographie, boutons, grilles) · atelier.css (poste de travail)
 ```

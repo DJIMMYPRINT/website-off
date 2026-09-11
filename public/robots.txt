@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
+# Espace de travail interne : noms de clients, montants, échéances.
+# Il n'est pas derrière une authentification — au minimum, il ne doit pas
+# être indexé. Les pages portent aussi une balise meta robots noindex, qui
+# est la protection réelle : ce fichier demande seulement aux robots de ne
+# pas explorer, il n'empêche personne d'ouvrir l'adresse.
+Disallow: /atelier
+
 Sitemap: https://djimmyprints.xyz/sitemap.xml

@@ -1,0 +1,665 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ATELIER — poste de travail vocal
+   ═══════════════════════════════════════════════════════════════════════
+
+   Le site public est un shell de téléphone : une colonne de 520 px, barre
+   d'onglets en bas. L'atelier est l'inverse — un poste de travail à trois
+   volets, consulté sur l'écran de l'atelier autant que sur le téléphone. Il
+   a donc sa propre coquille, mais **pas** sa propre identité : tous les
+   jetons de couleur, la police d'affichage, les cartes en verre et le fond
+   animé viennent de globals.css. Ce qui est repris de Gmail, c'est la
+   structure et la densité — rail de filtres, liste compacte, volet de
+   détail, actions révélées au survol — jamais le blanc.
+
+   Les couleurs de priorité ci-dessous ont été vérifiées avec le validateur
+   de palette sur le fond #1B241C : séparation daltonisme et plancher vision
+   normale tous deux au-dessus du seuil. Elles ne portent jamais
+   l'information seules — chaque priorité affiche aussi son libellé.
+   ═════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --p1: #F2795C;   /* Urgent      */
+  --p2: #E8C24F;   /* À traiter   */
+  --p3: #57B07A;   /* Planifié    */
+  --p4: #8C978A;   /* Pour info — volontairement neutre : absence de statut */
+
+  --p1-bg: rgba(242,121,92,.14);
+  --p2-bg: rgba(232,194,79,.13);
+  --p3-bg: rgba(87,176,122,.13);
+  --p4-bg: rgba(140,151,138,.12);
+
+  --rail-w: 224px;
+  --side-w: 372px;
+  --top-h: 60px;
+}
+
+/* ══ COQUILLE ══════════════════════════════════════════════════════════ */
+
+.atl {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  color: var(--txt);
+}
+
+.atl-top {
+  position: sticky; top: 0; z-index: 60;
+  height: var(--top-h);
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0 1rem;
+  background: rgba(21,28,22,.82);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+}
+
+.atl-brand {
+  display: flex; align-items: center; gap: .55rem;
+  text-decoration: none; color: var(--txt); flex-shrink: 0;
+}
+.atl-brand img {
+  width: 32px; height: 32px; border-radius: 50%;
+  object-fit: cover; border: 1px solid var(--line);
+}
+.atl-brand b {
+  font-family: var(--display); font-weight: 700;
+  font-size: .92rem; letter-spacing: -.01em;
+}
+.atl-brand i {
+  font-style: normal; font-size: .58rem; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: #10190C; background: var(--gold);
+  padding: .16rem .45rem; border-radius: 5px; margin-left: .1rem;
+}
+
+/* Barre de recherche — la seule zone franchement large du bandeau, comme
+   chez Gmail où elle occupe le centre plutôt qu'un coin. */
+.atl-search {
+  flex: 1; max-width: 520px;
+  position: relative; display: flex; align-items: center;
+}
+.atl-search svg { position: absolute; left: .85rem; color: var(--muted-light); pointer-events: none; }
+.atl-search input {
+  width: 100%; padding: .62rem .9rem .62rem 2.4rem;
+  border: 1px solid var(--line); border-radius: 12px;
+  background: rgba(245,240,232,.05) !important;
+  font-size: .85rem;
+  transition: border-color .18s, background .18s;
+}
+.atl-search input:focus {
+  background: var(--well) !important;
+  border-color: var(--green) !important;
+  box-shadow: 0 0 0 3px rgba(111,175,82,.14);
+}
+.atl-kbd {
+  position: absolute; right: .6rem;
+  font-size: .62rem; font-weight: 600; color: var(--muted-light);
+  border: 1px solid var(--line); border-radius: 5px;
+  padding: .1rem .35rem; pointer-events: none;
+}
+
+.atl-top-right { display: flex; align-items: center; gap: .5rem; margin-left: auto; flex-shrink: 0; }
+
+/* Pastille d'état de synchronisation. Discrète par principe : une base non
+   configurée dégrade la synchro, elle ne casse pas la checklist. */
+.atl-sync {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .68rem; font-weight: 600; color: var(--muted);
+  padding: .35rem .7rem; border-radius: 100px;
+  border: 1px solid var(--line); background: rgba(245,240,232,.04);
+  white-space: nowrap;
+}
+.atl-sync b { width: 6px; height: 6px; border-radius: 50%; background: var(--p4); }
+.atl-sync.on b   { background: var(--p3); box-shadow: 0 0 0 3px rgba(87,176,122,.18); }
+.atl-sync.warn b { background: var(--p2); }
+
+.atl-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--side-w);
+  align-items: start;
+}
+
+/* ══ RAIL DE GAUCHE ════════════════════════════════════════════════════ */
+
+.atl-rail {
+  position: sticky; top: var(--top-h);
+  height: calc(100vh - var(--top-h));
+  overflow-y: auto; scrollbar-width: thin;
+  padding: 1rem .7rem 2rem;
+  border-right: 1px solid var(--line);
+}
+
+.atl-rail-lbl {
+  font-size: .6rem; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted-light);
+  padding: 0 .6rem; margin: 1.3rem 0 .45rem;
+}
+.atl-rail-lbl:first-child { margin-top: .2rem; }
+
+.atl-nav {
+  display: flex; align-items: center; gap: .6rem;
+  width: 100%; text-align: left;
+  padding: .55rem .7rem;
+  margin-bottom: .12rem;
+  border: none; border-radius: 100px;
+  background: transparent; color: var(--muted);
+  font-family: inherit; font-size: .83rem; font-weight: 500;
+  cursor: pointer;
+  transition: background .16s, color .16s;
+}
+.atl-nav:hover { background: rgba(245,240,232,.06); color: var(--txt); }
+.atl-nav .ic { width: 18px; display: grid; place-items: center; flex-shrink: 0; opacity: .85; }
+.atl-nav .tx { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.atl-nav .ct {
+  font-size: .7rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--muted-light); flex-shrink: 0;
+}
+.atl-nav.on {
+  background: var(--grad-soft);
+  color: var(--txt); font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.atl-nav.on .ct { color: var(--gold-l); }
+.atl-nav.on .ic { opacity: 1; color: var(--green-l); }
+
+/* Puce de priorité dans le rail : le rond coloré est doublé par le libellé
+   du bouton, jamais seul. */
+.atl-dot { width: 9px; height: 9px; border-radius: 50%; display: block; }
+.atl-dot.P1 { background: var(--p1); }
+.atl-dot.P2 { background: var(--p2); }
+.atl-dot.P3 { background: var(--p3); }
+.atl-dot.P4 { background: var(--p4); }
+
+/* ══ COLONNE CENTRALE ══════════════════════════════════════════════════ */
+
+.atl-main { padding: 1.2rem 1.3rem 8rem; min-width: 0; }
+
+.atl-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+.atl-h1 {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(1.5rem, 3.2vw, 1.95rem);
+  line-height: 1.1; letter-spacing: -.015em;
+}
+.atl-h1 span {
+  background: var(--grad-text);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.atl-sub { font-size: .8rem; color: var(--muted); margin-top: .3rem; }
+
+.atl-daynav { display: flex; gap: .3rem; }
+.atl-daynav button {
+  width: 34px; height: 34px; border-radius: 10px; cursor: pointer;
+  display: grid; place-items: center;
+  border: 1px solid var(--line); background: rgba(245,240,232,.05);
+  color: var(--muted); font-family: inherit;
+  transition: all .16s;
+}
+.atl-daynav button:hover { color: var(--txt); border-color: var(--line-strong); background: rgba(245,240,232,.1); }
+.atl-daynav button.wide { width: auto; padding: 0 .85rem; font-size: .78rem; font-weight: 600; }
+
+/* ── Tuiles de synthèse ───────────────────────────────────────────────
+   Trois nombres, pas un graphique : à ce volume, le chiffre EST la
+   visualisation. Le libellé porte le sens, la couleur ne fait que le
+   redoubler. */
+.atl-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: 1rem; }
+.atl-tile {
+  padding: .85rem .95rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.015));
+  position: relative; overflow: hidden;
+}
+.atl-tile::after {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--tone, var(--p4));
+}
+.atl-tile .n {
+  font-family: var(--display); font-weight: 700;
+  font-size: 1.85rem; line-height: 1; letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--tone, var(--txt));
+}
+.atl-tile .l {
+  font-size: .68rem; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--muted); margin-top: .35rem;
+}
+
+/* ── Bande de charge de la semaine ────────────────────────────────────
+   Une seule série (le nombre de tâches ouvertes par jour), donc une seule
+   teinte en dégradé de magnitude — jamais un arc-en-ciel. Les colonnes du
+   week-end algérien (vendredi, samedi) sont estompées. */
+.atl-week {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: .35rem;
+  padding: .85rem .95rem 0.7rem;
+  border: 1px solid var(--line); border-radius: 16px;
+  background: rgba(255,255,255,.028);
+  margin-bottom: 1.1rem;
+}
+.atl-wd {
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  padding: .25rem .1rem; border-radius: 10px; cursor: pointer;
+  border: none; background: none; font-family: inherit;
+  transition: background .16s;
+}
+.atl-wd:hover { background: rgba(245,240,232,.06); }
+.atl-wd .dn { font-size: .62rem; font-weight: 700; color: var(--muted-light); letter-spacing: .04em; }
+.atl-wd .bar {
+  width: 100%; height: 40px;
+  display: flex; align-items: flex-end;
+  border-radius: 4px; overflow: hidden;
+  background: rgba(245,240,232,.05);
+}
+.atl-wd .fill {
+  width: 100%;
+  border-radius: 4px 4px 0 0;      /* extrémité arrondie, ancrée à la base */
+  background: var(--green);
+  min-height: 3px;
+  transition: height .4s cubic-bezier(.22,.7,.3,1);
+}
+.atl-wd.heavy .fill { background: var(--grad); }
+.atl-wd .dd { font-size: .72rem; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.atl-wd.weekend { opacity: .42; }
+.atl-wd.sel .dn, .atl-wd.sel .dd { color: var(--gold-l); }
+.atl-wd.sel { background: rgba(201,168,76,.10); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.atl-wd.today .dn::after {
+  content: ""; display: block; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--gold); margin: .18rem auto 0;
+}
+
+/* ── Lignes de tâche ──────────────────────────────────────────────────
+   Denses comme une boîte de réception : 1 ligne de titre, 1 ligne de
+   métadonnées, actions révélées au survol. */
+.atl-list { display: flex; flex-direction: column; gap: .3rem; }
+
+.atl-row {
+  position: relative;
+  display: flex; align-items: flex-start; gap: .75rem;
+  padding: .7rem .85rem .7rem .95rem;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: rgba(255,255,255,.03);
+  cursor: pointer;
+  transition: background .16s, border-color .16s, transform .16s;
+}
+.atl-row:hover { background: rgba(255,255,255,.065); border-color: var(--line-strong); }
+.atl-row.sel { border-color: var(--green); background: rgba(111,175,82,.09); }
+.atl-row.done { opacity: .45; }
+.atl-row.done .atl-row-t { text-decoration: line-through; }
+
+/* Échine de priorité : la barre colorée à gauche, doublée par la puce
+   textuelle dans la ligne de métadonnées. */
+.atl-row::before {
+  content: ""; position: absolute; left: 0; top: 10px; bottom: 10px;
+  width: 3px; border-radius: 0 3px 3px 0;
+  background: var(--tone, var(--p4));
+}
+.atl-row.done::before { background: var(--p4); }
+
+.atl-check {
+  flex-shrink: 0; margin-top: .1rem;
+  width: 21px; height: 21px; border-radius: 50%;
+  border: 1.8px solid var(--line-strong);
+  background: transparent; cursor: pointer; padding: 0;
+  display: grid; place-items: center;
+  color: transparent;
+  transition: all .18s;
+}
+.atl-check:hover { border-color: var(--green-l); background: rgba(111,175,82,.14); }
+.atl-check.on { background: var(--grad); border-color: transparent; color: #0E1A0B; }
+
+.atl-row-b { flex: 1; min-width: 0; }
+.atl-row-t {
+  font-size: .88rem; font-weight: 600; line-height: 1.4;
+  color: var(--txt);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.atl-row-m {
+  display: flex; align-items: center; gap: .4rem; flex-wrap: wrap;
+  margin-top: .38rem;
+}
+
+.atl-chip {
+  display: inline-flex; align-items: center; gap: .28rem;
+  font-size: .66rem; font-weight: 600; line-height: 1;
+  padding: .26rem .5rem; border-radius: 6px;
+  background: rgba(245,240,232,.07); color: var(--muted);
+  white-space: nowrap;
+}
+.atl-chip.pri { color: var(--tone); background: var(--tone-bg); }
+.atl-chip.ref { font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--gold-l); background: rgba(201,168,76,.12); }
+.atl-chip.late { color: var(--p1); background: var(--p1-bg); }
+.atl-chip.today { color: var(--gold-l); background: rgba(201,168,76,.14); }
+.atl-chip.review { color: var(--p2); background: var(--p2-bg); }
+
+.atl-row-a {
+  display: flex; gap: .2rem; flex-shrink: 0;
+  opacity: 0; transform: translateX(4px);
+  transition: opacity .16s, transform .16s;
+}
+.atl-row:hover .atl-row-a, .atl-row:focus-within .atl-row-a { opacity: 1; transform: none; }
+.atl-ia {
+  width: 30px; height: 30px; border-radius: 9px; cursor: pointer;
+  display: grid; place-items: center;
+  border: 1px solid var(--line); background: rgba(245,240,232,.05);
+  color: var(--muted); font-family: inherit;
+  transition: all .15s;
+}
+.atl-ia:hover { color: var(--txt); background: rgba(245,240,232,.13); border-color: var(--line-strong); }
+.atl-ia.wa:hover { color: #25D366; border-color: rgba(37,211,102,.5); background: rgba(37,211,102,.12); }
+
+/* Sur mobile il n'y a pas de survol : les actions restent visibles. */
+@media (hover: none) {
+  .atl-row-a { opacity: 1; transform: none; }
+}
+
+/* ── Bandeau « à vérifier » ──────────────────────────────────────────── */
+.atl-review {
+  border: 1px solid rgba(232,194,79,.3);
+  background: rgba(232,194,79,.07);
+  border-radius: 16px; padding: .9rem 1rem;
+  margin-bottom: 1rem;
+}
+.atl-review h4 {
+  display: flex; align-items: center; gap: .45rem;
+  font-size: .76rem; font-weight: 700; color: var(--p2);
+  letter-spacing: .04em; text-transform: uppercase; margin-bottom: .3rem;
+}
+.atl-review p { font-size: .79rem; color: var(--muted); line-height: 1.6; }
+
+/* ── États vides ──────────────────────────────────────────────────────
+   Un écran vide doit avoir l'air conçu, pas cassé. */
+.atl-empty {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 3.2rem 1.5rem;
+  border: 1px dashed var(--line-strong); border-radius: 20px;
+  background: rgba(255,255,255,.02);
+}
+.atl-empty .em-ic {
+  width: 58px; height: 58px; border-radius: 20px;
+  display: grid; place-items: center; margin-bottom: .9rem;
+  background: var(--grad-soft); border: 1px solid var(--line-strong);
+  color: var(--green-l);
+}
+.atl-empty h3 { font-family: var(--display); font-weight: 700; font-size: 1.1rem; margin-bottom: .35rem; }
+.atl-empty p { font-size: .84rem; color: var(--muted); line-height: 1.7; max-width: 34ch; }
+
+/* ══ VOLET DE DROITE ═══════════════════════════════════════════════════ */
+
+.atl-side {
+  position: sticky; top: var(--top-h);
+  height: calc(100vh - var(--top-h));
+  overflow-y: auto; scrollbar-width: thin;
+  padding: 1.2rem 1.1rem 2rem;
+  border-left: 1px solid var(--line);
+}
+
+.atl-card {
+  border: 1px solid var(--line); border-radius: 18px;
+  background: linear-gradient(160deg, rgba(255,255,255,.055), rgba(255,255,255,.015));
+  padding: 1rem; margin-bottom: .9rem;
+}
+.atl-card-h {
+  font-size: .62rem; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold-l);
+  display: flex; align-items: center; gap: .45rem; margin-bottom: .8rem;
+}
+.atl-card-h::before { content: ""; width: 14px; height: 1.5px; background: var(--gold); }
+
+/* ── Mini calendrier ─────────────────────────────────────────────────── */
+.atl-cal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: .7rem; }
+.atl-cal-top b { font-family: var(--display); font-size: .92rem; font-weight: 600; text-transform: capitalize; }
+.atl-cal-top button {
+  width: 26px; height: 26px; border-radius: 8px; cursor: pointer;
+  display: grid; place-items: center;
+  border: 1px solid var(--line); background: rgba(245,240,232,.05); color: var(--muted);
+}
+.atl-cal-top button:hover { color: var(--txt); background: rgba(245,240,232,.12); }
+
+.atl-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.atl-cal .hd {
+  text-align: center; font-size: .6rem; font-weight: 700;
+  color: var(--muted-light); padding-bottom: .3rem;
+}
+.atl-cal .hd.we { color: rgba(245,240,232,.22); }
+.atl-cd {
+  position: relative; aspect-ratio: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; border-radius: 9px; cursor: pointer;
+  border: 1px solid transparent; background: none;
+  font-family: inherit; font-size: .74rem; font-weight: 500;
+  color: var(--txt-soft);
+  transition: background .15s, border-color .15s;
+}
+.atl-cd:hover { background: rgba(245,240,232,.08); }
+.atl-cd.out { color: rgba(245,240,232,.2); }
+.atl-cd.we { color: var(--muted-light); }
+.atl-cd.today { border-color: var(--gold); color: var(--gold-l); font-weight: 700; }
+.atl-cd.sel { background: var(--grad); color: #fff; font-weight: 700; box-shadow: 0 4px 14px rgba(111,175,82,.35); }
+.atl-cd.sel .ld i { background: rgba(255,255,255,.85) !important; }
+/* Charge du jour : jusqu'à trois points, le plus urgent en premier. */
+.atl-cd .ld { display: flex; gap: 2px; height: 4px; }
+.atl-cd .ld i { width: 4px; height: 4px; border-radius: 50%; display: block; }
+
+/* ── Détail d'une tâche ──────────────────────────────────────────────── */
+.atl-det-t { font-family: var(--display); font-weight: 700; font-size: 1.08rem; line-height: 1.3; margin-bottom: .6rem; }
+.atl-det-l { list-style: none; margin: 0 0 .9rem; padding: 0; border-top: 1px solid var(--line); }
+.atl-det-l li {
+  display: flex; justify-content: space-between; gap: 1rem; align-items: baseline;
+  padding: .52rem .1rem; border-bottom: 1px solid var(--line); font-size: .8rem;
+}
+.atl-det-l span { color: var(--muted); flex-shrink: 0; }
+.atl-det-l strong { font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+
+.atl-quote {
+  font-size: .81rem; line-height: 1.7; color: var(--txt-soft);
+  font-style: italic;
+  padding: .7rem .85rem; border-radius: 12px;
+  background: var(--well); border-left: 2px solid var(--green);
+}
+
+.atl-why { display: flex; flex-direction: column; gap: .3rem; margin-top: .6rem; }
+.atl-why i {
+  font-style: normal; font-size: .74rem; color: var(--muted);
+  display: flex; align-items: center; gap: .4rem;
+}
+.atl-why i::before { content: "→"; color: var(--green-l); }
+
+.atl-side-acts { display: flex; gap: .4rem; flex-wrap: wrap; }
+.atl-side-acts .btn-g, .atl-side-acts .btn-outline { padding: .6rem 1rem; font-size: .78rem; flex: 1; }
+
+/* ══ MICRO ═════════════════════════════════════════════════════════════
+   Le geste principal de l'application : un bouton large, flottant, à portée
+   de pouce. Les anneaux sont pilotés par le niveau sonore réel mesuré sur
+   le flux (AnalyserNode) — pas par une animation en boucle : quand on se
+   tait, ça se voit.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.atl-mic-wrap {
+  position: fixed; z-index: 70;
+  bottom: 1.5rem;
+  left: calc(var(--rail-w) + (100vw - var(--rail-w) - var(--side-w)) / 2);
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: .6rem;
+  pointer-events: none;
+}
+.atl-mic-wrap > * { pointer-events: auto; }
+
+.atl-orb {
+  position: relative;
+  width: 68px; height: 68px; border-radius: 50%;
+  border: none; cursor: pointer; padding: 0;
+  display: grid; place-items: center;
+  background: var(--grad); color: #fff;
+  box-shadow: 0 10px 30px rgba(111,175,82,.42), 0 2px 8px rgba(0,0,0,.5);
+  transition: transform .2s cubic-bezier(.2,.8,.3,1), box-shadow .2s, background .3s;
+}
+.atl-orb:hover { transform: scale(1.06); }
+.atl-orb:active { transform: scale(.97); }
+.atl-orb:disabled { cursor: default; }
+
+/* Anneaux réactifs : deux couronnes dont l'échelle suit --lvl (0…1). */
+.atl-orb .ring {
+  position: absolute; inset: -6px; border-radius: 50%;
+  border: 2px solid rgba(147,209,114,.5);
+  transform: scale(calc(1 + var(--lvl, 0) * .38));
+  opacity: calc(.25 + var(--lvl, 0) * .75);
+  transition: transform .09s linear, opacity .09s linear;
+  pointer-events: none;
+}
+.atl-orb .ring.r2 {
+  inset: -14px; border-color: rgba(201,168,76,.34);
+  transform: scale(calc(1 + var(--lvl, 0) * .55));
+  opacity: calc(.12 + var(--lvl, 0) * .5);
+}
+
+.atl-orb.rec {
+  background: linear-gradient(135deg, #C4553C 0%, #F2795C 60%, #E8C24F 100%);
+  box-shadow: 0 10px 34px rgba(242,121,92,.5), 0 2px 8px rgba(0,0,0,.5);
+}
+.atl-orb.rec .ring { border-color: rgba(242,121,92,.55); }
+.atl-orb.rec .ring.r2 { border-color: rgba(242,121,92,.3); }
+
+/* État « en cours de traitement » : une couronne conique qui tourne. */
+.atl-orb.busy { background: var(--surface-2); box-shadow: 0 6px 22px rgba(0,0,0,.5); }
+.atl-orb.busy::after {
+  content: ""; position: absolute; inset: -3px; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, var(--green-l) 90deg, var(--gold) 180deg, transparent 260deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+          mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: orbSpin 1.1s linear infinite;
+}
+@keyframes orbSpin { to { transform: rotate(360deg); } }
+
+.atl-mic-hint {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .74rem; font-weight: 600;
+  padding: .42rem .85rem; border-radius: 100px;
+  background: rgba(21,28,22,.9); backdrop-filter: blur(12px);
+  border: 1px solid var(--line); color: var(--muted);
+  white-space: nowrap; max-width: 78vw;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.atl-mic-hint.rec { color: var(--p1); border-color: rgba(242,121,92,.4); }
+.atl-mic-hint .t { font-variant-numeric: tabular-nums; color: var(--txt); }
+.atl-mic-hint .cx {
+  border: none; background: none; cursor: pointer; padding: 0 0 0 .3rem;
+  color: var(--muted); font-family: inherit; font-size: .74rem; text-decoration: underline;
+}
+.atl-mic-hint .cx:hover { color: var(--txt); }
+
+/* Barre d'erreur — le micro échoue de façons trop variées pour un simple
+   « erreur ». Le message dit laquelle et ce qu'on peut y faire. */
+.atl-err {
+  display: flex; align-items: flex-start; gap: .6rem;
+  padding: .75rem .9rem; margin-bottom: .9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(242,121,92,.35);
+  background: rgba(242,121,92,.09);
+  font-size: .8rem; line-height: 1.6; color: var(--txt-soft);
+}
+.atl-err b { color: var(--p1); }
+.atl-err button {
+  margin-left: auto; flex-shrink: 0;
+  border: none; background: none; cursor: pointer;
+  color: var(--muted); font-family: inherit; font-size: 1rem; line-height: 1;
+}
+
+/* ── Saisie de secours au clavier ─────────────────────────────────────
+   Sans micro utilisable (navigateur trop ancien, permission refusée, pas
+   de https), taper la note doit rester possible : le reste de la chaîne
+   — agent, priorités, calendrier — fonctionne à l'identique. */
+.atl-type { display: flex; flex-direction: column; gap: .5rem; }
+.atl-type textarea {
+  width: 100%; min-height: 96px; resize: vertical;
+  padding: .75rem .85rem; border-radius: 14px;
+  border: 1px solid var(--line); font-size: .85rem; line-height: 1.65;
+  font-family: inherit;
+}
+.atl-type-row { display: flex; gap: .4rem; justify-content: flex-end; }
+
+/* ══ TIROIR MOBILE ═════════════════════════════════════════════════════ */
+.atl-drawer-x { display: none; }
+
+/* ══ RESPONSIVE ════════════════════════════════════════════════════════ */
+
+/* Écran moyen : le volet de détail devient un tiroir glissant. */
+@media (max-width: 1180px) {
+  .atl-body { grid-template-columns: var(--rail-w) minmax(0, 1fr); }
+  .atl-mic-wrap { left: calc(var(--rail-w) + (100vw - var(--rail-w)) / 2); }
+
+  .atl-side {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 80;
+    width: min(380px, 92vw); height: 100vh;
+    background: var(--bg-2);
+    border-left: 1px solid var(--line);
+    box-shadow: -18px 0 50px rgba(0,0,0,.55);
+    padding-top: 3.2rem;
+    transform: translateX(100%);
+    transition: transform .32s cubic-bezier(.2,.8,.3,1);
+  }
+  .atl-side.open { transform: none; }
+  .atl-drawer-x {
+    display: grid; place-items: center;
+    position: absolute; top: .8rem; right: .9rem;
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--line); background: rgba(245,240,232,.07);
+    color: var(--muted); cursor: pointer; font-family: inherit;
+  }
+  .atl-scrim {
+    position: fixed; inset: 0; z-index: 79;
+    background: rgba(8,12,8,.6); backdrop-filter: blur(3px);
+    animation: atlFade .25s ease both;
+  }
+}
+@keyframes atlFade { from { opacity: 0 } to { opacity: 1 } }
+
+/* Téléphone : une seule colonne, le rail passe en bandeau de filtres
+   défilant horizontalement — la même information, à la place où le pouce
+   l'atteint. */
+@media (max-width: 860px) {
+  :root { --top-h: 56px; }
+  .atl-body { grid-template-columns: minmax(0, 1fr); }
+  .atl-mic-wrap { left: 50%; bottom: 1.1rem; }
+
+  .atl-rail {
+    position: sticky; top: var(--top-h); z-index: 55;
+    height: auto; overflow: visible;
+    display: flex; gap: .35rem; align-items: center;
+    padding: .6rem .8rem;
+    border-right: none; border-bottom: 1px solid var(--line);
+    background: rgba(21,28,22,.9); backdrop-filter: blur(18px);
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .atl-rail::-webkit-scrollbar { display: none; }
+  .atl-rail-lbl { display: none; }
+  .atl-nav {
+    width: auto; flex-shrink: 0; margin-bottom: 0;
+    padding: .45rem .8rem; font-size: .78rem;
+    border: 1px solid var(--line); background: rgba(245,240,232,.04);
+  }
+  .atl-nav .ct { margin-left: .1rem; }
+
+  .atl-main { padding: 1rem .85rem 7.5rem; }
+  .atl-tiles { gap: .45rem; }
+  .atl-tile { padding: .7rem .75rem; }
+  .atl-tile .n { font-size: 1.5rem; }
+  .atl-tile .l { font-size: .6rem; }
+  .atl-search .atl-kbd { display: none; }
+  .atl-sync span { display: none; }
+  .atl-sync { padding: .35rem .5rem; }
+}
+
+@media (max-width: 560px) {
+  .atl-brand b { display: none; }
+  .atl-week { padding: .7rem .55rem .55rem; gap: .2rem; }
+  .atl-wd .bar { height: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atl-orb, .atl-orb .ring, .atl-wd .fill, .atl-side, .atl-row { transition: none; }
+  .atl-orb.busy::after { animation-duration: 3s; }
+}
