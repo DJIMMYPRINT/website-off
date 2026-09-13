@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { ALBUMS, FALLBACK_ALBUM, matchAlbum } from '../../lib/albums'
+import { FALLBACK_ALBUM } from '../../lib/albums'
+import { ErreurClassement, classer, validerImage, TAILLE_MAX } from '../../lib/classify'
 
 // POST /api/classify-photo
 //
@@ -14,56 +15,15 @@ import { ALBUMS, FALLBACK_ALBUM, matchAlbum } from '../../lib/albums'
 //
 // L'endpoint est public (le site l'est), d'où la clé partagée : sans
 // elle, n'importe qui pourrait faire tourner l'API sur notre compte.
+//
+// La bibliothèque web (/photos) passe par /api/photos, qui partage le
+// même lib/classify.js : les deux entrées ne peuvent pas diverger.
 
 export const config = {
   // Nous lisons le flux nous-mêmes : le parseur de Next plafonne à 1 Mo
   // et refuserait une photo d'iPhone.
   api: { bodyParser: false },
 }
-
-const MODELE = process.env.CLASSIFY_MODEL || 'claude-opus-5'
-
-// Format déduit des octets, pas de l'en-tête Content-Type : Raccourcis
-// n'annonce pas toujours le type réel du fichier qu'il poste, et une photo
-// correcte refusée sur la foi d'un en-tête approximatif serait un bug
-// impossible à diagnostiquer depuis le téléphone.
-function detecterType(buf) {
-  if (buf.length < 12) return null
-  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg'
-  if (buf.toString('latin1', 0, 8) === '\x89PNG\r\n\x1a\n') return 'image/png'
-  if (buf.toString('latin1', 0, 6) === 'GIF87a' || buf.toString('latin1', 0, 6) === 'GIF89a') return 'image/gif'
-  if (buf.toString('latin1', 0, 4) === 'RIFF' && buf.toString('latin1', 8, 12) === 'WEBP') return 'image/webp'
-  return null
-}
-
-// Le HEIC de l'iPhone n'est pas accepté par l'API vision. On le reconnaît
-// pour pouvoir dire quoi corriger dans le raccourci, au lieu de renvoyer
-// un « format inconnu » que personne ne saurait interpréter.
-function estHeic(buf) {
-  if (buf.length < 12) return false
-  if (buf.toString('latin1', 4, 8) !== 'ftyp') return false
-  return ['heic', 'heix', 'hevc', 'mif1', 'msf1'].includes(buf.toString('latin1', 8, 12))
-}
-
-// L'API vision plafonne à 5 Mo par image. On refuse un peu avant, pour
-// que le raccourci reçoive un message clair au lieu d'une erreur amont.
-const TAILLE_MAX = 4 * 1024 * 1024
-
-const CONSIGNE = `Tu ranges les photos d'un imprimeur de vêtements professionnels à Alger (Djimmy Prints).
-
-Réponds UNIQUEMENT par le nom exact d'un album de cette liste, sans phrase, sans ponctuation, sans guillemets :
-${ALBUMS.map((a) => `- ${a}`).join('\n')}
-
-Règles :
-- Vêtement porté, posé à plat ou en rayon -> l'album du type de vêtement.
-- Un gilet de travail multipoches : « Gilet avec col » s'il a un col, « Gilet sans col » sinon. Regarde l'encolure avant de trancher.
-- Page de catalogue, nuancier, planche de coloris -> Catalogues.
-- Grille de prix, tarif, devis, capture de facture -> Tarifs.
-- Logo, visuel de marque, fichier client à imprimer -> Logos clients.
-- Vêtement déjà floqué/brodé, livraison, équipe en tenue, chantier -> Réalisations.
-- Dans le doute, ou si ce n'est rien de tout ça -> ${FALLBACK_ALBUM}.
-
-Ne choisis jamais un nom absent de la liste.`
 
 function lireCorps(req) {
   return new Promise((resolve, reject) => {
@@ -114,55 +74,30 @@ export default async function handler(req, res) {
     console.error('[api/classify-photo] lecture', err)
     return res.status(400).send('Lecture de la photo impossible.')
   }
-  if (image.length === 0) return res.status(400).send('Photo vide.')
 
-  const type = detecterType(image)
-  if (!type) {
-    return res
-      .status(415)
-      .send(
-        estHeic(image)
+  let type
+  try {
+    type = validerImage(image)
+  } catch (err) {
+    if (err instanceof ErreurClassement) {
+      // Le raccourci a son propre remède à proposer pour le HEIC : il peut
+      // convertir, ce qu'un envoi depuis le web ne peut pas.
+      const message =
+        err.statut === 415 && err.message.startsWith('Photo en HEIC')
           ? 'Photo en HEIC. Ajoute « Convertir l’image » en JPEG dans le raccourci, avant l’envoi.'
-          : 'Ce fichier n’est pas une image JPEG, PNG, GIF ou WebP.'
-      )
+          : err.message
+      return res.status(err.statut).send(message)
+    }
+    throw err
   }
 
   try {
-    const client = new Anthropic()
-    const reponse = await client.messages.create({
-      model: MODELE,
-      // La consigne tient en trois mots, mais la réflexion adaptative est
-      // active par défaut sur Opus 5 et consomme aussi ce plafond : on
-      // laisse de la marge plutôt que de tronquer la réponse.
-      max_tokens: 2048,
-      output_config: { effort: 'low' },
-      system: CONSIGNE,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: type, data: image.toString('base64') } },
-            { type: 'text', text: 'Dans quel album ranger cette photo ?' },
-          ],
-        },
-      ],
-    })
-
-    if (reponse.stop_reason === 'refusal') {
-      console.warn('[api/classify-photo] refus', reponse.stop_details)
-      return res.status(200).send(FALLBACK_ALBUM)
-    }
-
-    const texte = reponse.content
-      .filter((b) => b.type === 'text')
-      .map((b) => b.text)
-      .join(' ')
-
+    const { album } = await classer(image, type)
     res.setHeader('Content-Type', 'text/plain; charset=utf-8')
-    // matchAlbum ne renvoie jamais autre chose qu'un album connu, donc le
+    // classer() ne renvoie jamais autre chose qu'un album connu, donc le
     // raccourci n'a aucun cas d'erreur à gérer : il reçoit toujours un
     // nom qu'il sait ranger.
-    return res.status(200).send(matchAlbum(texte))
+    return res.status(200).send(album)
   } catch (err) {
     console.error('[api/classify-photo]', err)
     if (err instanceof Anthropic.AuthenticationError) {
@@ -171,6 +106,8 @@ export default async function handler(req, res) {
     if (err instanceof Anthropic.RateLimitError) {
       return res.status(429).send('Trop de photos d’un coup. Réessaie dans une minute.')
     }
-    return res.status(502).send('Le classement a échoué.')
+    // Une photo non classée reste rangeable à la main : mieux vaut la
+    // mettre dans « Autres » que faire échouer tout le lot du raccourci.
+    return res.status(200).send(FALLBACK_ALBUM)
   }
 }

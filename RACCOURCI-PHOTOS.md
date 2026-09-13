@@ -142,7 +142,9 @@ pour de bon.
   n'est pas visible sur la photo, ça peut se tromper — l'album `Autres` sert de
   filet.
 - **Rien n'est renvoyé au site.** Le tri ne met pas à jour le catalogue de
-  djimmyprints.xyz ; il ne fait que ranger la galerie du téléphone.
+  djimmyprints.xyz ; il ne fait que ranger la galerie du téléphone. Pour une
+  bibliothèque consultable, avec recherche et envoi WhatsApp, voir
+  `BIBLIOTHEQUE-PHOTOS.md` — les deux partagent le même classement.
 
 ---
 
