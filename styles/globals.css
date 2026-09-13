@@ -580,7 +580,7 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
 }
 .sheet-chip.on { background: var(--grad); border-color: transparent; color: #fff; }
 
-/* --- Colour gallery (components/ColorGallery.js) ------------------------ */
+/* --- Variant gallery (components/VariantGallery.js) --------------------- */
 /* Native scroll-snap, so the swipe keeps the platform's own momentum and
    the track stays usable with a keyboard and a trackpad. */
 .cg { margin-bottom: 1.4rem; }
@@ -629,6 +629,13 @@ input[type=range] { accent-color: var(--vio); background: transparent !important
   border-color: var(--green-l); transform: scale(1.12);
   box-shadow: 0 0 0 3px rgba(111,175,82,.22);
 }
+/* Variants that differ in cut rather than colour show their own photo: the
+   three local work outfits are one navy, so swatches would be identical. */
+.cg-sw-photo {
+  width: 46px; height: 58px; border-radius: 10px;
+  background-color: #fff; background-size: cover; background-position: center top;
+}
+.cg-sw-photo.on { transform: scale(1.06); }
 
 .sheet-sizes { display: flex; flex-direction: column; gap: .45rem; }
 .sheet-row {

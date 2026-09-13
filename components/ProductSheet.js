@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import ProductImg from './ProductImg'
-import ColorGallery from './ColorGallery'
+import VariantGallery from './VariantGallery'
 import { COLORS, SIZES, MIN_ORDER, PRODUCT_PITCH } from '../lib/constants'
 import { unitPrice, hasPriceGrid, priceRange } from '../lib/products'
 
@@ -16,9 +16,10 @@ import { unitPrice, hasPriceGrid, priceRange } from '../lib/products'
 // pleasant for small runs, but this is a bulk business — nobody wants to tap
 // "+" sixty times.
 export default function ProductSheet({ product, onAdd, onClose }) {
-  // Products photographed shade by shade carry their own colour list; the
-  // rest fall back to the generic one, which has no photos behind it.
-  const shades = product?.colors || null
+  // Products photographed version by version carry their own list; the rest
+  // fall back to the generic colour list, which has no photos behind it.
+  const shades = product?.variants || null
+  const vLabel = product?.variantLabel || { one: 'Couleur', many: 'Coloris disponibles' }
   const [shade, setShade] = useState(0)
   const [color, setColor] = useState(COLORS[0])
   const [sizes, setSizes] = useState({})
@@ -35,7 +36,7 @@ export default function ProductSheet({ product, onAdd, onClose }) {
   // product's quantities carry over into the next one.
   useEffect(() => {
     setShade(0)
-    setColor(product?.colors ? product.colors[0].name : COLORS[0])
+    setColor(product?.variants ? product.variants[0].name : COLORS[0])
     setSizes({})
   }, [product?.name])
 
@@ -108,9 +109,10 @@ export default function ProductSheet({ product, onAdd, onClose }) {
               scrolling past four rows to find out the polo exists in red. */}
           {shades && (
             <>
-              <div className="sheet-lbl">Coloris disponibles · {shades.length}</div>
-              <ColorGallery
-                colors={shades}
+              <div className="sheet-lbl">{vLabel.many} · {shades.length}</div>
+              <VariantGallery
+                variants={shades}
+                label={vLabel.one}
                 index={shade}
                 onIndex={i => { setShade(i); setColor(shades[i].name) }}
               />

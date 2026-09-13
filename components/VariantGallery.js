@@ -1,14 +1,19 @@
 import { useRef, useEffect, useCallback } from 'react'
 
-// Swipeable colour gallery for products photographed in several shades.
+// Swipeable gallery for products photographed in several versions — usually
+// colours, sometimes cuts.
 //
 // The track is a native scroll-snap carousel rather than a JS drag: on a
 // phone that gives real momentum, rubber-banding and accessibility for free,
 // and it cannot lose the pointer the way the studio's hand-rolled drag did.
-// The swatch row underneath is the same selection by another route — tapping
-// scrolls the track, swiping the track lights the swatch — so the colour and
+// The picker row underneath is the same selection by another route — tapping
+// scrolls the track, swiping the track lights the button — so the choice and
 // the photo can never disagree.
-export default function ColorGallery({ colors, index, onIndex }) {
+//
+// A variant with a `hex` is drawn as a colour swatch; one without is drawn as
+// its own photo, because the three local work outfits share a single navy and
+// three identical dots would be no help at all.
+export default function VariantGallery({ variants, label, index, onIndex }) {
   const trackRef = useRef(null)
   const rowRef = useRef(null)
   // Set while the track is being scrolled programmatically, so the scroll
@@ -30,7 +35,7 @@ export default function ColorGallery({ colors, index, onIndex }) {
     const el = trackRef.current
     if (!el || Date.now() < lockRef.current) return
     const i = Math.round(el.scrollLeft / el.clientWidth)
-    if (i !== index && i >= 0 && i < colors.length) onIndex(i)
+    if (i !== index && i >= 0 && i < variants.length) onIndex(i)
   }
 
   // Follow a selection made from the swatch row, and keep the active swatch
@@ -44,35 +49,35 @@ export default function ColorGallery({ colors, index, onIndex }) {
     chip?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
   }, [index, scrollTo])
 
-  const current = colors[index]
+  const current = variants[index]
 
   return (
     <div className="cg">
       <div className="cg-track" ref={trackRef} onScroll={onScroll}>
-        {colors.map((c, i) => (
-          <div className="cg-slide" key={c.name}>
-            <img src={c.photo} alt={`${c.name}`} loading={i === 0 ? 'eager' : 'lazy'} draggable="false" />
+        {variants.map((v, i) => (
+          <div className="cg-slide" key={v.name}>
+            <img src={v.photo} alt={v.name} loading={i === 0 ? 'eager' : 'lazy'} draggable="false" />
           </div>
         ))}
       </div>
 
       <div className="cg-dots" aria-hidden="true">
-        {colors.map((c, i) => <i key={c.name} className={i === index ? 'on' : ''} />)}
+        {variants.map((v, i) => <i key={v.name} className={i === index ? 'on' : ''} />)}
       </div>
 
       <div className="cg-name">
-        <span>Couleur</span><strong>{current.name}</strong>
+        <span>{label}</span><strong>{current.name}</strong>
       </div>
 
       <div className="cg-row" ref={rowRef}>
-        {colors.map((c, i) => (
+        {variants.map((v, i) => (
           <button
-            key={c.name}
+            key={v.name}
             type="button"
             onClick={() => onIndex(i)}
-            className={`cg-sw${i === index ? ' on' : ''}`}
-            style={{ '--sw': c.hex }}
-            aria-label={c.name}
+            className={`cg-sw${v.hex ? '' : ' cg-sw-photo'}${i === index ? ' on' : ''}`}
+            style={v.hex ? { '--sw': v.hex } : { backgroundImage: `url(${v.photo})` }}
+            aria-label={v.name}
             aria-pressed={i === index}
           />
         ))}
