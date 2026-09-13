@@ -6,7 +6,8 @@
     "build": "next build",
     "start": "next start",
     "photo": "node scripts/add-photo.js",
-    "sheet": "node scripts/split-sheet.js"
+    "sheet": "node scripts/split-sheet.js",
+    "recolor": "node scripts/recolor-variant.js"
   },
   "dependencies": {
     "next": "^14.2.35",
