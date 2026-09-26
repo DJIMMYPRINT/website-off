@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Backdrop from './Backdrop'
-import PromoModal from './PromoModal'
+import PromoBar from './PromoBar'
 import { WA, PHONE_DISPLAY, EMAIL, ADDRESS, SITE_URL } from '../lib/constants'
 
 // Line icons rather than emoji: the tab bar is chrome, and coloured emoji
@@ -70,12 +70,8 @@ export default function Layout({ children }) {
   return (
     <div className="app-shell">
       <Backdrop />
-      <PromoModal />
 
-      {/* PROMO STRIP */}
-      <div className="promo-strip" onClick={() => router.push('/commande')}>
-        Remise volume automatique à partir de <strong>50 pièces</strong>
-      </div>
+      <PromoBar />
 
       {/* HEADER */}
       <header className={`hdr${scrolled ? ' scrolled' : ''}`}>

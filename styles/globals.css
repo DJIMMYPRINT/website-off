@@ -256,16 +256,19 @@ input[type=range] { accent-color: var(--green); background: transparent !importa
 
 /* ══ PROMO STRIP ══ */
 .promo-strip {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: .1rem .5rem;
   background: var(--green-d);
-  color: rgba(255,255,255,.94);
+  color: rgba(245,240,232,.88);
   text-align: center;
-  padding: .6rem 1rem;
-  font-size: .78rem;
+  padding: .65rem 1rem;
+  font-size: .8rem;
   font-weight: 500;
-  cursor: pointer;
   letter-spacing: .02em;
+  text-decoration: none;
 }
 .promo-strip strong { font-weight: 700; color: #fff; }
+.promo-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--gold-l); }
 
 /* ══ LAYOUT — single column, it is a phone ══ */
 .grid-2, .grid-side { display: grid; grid-template-columns: 1fr; gap: 1.6rem; align-items: start; }
@@ -390,90 +393,11 @@ input[type=range] { accent-color: var(--green); background: transparent !importa
 
 .u-mono { font-variant-numeric: tabular-nums; letter-spacing: .06em; }
 
-/* ══ POP-UP D'ACCUEIL — Pack Entreprises ══════════════════
-   Shown once per visit, 1.5s after the page paints, with a
-   two-minute countdown that closes the dialog when it runs
-   out. Sits above the tab bar (z 480) and the header (500).
+/* ══ ANIMATIONS PARTAGÉES ════════════════════════════════
+   Utilisées par la fiche produit (le pop-up d'accueil qui les
+   portait a été retiré au profit du bandeau permanent).
    ═══════════════════════════════════════════════════════ */
-.promo-ov {
-  position: fixed; inset: 0; z-index: 900;
-  display: flex; align-items: center; justify-content: center;
-  padding: 1.2rem;
-  background: rgba(26,26,26,.48);
-  animation: promoFade .3s ease both;
-}
-.promo-box {
-  position: relative;
-  width: 100%; max-width: 380px;
-  padding: 2rem 1.6rem 1.4rem;
-  text-align: center;
-  border-radius: var(--r);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--green);
-  box-shadow: 0 24px 60px rgba(26,26,26,.24);
-  animation: promoIn .35s cubic-bezier(.2,.8,.3,1) both;
-}
 @keyframes promoFade { from { opacity: 0 } to { opacity: 1 } }
-@keyframes promoIn {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: none; }
-}
-
-.promo-x {
-  position: absolute; top: .7rem; right: .7rem;
-  width: 34px; height: 34px; border-radius: var(--r-s);
-  display: grid; place-items: center;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  color: var(--muted); font-size: .85rem; cursor: pointer;
-}
-.promo-x:hover { background: var(--paper-2); color: var(--txt); }
-
-.promo-badge {
-  display: inline-block;
-  font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
-  color: #fff; background: var(--gold-d);
-  padding: .32rem .8rem; border-radius: 3px; margin-bottom: 1rem;
-}
-.promo-title {
-  font-family: var(--display); font-weight: 700;
-  font-size: 1.65rem; letter-spacing: -.02em; color: var(--txt);
-}
-.promo-off {
-  font-family: var(--display); font-weight: 700;
-  font-size: 3.6rem; line-height: 1; margin: .3rem 0 .7rem;
-  color: var(--green); letter-spacing: -.03em;
-}
-.promo-off span { font-size: 2rem; }
-.promo-txt { font-size: .95rem; color: var(--muted); line-height: 1.65; margin-bottom: 1.3rem; }
-.promo-txt strong { color: var(--txt); }
-
-.promo-timer {
-  display: flex; flex-direction: column; align-items: center; gap: .25rem;
-  padding: .8rem; margin-bottom: 1.2rem;
-  border-radius: var(--r-s);
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-}
-.promo-timer-lbl { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-.promo-clock {
-  font-family: var(--display); font-weight: 700;
-  font-size: 1.9rem; color: var(--gold-d); line-height: 1;
-}
-
-.promo-cta { width: 100%; justify-content: center; }
-.promo-later {
-  display: block; width: 100%; margin-top: .6rem; padding: .6rem;
-  background: none; border: none; cursor: pointer;
-  color: var(--muted); font-size: .82rem; font-family: inherit;
-}
-.promo-later { font-size: .88rem; }
-.promo-later:hover { color: var(--txt); }
-
-@media (prefers-reduced-motion: reduce) {
-  .promo-ov, .promo-box { animation: none; }
-}
 
 /* ══ FICHE PRODUIT (bas d'écran) ══════════════════════════
    Opened by tapping a product in the order grid. Slides up,
