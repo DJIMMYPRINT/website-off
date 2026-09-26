@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { WA, PHONE_DISPLAY, ORDER_STAGES } from '../lib/constants'
 import { findOrder, listOrders, normalizeRef } from '../lib/orders'
+import Ico from '../components/Ico'
 
 // A row from the database and a copy kept on the device carry the same
 // facts under slightly different names; the page renders one shape.
@@ -116,7 +117,7 @@ export default function Suivi() {
                 <button key={o.ref} onClick={() => search(o.ref)} className="u-mono" style={{
                   fontSize:'.75rem', fontWeight:700, padding:'.28rem .7rem', marginRight:'.4rem', marginTop:'.35rem',
                   border:'1.5px solid var(--cream-border)', background:'var(--white)', color:'var(--green)',
-                  borderRadius:'100px', cursor:'pointer', fontFamily:'inherit',
+                  borderRadius:'var(--r-s)', cursor:'pointer', fontFamily:'inherit',
                 }}>
                   {o.ref}
                 </button>
@@ -129,7 +130,7 @@ export default function Suivi() {
         {searched && result && (
           <div className="grid-side" style={{marginTop:'3.5rem'}}>
             {/* Timeline */}
-            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',padding:'2rem'}}>
+            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',padding:'2rem'}}>
               <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'.6rem',marginBottom:'2rem'}}>
                 <div>
                   <div style={{fontFamily:'var(--display)',fontSize:'1.5rem',letterSpacing:'.03em'}} className="u-mono">
@@ -142,7 +143,7 @@ export default function Suivi() {
                 <span style={{
                   background:'var(--green-pale)', color:'var(--green)', fontWeight:700,
                   fontSize:'.72rem', letterSpacing:'.08em', textTransform:'uppercase',
-                  padding:'.35rem .9rem', borderRadius:'100px', border:'1px solid rgba(111,175,82,.3)',
+                  padding:'.35rem .9rem', borderRadius:'var(--r-s)', border:'1px solid rgba(111,175,82,.3)',
                 }}>
                   {ORDER_STAGES[stageIndex].label}
                 </span>
@@ -152,7 +153,7 @@ export default function Suivi() {
                 {ORDER_STAGES.map((s, i) => (
                   <li key={s.key} className={`tl-item ${i < stageIndex ? 'done' : i === stageIndex ? 'current' : ''}`}>
                     <div className="tl-rail">
-                      <div className="tl-dot">{i < stageIndex ? '✓' : s.ic}</div>
+                      <div className="tl-dot">{i < stageIndex ? <Ico n="check" size={17} stroke={2.4} /> : i + 1}</div>
                       {i < ORDER_STAGES.length - 1 && <div className="tl-line" />}
                     </div>
                     <div className="tl-body">
@@ -165,17 +166,17 @@ export default function Suivi() {
                 ))}
               </ul>
 
-              <div style={{marginTop:'1.5rem',padding:'1rem 1.2rem',background:'var(--cream)',borderRadius:'16px',fontSize:'.82rem',color:'var(--muted)',lineHeight:1.7}}>
-                ℹ️ L'étape affichée correspond au dernier état enregistré sur cet appareil.
+              <div style={{marginTop:'1.5rem',padding:'1rem 1.2rem',background:'var(--cream)',borderRadius:'var(--r)',fontSize:'.82rem',color:'var(--muted)',lineHeight:1.7}}>
+                L'étape affichée correspond au dernier état enregistré sur cet appareil.
                 Pour le point exact en atelier, un message WhatsApp reste le plus rapide.
               </div>
             </div>
 
             {/* Order detail */}
             <div className="sticky-side">
-              <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden',marginBottom:'1.2rem'}}>
+              <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',overflow:'hidden',marginBottom:'1.2rem'}}>
                 <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontSize:'1rem',letterSpacing:'.04em'}}>
-                  📦 Détail
+                  Détail
                 </div>
                 <div style={{padding:'1.5rem'}}>
                   {(result.items || []).map((it, i) => (
@@ -190,19 +191,19 @@ export default function Suivi() {
                   </div>
                   {result.technique && (
                     <div style={{marginTop:'1rem',padding:'.7rem',background:'var(--green-pale)',borderRadius:'4px',fontSize:'.8rem',color:'var(--green)',fontWeight:600}}>
-                      🔧 {result.technique}
+                      {result.technique}
                     </div>
                   )}
                   {result.wilaya && (
                     <div style={{marginTop:'.5rem',padding:'.7rem',background:'var(--cream)',borderRadius:'4px',fontSize:'.78rem',color:'var(--muted)'}}>
-                      📍 {result.wilaya}
+                      {result.wilaya}
                     </div>
                   )}
                 </div>
               </div>
 
               <a href={waFollowUp} target="_blank" rel="noopener noreferrer" className="btn-g" style={{width:'100%',justifyContent:'center'}}>
-                💬 Demander le statut
+                Demander le statut
               </a>
             </div>
           </div>
@@ -212,9 +213,9 @@ export default function Suivi() {
         {searched && !result && (
           <div style={{
             marginTop:'2.5rem', maxWidth:640, background:'var(--white)',
-            border:'1.5px solid var(--cream-border)', borderRadius:'20px', padding:'2rem',
+            border:'1.5px solid var(--cream-border)', borderRadius:'var(--r)', padding:'2rem',
           }}>
-            <div style={{fontSize:'2rem',marginBottom:'.8rem'}}>🔎</div>
+            <div style={{marginBottom:'.8rem',color:'var(--muted-light)',display:'flex',justifyContent:'center'}}><Ico n="search" size={28} /></div>
             <h2 style={{fontFamily:'var(--display)',fontSize:'1.3rem',marginBottom:'.7rem'}}>
               Référence introuvable
             </h2>
@@ -227,9 +228,9 @@ export default function Suivi() {
             <div style={{display:'flex',gap:'.8rem',flexWrap:'wrap'}}>
               <a href={`https://wa.me/${WA}?text=${encodeURIComponent(`Bonjour Djimmy Prints, je souhaite le statut de ma commande ${normalizeRef(ref) || ''}`)}`}
                 target="_blank" rel="noopener noreferrer" className="btn-g">
-                💬 Demander sur WhatsApp
+                Demander sur WhatsApp
               </a>
-              <a href={`tel:+${WA}`} className="btn-outline">📞 {PHONE_DISPLAY}</a>
+              <a href={`tel:+${WA}`} className="btn-outline">{PHONE_DISPLAY}</a>
             </div>
           </div>
         )}
@@ -244,7 +245,7 @@ export default function Suivi() {
               {ORDER_STAGES.map((s, i) => (
                 <div key={s.key} style={{
                   background:'var(--white)', border:'1.5px solid var(--cream-border)',
-                  borderRadius:'16px', padding:'1.6rem 1.4rem',
+                  borderRadius:'var(--r)', padding:'1.6rem 1.4rem',
                 }}>
                   <div style={{fontSize:'1.6rem',marginBottom:'.7rem'}}>{s.ic}</div>
                   <div style={{fontSize:'.68rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'var(--green)',marginBottom:'.3rem'}}>

@@ -5,26 +5,38 @@ import { WA } from '../lib/constants'
 
 const WA_MSG = encodeURIComponent('Bonjour Djimmy Prints, je souhaite un devis pour des uniformes.')
 
+// Line icons rather than emoji. A coloured emoji is the fastest way to make
+// a supplier page read as a consumer app, and these six sit at the top of the
+// section a buyer reads first.
+const ICONS = {
+  broderie:   'M4 20c4-1 6-3 8-7s4-6 8-7M8 16l-2 4 4-2M15 4l5 5',
+  serigraphie:'M4 5h16v9H4zM7 14v6M17 14v6M4 9h16',
+  transfert:  'M12 3v11m0 0 4-4m-4 4-4-4M4 17v3h16v-3',
+  sublimation:'M12 3c3 3.5 5 6 5 8.5A5 5 0 0 1 7 11.5C7 9 9 6.5 12 3Z',
+  flocage:    'M5 7h14M9 7v13M4 4h16',
+  livraison:  'M3 7h11v9H3zM14 10h4l3 3v3h-7zM7 19a1.6 1.6 0 1 0 0-3.2A1.6 1.6 0 0 0 7 19Zm10 0a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2Z',
+}
+
 const SERVICES = [
-  { ic: '🪡', name: 'Broderie', desc: 'Rendu premium, idéal pour logos, textes et armoiries sur col, poitrine ou manche.' },
-  { ic: '🖨️', name: 'Sérigraphie', desc: 'Impression haute résistance sur grandes surfaces. Parfaite pour commandes en volume.' },
-  { ic: '💻', name: 'Transfert numérique', desc: 'Reproduction fidèle de votre logo avec couleurs exactes. Délai rapide.' },
-  { ic: '🌈', name: 'Sublimation', desc: 'Couleurs vibrantes et durables sur polyester. Idéal pour sportswear.' },
-  { ic: '🔤', name: 'Flocage', desc: 'Lettrage en velours ou flex pour un look sport authentique.' },
-  { ic: '📦', name: 'Livraison Algérie', desc: 'Livraison à domicile ou stop desk dans les 58 wilayas.' },
+  { ic: ICONS.broderie,    name: 'Broderie', desc: 'Fil cousu dans la matière. Tenue durable au lavage industriel, sur col, poitrine ou manche.' },
+  { ic: ICONS.serigraphie, name: 'Sérigraphie', desc: 'Le meilleur coût unitaire au-delà de 100 pièces, sur aplats et grandes surfaces.' },
+  { ic: ICONS.transfert,   name: 'Transfert numérique', desc: 'Logos en dégradé ou multicolores reproduits à l\'identique, sans surcoût par couleur.' },
+  { ic: ICONS.sublimation, name: 'Sublimation', desc: 'Encre intégrée à la fibre sur polyester : le marquage ne craquelle pas et ne se décolle pas.' },
+  { ic: ICONS.flocage,     name: 'Flocage', desc: 'Lettrage velours ou flex, pour les numéros, noms de poste et mentions de service.' },
+  { ic: ICONS.livraison,   name: 'Livraison nationale', desc: 'Domicile ou stop desk dans les 58 wilayas, avec bon de livraison détaillé.' },
 ]
 
 const WHY = [
-  { n: '48H', t: 'Délai de traitement', d: 'Confirmation et mise en production sous 48h ouvrables.' },
-  { n: '58', t: 'Wilayas livrées', d: 'Couverture nationale complète, domicile ou stop desk.' },
-  { n: '20+', t: 'Pièces minimum', d: 'Accessible aux petites et grandes structures.' },
-  { n: '100%', t: 'Sur mesure', d: 'Vos couleurs, votre logo, votre identité.' },
+  { n: '48H', t: 'Mise en production', d: 'Délai entre la validation de la maquette et le lancement en atelier.' },
+  { n: '58', t: 'Wilayas desservies', d: 'Couverture nationale, à domicile ou en point de retrait.' },
+  { n: '20', t: 'Pièces minimum', d: 'Seuil de commande accessible aux structures de toute taille.' },
+  { n: '15%', t: 'Remise maximale', d: 'Dégressif automatique appliqué dès 50 pièces, jusqu\'à 15% au-delà de 200.' },
 ]
 
 const PROCESS = [
-  { n: '01', t: 'Demandez un devis', d: 'Produits, quantité, technique : vous décrivez le besoin, on chiffre sous 24h ouvrables.', href: '/devis', cta: 'Demander un devis' },
-  { n: '02', t: 'Validez la maquette', d: 'On place votre logo et on vous envoie un aperçu. Rien ne part en production sans votre feu vert.', href: '/catalogue', cta: 'Essayer le configurateur' },
-  { n: '03', t: 'Suivez la production', d: 'Votre référence DP vous donne l\'étape en cours, de l\'atelier jusqu\'à la livraison.', href: '/suivi', cta: 'Suivre ma commande' },
+  { n: '01', t: 'Devis chiffré', d: 'Vous précisez produits, quantités et technique de marquage. Vous recevez un chiffrage détaillé sous 24h ouvrables.', href: '/devis', cta: 'Demander un devis' },
+  { n: '02', t: 'Validation de la maquette', d: 'Votre logo est positionné sur le vêtement et soumis à votre accord. Rien ne part en production avant validation écrite.', href: '/catalogue', cta: 'Ouvrir le configurateur' },
+  { n: '03', t: 'Production et livraison', d: 'Votre référence de commande donne l\'étape en cours, de l\'atelier jusqu\'à la réception.', href: '/suivi', cta: 'Suivre une commande' },
 ]
 
 const TESTIMONIALS = [
@@ -32,6 +44,13 @@ const TESTIMONIALS = [
   { text: "Le configurateur en ligne est génial — on a pu visualiser nos logos avant de commander. Très professionnel.", author: "Soraya M.", role: "Directrice hôtel, Oran" },
   { text: "Prix compétitifs, excellent suivi. On renouvelle nos commandes chaque saison sans hésiter.", author: "Yazid T.", role: "DRH PME industrielle, Annaba" },
 ]
+
+const Ic = ({ d }) => (
+  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green)"
+       strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d={d} />
+  </svg>
+)
 
 export default function Home() {
   const rvRefs = useRef([])
@@ -52,8 +71,8 @@ export default function Home() {
       <Head>
         <title>Djimmy Prints — Uniformes Personnalisés Alger | Broderie Algérie</title>
         <meta name="description" content="Djimmy Prints — Impression professionnelle sur uniformes et tenues de travail à Alger. Broderie, sérigraphie, transfert numérique. Devis gratuit sous 24h." />
-        <meta property="og:title" content="Djimmy Prints — Fait pour ceux qui rêvent grand" />
-        <meta property="og:description" content="Broderie, sérigraphie, transfert numérique sur uniformes. Livraison partout en Algérie." />
+        <meta property="og:title" content="Djimmy Prints — Uniformes d'entreprise personnalisés | Alger" />
+        <meta property="og:description" content="Broderie, sérigraphie et transfert numérique sur uniformes et tenues de travail. À partir de 20 pièces, livré dans les 58 wilayas." />
       </Head>
 
       {/* ── HERO ── */}
@@ -66,42 +85,47 @@ export default function Home() {
         overflow: 'hidden',
       }}>
         <div style={{maxWidth: 860, position: 'relative', zIndex: 1}}>
-          {/* Badge */}
+          {/* Eyebrow : ce que fait l'entreprise, et où. Pas un slogan. */}
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '.6rem',
-            background: 'var(--green-pale)', border: '1px solid rgba(111,175,82,.3)',
-            padding: '.4rem 1rem', borderRadius: '100px',
-            fontSize: '.72rem', fontWeight: 600, letterSpacing: '.12em',
-            textTransform: 'uppercase', color: 'var(--green)', marginBottom: '2rem',
+            display: 'inline-block',
+            borderLeft: '3px solid var(--gold)',
+            paddingLeft: '.8rem',
+            fontSize: '.78rem', fontWeight: 600, letterSpacing: '.16em',
+            textTransform: 'uppercase', color: 'var(--green)', marginBottom: '1.8rem',
+            lineHeight: 1.6,
           }}>
-            <span style={{width:6,height:6,background:'var(--green)',borderRadius:'50%',animation:'blk 2s infinite'}} />
-            Impression textile professionnelle · Alger
+            Uniformes &amp; tenues de travail<br/>Aïn Bénian, Alger
           </div>
 
-          {/* H1 */}
+          {/* H1 — l'offre, énoncée. « Fait pour ceux qui rêvent grand »
+              s'adressait à une personne qui se projette ; un acheteur
+              professionnel cherche d'abord à savoir ce qu'on fabrique. */}
           <h1 style={{
-            fontFamily: 'var(--display)', fontWeight: 800,
-            fontSize: 'clamp(2.2rem, 10vw, 3rem)',
-            lineHeight: 1.08,
-            letterSpacing: '-.02em', marginBottom: '1.4rem', color: 'var(--txt)',
+            fontFamily: 'var(--display)', fontWeight: 700,
+            fontSize: 'clamp(2.5rem, 11vw, 3.4rem)',
+            lineHeight: 1.06,
+            letterSpacing: '-.035em', marginBottom: '1.5rem', color: 'var(--txt)',
           }}>
-            Fait pour ceux<br/>
-            <span style={{color: 'var(--green)'}}>qui rêvent grand.</span>
+            Uniformes d'entreprise,<br/>
+            <span style={{color: 'var(--green)'}}>personnalisés à votre image.</span>
           </h1>
 
           <p style={{
-            fontSize: '1.05rem', color: 'var(--muted)',
-            lineHeight: 1.85, maxWidth: 500, marginBottom: '2.8rem',
+            fontSize: '1.12rem', color: 'var(--muted)',
+            lineHeight: 1.7, maxWidth: 480, marginBottom: '2.4rem',
           }}>
-            Uniformes brodés, sérigraphiés, personnalisés à votre image.
-            Livraison dans les <strong style={{color:'var(--black)'}}>58 wilayas</strong> d'Algérie.
-            Devis gratuit en moins de 24h.
+            Broderie, sérigraphie et transfert numérique sur polos, t-shirts,
+            gilets et combinaisons. À partir de{' '}
+            <strong style={{color:'var(--black)',fontWeight:600}}>20 pièces</strong>,
+            livré dans les{' '}
+            <strong style={{color:'var(--black)',fontWeight:600}}>58 wilayas</strong>.
           </p>
 
-          {/* CTAs */}
-          <div style={{display:'flex',gap:'1rem',flexWrap:'wrap',marginBottom:'4rem'}}>
-            <Link href="/commande" className="btn-g">
-              Commander maintenant
+          {/* Le devis passe devant : un acheteur professionnel veut un
+              chiffrage avant de commander. */}
+          <div style={{display:'flex',gap:'.8rem',flexWrap:'wrap',marginBottom:'3.4rem'}}>
+            <Link href="/devis" className="btn-g">
+              Demander un devis
             </Link>
             <Link href="/catalogue" className="btn-outline">
               Voir le catalogue
@@ -110,13 +134,14 @@ export default function Home() {
 
           {/* Stats */}
           <div style={{
-            display: 'flex', gap: '3rem', paddingTop: '2.2rem',
-            borderTop: '1.5px solid var(--cream-border)', flexWrap: 'wrap',
+            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '1.6rem 1.2rem', paddingTop: '2rem',
+            borderTop: '1px solid var(--cream-border)',
           }}>
-            {[['500+','Clients satisfaits'],['48H','Délai de traitement'],['58','Wilayas livrées'],['5+','Techniques d\'impression']].map(([n,l]) => (
+            {[['500+','Entreprises équipées'],['48H','Mise en production'],['58','Wilayas desservies'],['5','Techniques de marquage']].map(([n,l]) => (
               <div key={l}>
-                <div style={{fontFamily:'var(--display)',fontSize:'2.6rem',fontWeight:400,color:'var(--green)',lineHeight:1}}>{n}</div>
-                <div style={{fontSize:'.72rem',color:'var(--muted)',letterSpacing:'.07em',marginTop:'.3rem',fontWeight:500,textTransform:'uppercase'}}>{l}</div>
+                <div style={{fontFamily:'var(--display)',fontSize:'2.4rem',fontWeight:700,letterSpacing:'-.03em',color:'var(--green)',lineHeight:1}}>{n}</div>
+                <div style={{fontSize:'.78rem',color:'var(--muted)',letterSpacing:'.04em',marginTop:'.35rem',fontWeight:500}}>{l}</div>
               </div>
             ))}
           </div>
@@ -137,67 +162,69 @@ export default function Home() {
       </div>
 
       {/* ── SERVICES ── */}
-      <section ref={rv(0)} className="rv" style={{padding:'2.6rem 1.15rem',background:'rgba(255,255,255,.5)',backdropFilter:'blur(6px)',position:'relative',zIndex:1}}>
-        <p className="s-lbl">Nos techniques</p>
-        <h2 className="s-ttl">Ce qu'on fait <span className="kw">mieux que tout le monde</span></h2>
+      <section ref={rv(0)} className="rv" style={{padding:'3.2rem 1.15rem',background:'var(--surface)',borderTop:'1px solid var(--line)',borderBottom:'1px solid var(--line)',position:'relative',zIndex:1}}>
+        <p className="s-lbl">Techniques de marquage</p>
+        <h2 className="s-ttl">Cinq façons d'appliquer <span className="kw">votre logo</span></h2>
+        <p className="s-desc">Le choix dépend du support, de la quantité et du rendu attendu. On vous oriente au moment du devis.</p>
         <div className="cards" style={{marginTop:'3rem'}}>
           {SERVICES.map((s, i) => (
             <div key={s.name} ref={rv(10 + i)} className="rv" style={{
-              background: 'var(--cream)', border: '1.5px solid var(--cream-border)',
-              padding: '1.5rem 1.3rem', borderRadius: '16px',
-              transition: 'all .3s', cursor: 'default',
-              transitionDelay: `${i * 0.08}s`,
+              background: 'var(--paper)', border: '1px solid var(--line)',
+              padding: '1.6rem 1.4rem', borderRadius: 'var(--r)',
+              transition: 'border-color .25s', cursor: 'default',
+              transitionDelay: `${i * 0.06}s`,
             }}
-              onMouseOver={e => { e.currentTarget.style.borderColor='var(--green)'; e.currentTarget.style.boxShadow='var(--shadow-md)'; e.currentTarget.style.transform='translateY(-3px)'; }}
-              onMouseOut={e => { e.currentTarget.style.borderColor='var(--cream-border)'; e.currentTarget.style.boxShadow='none'; e.currentTarget.style.transform='none'; }}
+              onMouseOver={e => { e.currentTarget.style.borderColor='var(--green)' }}
+              onMouseOut={e => { e.currentTarget.style.borderColor='var(--line)' }}
             >
-              <span style={{fontSize:'1.8rem',marginBottom:'1.1rem',display:'block'}}>{s.ic}</span>
-              <div style={{fontFamily:'var(--display)',fontSize:'1.15rem',letterSpacing:'.02em',marginBottom:'.5rem'}}>{s.name}</div>
-              <p style={{fontSize:'.85rem',color:'var(--muted)',lineHeight:1.7}}>{s.desc}</p>
+              <span style={{display:'block',marginBottom:'1rem'}}><Ic d={s.ic} /></span>
+              <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.2rem',letterSpacing:'-.01em',marginBottom:'.5rem'}}>{s.name}</div>
+              <p style={{fontSize:'.95rem',color:'var(--muted)',lineHeight:1.65}}>{s.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── WHY US ── */}
-      <section ref={rv(1)} className="rv" style={{padding:'2.6rem 1.15rem',position:'relative',zIndex:1}}>
-        <p className="s-lbl">Pourquoi Djimmy Prints</p>
-        <h2 className="s-ttl">Des chiffres qui <span className="kw">parlent d'eux-mêmes</span></h2>
+      <section ref={rv(1)} className="rv" style={{padding:'3.2rem 1.15rem',position:'relative',zIndex:1}}>
+        <p className="s-lbl">Nos engagements</p>
+        <h2 className="s-ttl">Ce sur quoi vous pouvez <span className="kw">compter</span></h2>
         <div className="cards-sm" style={{marginTop:'3rem'}}>
           {WHY.map((w, i) => (
             <div key={w.n} ref={rv(20 + i)} className="rv" style={{
-              padding:'1.3rem 1.2rem', border:'1.5px solid var(--cream-border)',
-              borderRadius:'16px', background:'var(--white)', transition:'all .3s',
-              transitionDelay:`${i*0.08}s`,
-            }}
-              onMouseOver={e=>{e.currentTarget.style.borderColor='var(--green)';e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='var(--shadow)'}}
-              onMouseOut={e=>{e.currentTarget.style.borderColor='var(--cream-border)';e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='none'}}
-            >
-              <div style={{fontFamily:'var(--display)',fontSize:'2.6rem',fontWeight:400,color:'var(--green)',lineHeight:1}}>{w.n}</div>
-              <div style={{fontWeight:700,fontSize:'.9rem',margin:'.4rem 0',color:'var(--black)'}}>{w.t}</div>
-              <p style={{fontSize:'.8rem',color:'var(--muted)',lineHeight:1.7}}>{w.d}</p>
+              padding:'1.4rem 1.2rem', border:'1px solid var(--line)',
+              borderTop:'3px solid var(--green)',
+              borderRadius:'var(--r)', background:'var(--surface)',
+              transitionDelay:`${i*0.06}s`,
+            }}>
+              <div style={{fontFamily:'var(--display)',fontSize:'2.3rem',fontWeight:700,letterSpacing:'-.03em',color:'var(--green)',lineHeight:1}}>{w.n}</div>
+              <div style={{fontWeight:700,fontSize:'.98rem',margin:'.45rem 0 .3rem',color:'var(--black)'}}>{w.t}</div>
+              <p style={{fontSize:'.88rem',color:'var(--muted)',lineHeight:1.6}}>{w.d}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── PROCESS ── */}
-      <section ref={rv(4)} className="rv" style={{padding:'2.6rem 1.15rem',background:'rgba(255,255,255,.5)',backdropFilter:'blur(6px)',position:'relative',zIndex:1}}>
-        <p className="s-lbl">Comment ça marche</p>
-        <h2 className="s-ttl">De l'idée à la <span className="kw">livraison</span></h2>
-        <p className="s-desc">Trois étapes, zéro surprise. Vous gardez la main à chaque validation.</p>
+      <section ref={rv(4)} className="rv" style={{padding:'3.2rem 1.15rem',background:'var(--surface)',borderTop:'1px solid var(--line)',borderBottom:'1px solid var(--line)',position:'relative',zIndex:1}}>
+        <p className="s-lbl">Déroulé d'une commande</p>
+        <h2 className="s-ttl">Du devis à la <span className="kw">livraison</span></h2>
+        <p className="s-desc">Trois étapes, chacune validée par vous avant de passer à la suivante.</p>
         <div className="cards" style={{marginTop:'3rem'}}>
           {PROCESS.map((s2, i) => (
             <div key={s2.n} ref={rv(40 + i)} className="rv" style={{
-              background:'var(--cream)', border:'1.5px solid var(--cream-border)',
-              borderRadius:'16px', padding:'1.5rem 1.3rem',
-              display:'flex', flexDirection:'column', transitionDelay:`${i * 0.08}s`,
+              background:'var(--paper)', border:'1px solid var(--line)',
+              borderRadius:'var(--r)', padding:'1.6rem 1.4rem',
+              display:'flex', flexDirection:'column', transitionDelay:`${i * 0.06}s`,
             }}>
-              <div style={{fontFamily:'var(--display)',fontSize:'2.4rem',color:'var(--gold)',lineHeight:1,marginBottom:'.8rem'}}>{s2.n}</div>
-              <div style={{fontFamily:'var(--display)',fontSize:'1.15rem',letterSpacing:'.02em',marginBottom:'.5rem'}}>{s2.t}</div>
-              <p style={{fontSize:'.85rem',color:'var(--muted)',lineHeight:1.7,marginBottom:'1.3rem',flex:1}}>{s2.d}</p>
+              <div style={{display:'flex',alignItems:'center',gap:'.7rem',marginBottom:'.9rem'}}>
+                <span style={{fontFamily:'var(--display)',fontSize:'.95rem',fontWeight:700,color:'#fff',background:'var(--green)',width:32,height:32,borderRadius:'var(--r-s)',display:'grid',placeItems:'center'}}>{s2.n}</span>
+                <span style={{flex:1,height:1,background:'var(--line)'}} />
+              </div>
+              <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.2rem',letterSpacing:'-.01em',marginBottom:'.5rem'}}>{s2.t}</div>
+              <p style={{fontSize:'.95rem',color:'var(--muted)',lineHeight:1.65,marginBottom:'1.3rem',flex:1}}>{s2.d}</p>
               <Link href={s2.href} style={{
-                fontSize:'.78rem', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase',
+                fontSize:'.85rem', fontWeight:700, letterSpacing:'.05em',
                 color:'var(--green)', textDecoration:'none',
               }}>
                 {s2.cta} →
@@ -209,65 +236,60 @@ export default function Home() {
 
       {/* ── CTA BAND ── */}
       <section ref={rv(2)} className="rv" style={{
-        background:'var(--green)', padding:'2.2rem 1.15rem',
+        background:'var(--green-d)', padding:'2.8rem 1.15rem',
         display:'flex', alignItems:'center', justifyContent:'space-between',
         gap:'2rem', flexWrap:'wrap', position:'relative', overflow:'hidden', zIndex:1,
       }}>
-        <div style={{position:'absolute',right:'-1rem',top:'50%',transform:'translateY(-50%)',fontFamily:'var(--display)',fontSize:'7rem',fontWeight:400,color:'rgba(255,255,255,.07)',whiteSpace:'nowrap',pointerEvents:'none'}}>
-          DJIMMY PRINTS
-        </div>
         <div>
-          <div style={{fontFamily:'var(--display)',fontWeight:400,fontSize:'clamp(1.6rem,3.5vw,2.5rem)',color:'#fff',lineHeight:1}}>
-            Prêt à habiller votre équipe ?
+          <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'clamp(1.75rem,7vw,2.3rem)',letterSpacing:'-.03em',color:'#fff',lineHeight:1.1}}>
+            Un besoin en uniformes ?
           </div>
-          <p style={{fontSize:'.88rem',color:'rgba(255,255,255,.75)',marginTop:'.4rem'}}>
-            Devis gratuit · Réponse sous 24h · Livraison dans 58 wilayas
+          <p style={{fontSize:'1rem',color:'rgba(245,240,232,.75)',marginTop:'.6rem',lineHeight:1.6}}>
+            Devis gratuit, chiffré sous 24h ouvrables. Sans engagement.
           </p>
         </div>
         <div style={{display:'flex',gap:'1rem',flexWrap:'wrap',position:'relative',zIndex:1}}>
-          <Link href="/commande" style={{
-            background:'#fff',color:'#0B0D16',
-            padding:'.9rem 2.2rem',fontWeight:700,fontSize:'.85rem',
-            letterSpacing:'.07em',textTransform:'uppercase',border:'none',
-            borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',
-            transition:'all .2s',textDecoration:'none',display:'inline-block',
+          <Link href="/devis" style={{
+            background:'var(--gold-l)',color:'var(--green-d)',
+            padding:'1rem 1.9rem',fontWeight:700,fontSize:'.95rem',
+            border:'none',borderRadius:'var(--r-s)',cursor:'pointer',fontFamily:'inherit',
+            textDecoration:'none',display:'inline-block',
           }}>
-            Commander
+            Demander un devis
           </Link>
           <a href={`https://wa.me/${WA}?text=${WA_MSG}`} target="_blank" rel="noopener noreferrer"
             style={{
-              background:'rgba(255,255,255,.14)',color:'#fff',
-              padding:'.9rem 2.2rem',fontWeight:600,fontSize:'.85rem',
-              letterSpacing:'.07em',textTransform:'uppercase',
-              border:'1.5px solid rgba(255,255,255,.4)',
-              borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',
-              transition:'all .2s',textDecoration:'none',display:'inline-block',
+              background:'transparent',color:'#fff',
+              padding:'1rem 1.9rem',fontWeight:600,fontSize:'.95rem',
+              border:'1.5px solid rgba(245,240,232,.45)',
+              borderRadius:'var(--r-s)',cursor:'pointer',fontFamily:'inherit',
+              textDecoration:'none',display:'inline-block',
             }}>
-            💬 WhatsApp
+            Écrire sur WhatsApp
           </a>
         </div>
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section ref={rv(3)} className="rv" style={{padding:'2.6rem 1.15rem',position:'relative',zIndex:1}}>
-        <p className="s-lbl">Témoignages</p>
+      <section ref={rv(3)} className="rv" style={{padding:'3.2rem 1.15rem',position:'relative',zIndex:1}}>
+        <p className="s-lbl">Références</p>
         <h2 className="s-ttl">Ils nous font <span className="kw">confiance</span></h2>
         <div className="cards" style={{marginTop:'3rem'}}>
           {TESTIMONIALS.map((t, i) => (
             <div key={i} ref={rv(30+i)} className="rv" style={{
-              background:'var(--white)',border:'1.5px solid var(--cream-border)',
-              borderRadius:'16px',padding:'1.4rem',transition:'all .3s',
-              transitionDelay:`${i*0.1}s`,
+              background:'var(--surface)',border:'1px solid var(--line)',
+              borderRadius:'var(--r)',padding:'1.6rem 1.4rem',
+              transitionDelay:`${i*0.08}s`,
             }}>
-              <div style={{color:'var(--gold)',fontSize:'1.1rem',marginBottom:'1rem'}}>★★★★★</div>
-              <p style={{fontSize:'.9rem',color:'var(--black-soft)',lineHeight:1.8,marginBottom:'1.2rem',fontStyle:'italic'}}>"{t.text}"</p>
-              <div style={{display:'flex',alignItems:'center',gap:'.8rem'}}>
-                <div style={{width:38,height:38,background:'var(--grad)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:700,fontSize:'.9rem',flexShrink:0}}>
+              <div style={{color:'var(--gold)',fontSize:'.95rem',letterSpacing:'.15em',marginBottom:'1rem'}}>★★★★★</div>
+              <p style={{fontSize:'1rem',color:'var(--black-soft)',lineHeight:1.7,marginBottom:'1.3rem'}}>«&nbsp;{t.text}&nbsp;»</p>
+              <div style={{display:'flex',alignItems:'center',gap:'.8rem',paddingTop:'1rem',borderTop:'1px solid var(--line)'}}>
+                <div style={{width:38,height:38,background:'var(--green-pale)',color:'var(--green)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:'.95rem',flexShrink:0}}>
                   {t.author[0]}
                 </div>
                 <div>
-                  <div style={{fontWeight:700,fontSize:'.85rem'}}>{t.author}</div>
-                  <div style={{fontSize:'.75rem',color:'var(--muted)'}}>{t.role}</div>
+                  <div style={{fontWeight:700,fontSize:'.92rem'}}>{t.author}</div>
+                  <div style={{fontSize:'.82rem',color:'var(--muted)'}}>{t.role}</div>
                 </div>
               </div>
             </div>
@@ -275,9 +297,6 @@ export default function Home() {
         </div>
       </section>
 
-      <style jsx>{`
-        @keyframes blk { 0%,100%{opacity:1} 50%{opacity:.2} }
-      `}</style>
     </>
   )
 }

@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { WA, PHONE_DISPLAY, EMAIL, ADDRESS } from '../lib/constants'
+import Ico from '../components/Ico'
 
 const FAQ = [
   { q: 'Quel est le minimum de commande ?', r: '20 pièces minimum. Pour les commandes inférieures, contactez-nous pour un devis personnalisé.' },
@@ -29,10 +30,10 @@ export default function Contact() {
 
             {/* Cards contact */}
             {[
-              { ic:'💬', title:'WhatsApp', sub:'Réponse en moins de 2h', action:'Écrire maintenant', href:`https://wa.me/${WA}?text=Bonjour Djimmy Prints, je souhaite un devis.`, highlight:true },
-              { ic:'📞', title:'Téléphone', sub:PHONE_DISPLAY, action:'Appeler', href:`tel:+${WA}` },
-              { ic:'📧', title:'Email', sub:EMAIL, action:'Envoyer un email', href:`mailto:${EMAIL}` },
-              { ic:'📍', title:'Adresse', sub:`${ADDRESS}, Algérie`, action:'Voir sur la carte', href:'https://www.google.com/maps?q=Aïn+Bénian+Alger' },
+              { ic:'wa', title:'WhatsApp', sub:'Réponse en moins de 2h', action:'Écrire maintenant', href:`https://wa.me/${WA}?text=Bonjour Djimmy Prints, je souhaite un devis.`, highlight:true },
+              { ic:'phone', title:'Téléphone', sub:PHONE_DISPLAY, action:'Appeler', href:`tel:+${WA}` },
+              { ic:'mail', title:'Email', sub:EMAIL, action:'Envoyer un email', href:`mailto:${EMAIL}` },
+              { ic:'pin', title:'Adresse', sub:`${ADDRESS}, Algérie`, action:'Voir sur la carte', href:'https://www.google.com/maps?q=Aïn+Bénian+Alger' },
             ].map((c,i) => (
               <a key={i} href={c.href} target={c.href.startsWith('http')?'_blank':'_self'} rel="noopener noreferrer"
                 className="c-card"
@@ -40,13 +41,13 @@ export default function Contact() {
                   padding:'1.4rem 1.5rem',marginBottom:'1rem',
                   background: c.highlight ? 'var(--green)' : 'var(--white)',
                   border:`1.5px solid ${c.highlight?'var(--green)':'var(--cream-border)'}`,
-                  borderRadius:'20px',textDecoration:'none',
+                  borderRadius:'var(--r)',textDecoration:'none',
                   transition:'all .25s',
                 }}
                 onMouseOver={e=>{if(!c.highlight){e.currentTarget.style.borderColor='var(--green)';e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='var(--shadow)'}}}
                 onMouseOut={e=>{if(!c.highlight){e.currentTarget.style.borderColor='var(--cream-border)';e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='none'}}}
               >
-                <span style={{fontSize:'1.8rem',flexShrink:0}}>{c.ic}</span>
+                <span style={{flexShrink:0,width:42,height:42,borderRadius:'var(--r-s)',display:'grid',placeItems:'center',background:'var(--green-pale)',color:'var(--green)'}}><Ico n={c.ic} size={20} /></span>
                 <div className="c-body">
                   <div style={{fontWeight:700,fontSize:'.9rem',color:c.highlight?'#fff':'var(--black)',marginBottom:'.2rem'}}>{c.title}</div>
                   <div style={{fontSize:'.82rem',color:c.highlight?'rgba(255,255,255,.75)':'var(--muted)'}}>{c.sub}</div>
@@ -58,8 +59,8 @@ export default function Contact() {
             ))}
 
             {/* Horaires */}
-            <div style={{marginTop:'2rem',padding:'1.5rem',background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'20px'}}>
-              <div style={{fontFamily:'var(--display)',fontSize:'.9rem',letterSpacing:'.04em',marginBottom:'1rem'}}>🕐 Horaires</div>
+            <div style={{marginTop:'2rem',padding:'1.5rem',background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)'}}>
+              <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'-.01em',marginBottom:'1rem',display:'flex',alignItems:'center',gap:'.5rem'}}><Ico n="clock" /> Horaires</div>
               {[
                 ['Dimanche – Jeudi', '8h00 – 18h00'],
                 ['Vendredi', '8h00 – 12h00'],
@@ -80,7 +81,7 @@ export default function Contact() {
               {FAQ.map((f,i) => (
                 <details key={i} style={{
                   background:'var(--white)',border:'1.5px solid var(--cream-border)',
-                  borderRadius:'16px',overflow:'hidden',
+                  borderRadius:'var(--r)',overflow:'hidden',
                 }}>
                   <summary style={{
                     padding:'1.1rem 1.3rem',cursor:'pointer',fontWeight:700,
@@ -101,7 +102,7 @@ export default function Contact() {
             {/* CTA dévis */}
             <div style={{
               marginTop:'2rem',
-              background:'var(--green)',borderRadius:'20px',
+              background:'var(--green)',borderRadius:'var(--r)',
               padding:'2rem',textAlign:'center',position:'relative',overflow:'hidden',
             }}>
               <div style={{position:'absolute',inset:0,fontFamily:'var(--display)',fontSize:'5rem',color:'rgba(255,255,255,.05)',display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none',letterSpacing:'.05em'}}>
@@ -118,12 +119,11 @@ export default function Contact() {
                   target="_blank" rel="noopener noreferrer"
                   style={{
                     display:'inline-flex',alignItems:'center',gap:'.5rem',
-                    background:'#fff',color:'#0B0D16',
-                    padding:'.9rem 2rem',fontWeight:700,fontSize:'.85rem',
-                    letterSpacing:'.05em',textTransform:'uppercase',
-                    borderRadius:'3px',textDecoration:'none',
+                    background:'var(--gold-l)',color:'var(--green-d)',
+                    padding:'1rem 1.9rem',fontWeight:700,fontSize:'.95rem',
+                    borderRadius:'var(--r-s)',textDecoration:'none',
                   }}>
-                  💬 Demander un devis
+                  Demander un devis
                 </a>
               </div>
             </div>

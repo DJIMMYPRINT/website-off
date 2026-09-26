@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { PRODUCTS , hasPriceGrid, priceRange } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import { VOLUME_DISCOUNTS } from '../lib/constants'
+import Ico from '../components/Ico'
 
 export default function Catalogue() {
   const [activeProduct, setActiveProduct] = useState(PRODUCTS[0])
@@ -77,7 +78,7 @@ export default function Catalogue() {
     const canvas = document.createElement('canvas')
     canvas.width = 600; canvas.height = 600
     const ctx = canvas.getContext('2d')
-    ctx.fillStyle = '#141827'; ctx.fillRect(0,0,600,600)
+    ctx.fillStyle = '#FBF8F3'; ctx.fillRect(0,0,600,600)
     ctx.font = '200px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
     ctx.fillText(activeProduct.emoji, 300, 300)
     if (logoSrc) {
@@ -111,17 +112,17 @@ export default function Catalogue() {
         <div className="grid-2 rv">
 
           {/* ── CONFIGURATEUR ── */}
-          <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden'}}>
+          <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',overflow:'hidden'}}>
             {/* Header */}
             <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <div style={{fontFamily:'var(--display)',fontSize:'1rem',letterSpacing:'.04em'}}>🎨 Studio logo</div>
+              <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.1rem',letterSpacing:'-.01em'}}>Studio logo</div>
             </div>
 
             {/* Product selector */}
             <div style={{padding:'1rem 1.5rem',display:'flex',gap:'.5rem',flexWrap:'wrap',borderBottom:'1px solid var(--cream-border)'}}>
               {PRODUCTS.map(p => (
                 <button key={p.name} onClick={() => setActiveProduct(p)} style={{
-                  padding:'.3rem .7rem',fontSize:'.75rem',border:'1.5px solid',borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',fontWeight:500,
+                  padding:'.3rem .7rem',fontSize:'.75rem',border:'1.5px solid',borderRadius:'var(--r-s)',cursor:'pointer',fontFamily:'inherit',fontWeight:500,
                   borderColor: activeProduct.name===p.name ? 'var(--green)' : 'var(--cream-border)',
                   background: activeProduct.name===p.name ? 'var(--green)' : 'var(--cream)',
                   color: activeProduct.name===p.name ? '#fff' : 'var(--black)',
@@ -137,7 +138,7 @@ export default function Catalogue() {
               ref={canvasRef}
               style={{
                 position:'relative', aspectRatio:'1',
-                background: 'linear-gradient(135deg, #141827 0%, #0E1018 100%)',
+                background: 'var(--surface-2)',
                 display:'flex', alignItems:'center', justifyContent:'center',
                 cursor: logoSrc ? (isDragging ? 'grabbing' : 'grab') : 'default',
                 userSelect:'none',
@@ -166,7 +167,7 @@ export default function Catalogue() {
               {!logoSrc && (
                 <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
                   <div style={{textAlign:'center',color:'var(--muted)',fontSize:'.8rem'}}>
-                    <div style={{fontSize:'1.5rem',marginBottom:'.3rem'}}>⬆️</div>
+                    <div style={{marginBottom:'.45rem',display:'flex',justifyContent:'center',color:'var(--muted-light)'}}><Ico n="upload" size={26} /></div>
                     Uploadez votre logo pour le placer ici
                   </div>
                 </div>
@@ -189,7 +190,7 @@ export default function Catalogue() {
               style={{
                 margin:'1rem 1.5rem',
                 border:`2px dashed ${dragOver ? 'var(--green)' : 'var(--cream-border)'}`,
-                borderRadius:'16px',
+                borderRadius:'var(--r)',
                 padding:'1.5rem',
                 textAlign:'center',
                 cursor:'pointer',
@@ -201,7 +202,7 @@ export default function Catalogue() {
               onDragLeave={()=>setDragOver(false)}
               onDrop={e=>{e.preventDefault();setDragOver(false);handleFileInput(e.dataTransfer.files)}}
             >
-              <div style={{fontSize:'1.5rem',marginBottom:'.3rem'}}>⬆️</div>
+              <div style={{marginBottom:'.45rem',display:'flex',justifyContent:'center',color:'var(--green)'}}><Ico n="upload" size={26} /></div>
               <div style={{fontWeight:600,fontSize:'.85rem',marginBottom:'.2rem'}}>Uploadez votre logo</div>
               <div style={{fontSize:'.72rem',color:'var(--muted)'}}>PNG, JPG, SVG — glissez-déposez ou cliquez</div>
               <input id="logoInput" type="file" accept=".jpg,.jpeg,.png,.svg" style={{display:'none'}} onChange={e=>handleFileInput(e.target.files)} />
@@ -210,15 +211,16 @@ export default function Catalogue() {
             {/* Actions */}
             <div style={{padding:'0 1.5rem 1.5rem',display:'flex',gap:'.7rem'}}>
               <button onClick={downloadPreview} style={{
-                flex:1,padding:'.7rem',fontSize:'.78rem',fontWeight:600,border:'1.5px solid var(--green)',
-                color:'var(--green)',background:'transparent',borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',
+                flex:1,padding:'.8rem',fontSize:'.88rem',fontWeight:600,border:'1.5px solid var(--green)',
+                color:'var(--green)',background:'transparent',borderRadius:'var(--r-s)',cursor:'pointer',fontFamily:'inherit',
+                display:'inline-flex',alignItems:'center',justifyContent:'center',gap:'.45rem',
               }}>
-                ⬇ Télécharger aperçu
+                <Ico n="download" size={16} /> Télécharger aperçu
               </button>
               {logoSrc && (
                 <button onClick={()=>{setLogoSrc(null);setLogoPos({x:50,y:40});setLogoSize(80)}} style={{
                   padding:'.7rem 1rem',fontSize:'.78rem',fontWeight:600,border:'1.5px solid var(--cream-border)',
-                  color:'var(--muted)',background:'transparent',borderRadius:'3px',cursor:'pointer',fontFamily:'inherit',
+                  color:'var(--muted)',background:'transparent',borderRadius:'var(--r-s)',cursor:'pointer',fontFamily:'inherit',
                 }}>
                   ↺ Reset
                 </button>
@@ -235,42 +237,50 @@ export default function Catalogue() {
                 <div key={p.name} onClick={()=>setActiveProduct(p)} style={{
                   background: activeProduct.name===p.name ? 'var(--green-pale)' : 'var(--white)',
                   border: `1.5px solid ${activeProduct.name===p.name ? 'var(--green)' : 'var(--cream-border)'}`,
-                  borderRadius:'16px', padding:'1.2rem 1.5rem',
-                  display:'flex', alignItems:'center', justifyContent:'space-between',
+                  borderRadius:'var(--r)', padding:'1.2rem',
+                  display:'flex', alignItems:'center', justifyContent:'space-between', gap:'.8rem',
                   cursor:'pointer', transition:'all .2s', position:'relative',
                 }}>
                   {p.popular && (
                     <span style={{
                       position:'absolute',top:'-10px',right:'12px',
-                      background:'var(--gold)',color:'#04121A',
-                      fontSize:'.62rem',fontWeight:700,padding:'.2rem .6rem',borderRadius:'100px',
+                      background:'var(--gold-d)',color:'#fff',
+                      fontSize:'.68rem',fontWeight:700,padding:'.22rem .6rem',borderRadius:'3px',
                       letterSpacing:'.08em',textTransform:'uppercase',
                     }}>Populaire</span>
                   )}
-                  <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
-                    <ProductImg product={p} size={104} radius={16} />
-                    <div>
-                      <div style={{fontFamily:'var(--display)',fontSize:'.95rem',letterSpacing:'.02em',marginBottom:'.2rem'}}>{p.name}</div>
-                      <div style={{fontSize:'.75rem',color:'var(--muted)'}}>{p.desc}</div>
+                  <div style={{display:'flex',alignItems:'center',gap:'1rem',minWidth:0,flex:1}}>
+                    <ProductImg product={p} size={104} radius={8} />
+                    <div style={{minWidth:0}}>
+                      <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'-.01em',marginBottom:'.25rem'}}>{p.name}</div>
+                      <div style={{fontSize:'.85rem',color:'var(--muted)',lineHeight:1.5}}>{p.desc}</div>
                       <div style={{display:'flex',gap:'.4rem',marginTop:'.4rem',flexWrap:'wrap'}}>
                         {p.techniques.map(t => (
-                          <span key={t} style={{fontSize:'.65rem',background:'var(--green-pale)',color:'var(--green)',padding:'.15rem .5rem',borderRadius:'100px',fontWeight:600}}>{t}</span>
+                          <span key={t} style={{fontSize:'.72rem',background:'var(--green-pale)',color:'var(--green)',padding:'.18rem .55rem',borderRadius:'3px',fontWeight:600}}>{t}</span>
                         ))}
                       </div>
                     </div>
                   </div>
+                  {/* "dès" goes on its own line rather than in front of the
+                      figure: prefixed, the price column grew wide enough to
+                      push the row past the screen on a 320px handset. */}
                   <div style={{textAlign:'right',flexShrink:0}}>
-                    <div style={{fontFamily:'var(--display)',fontSize:'1.4rem',color:'var(--green)',lineHeight:1}}>{hasPriceGrid(p) ? `dès ${priceRange(p)[0].toLocaleString('fr-DZ')}` : p.price.toLocaleString('fr-DZ')}</div>
-                    <div style={{fontSize:'.7rem',color:'var(--muted)'}}>DA / pièce</div>
+                    {hasPriceGrid(p) && (
+                      <div style={{fontSize:'.72rem',color:'var(--muted)',lineHeight:1.2}}>à partir de</div>
+                    )}
+                    <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.45rem',letterSpacing:'-.02em',color:'var(--green)',lineHeight:1.05,whiteSpace:'nowrap'}}>
+                      {(hasPriceGrid(p) ? priceRange(p)[0] : p.price).toLocaleString('fr-DZ')}
+                    </div>
+                    <div style={{fontSize:'.76rem',color:'var(--muted)'}}>DA / pièce</div>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Remises volume */}
-            <div style={{background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden',marginBottom:'2rem'}}>
-              <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontSize:'.9rem',letterSpacing:'.04em'}}>
-                📦 Remises volume
+            <div style={{background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',overflow:'hidden',marginBottom:'2rem'}}>
+              <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'-.01em'}}>
+                Remises volume
               </div>
               <div className="vol-grid">
                 {VOLUME_DISCOUNTS.map((d,i) => (

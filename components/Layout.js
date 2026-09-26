@@ -25,6 +25,12 @@ const TABS = [
   { label: 'Devis',     href: '/devis',     d: I.devis },
 ]
 
+const WaIcon = ({ size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.13h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 0 1-1.26-4.36c0-4.54 3.7-8.23 8.25-8.23a8.2 8.2 0 0 1 8.24 8.24c0 4.54-3.7 8.21-8.24 8.21Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.09-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.02 2.56c.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.29Z"/>
+  </svg>
+)
+
 const Icon = ({ d }) => (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
        strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -68,19 +74,16 @@ export default function Layout({ children }) {
 
       {/* PROMO STRIP */}
       <div className="promo-strip" onClick={() => router.push('/commande')}>
-        🎁 50 pièces ou plus — remise volume automatique
+        Remise volume automatique à partir de <strong>50 pièces</strong>
       </div>
 
       {/* HEADER */}
       <header className={`hdr${scrolled ? ' scrolled' : ''}`}>
-        <Link href="/" style={{display:'flex',alignItems:'center',gap:'.55rem',textDecoration:'none'}}>
+        <Link href="/" className="hdr-brand" style={{display:'flex',alignItems:'center',gap:'.55rem',textDecoration:'none',minWidth:0}}>
           <img src="/djimmy-logo-96.png" alt="Djimmy Prints"
                style={{width:36,height:36,objectFit:'cover',borderRadius:'50%',border:'1px solid var(--line)'}} />
-          <span style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'.95rem',letterSpacing:'-.01em',color:'var(--txt)'}}>
-            Djimmy&nbsp;<span style={{
-              background:'var(--grad)', WebkitBackgroundClip:'text', backgroundClip:'text',
-              WebkitTextFillColor:'transparent', color:'transparent',
-            }}>Prints</span>
+          <span style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'.01em',color:'var(--txt)',textTransform:'uppercase'}}>
+            Djimmy&nbsp;<span style={{color:'var(--green)'}}>Prints</span>
           </span>
         </Link>
 
@@ -90,13 +93,13 @@ export default function Layout({ children }) {
           target="_blank" rel="noopener noreferrer"
           aria-label="Nous écrire sur WhatsApp"
           style={{
-            display:'inline-flex', alignItems:'center', gap:'.4rem',
-            background:'#25D366', color:'#04120A', textDecoration:'none',
-            padding:'.5rem .95rem', borderRadius:'100px',
-            fontSize:'.75rem', fontWeight:700,
-            boxShadow:'0 4px 14px rgba(37,211,102,.3)',
-          }}>
-          💬 WhatsApp
+            display:'inline-flex', alignItems:'center', gap:'.45rem',
+            background:'var(--green)', color:'#fff', textDecoration:'none',
+            padding:'.55rem 1rem', borderRadius:'var(--r-s)',
+            fontSize:'.85rem', fontWeight:600, flexShrink:0,
+          }}
+          className="hdr-wa">
+          <WaIcon /> <span>WhatsApp</span>
         </a>
       </header>
 
@@ -106,34 +109,37 @@ export default function Layout({ children }) {
       </main>
 
       {/* FOOTER */}
+      {/* Deep green closes the page. On an ivory ground a white footer just
+          runs on; the dark band tells the eye the document has ended, and it
+          is where the brand colour can be used at full strength. */}
       <footer style={{
-        background: 'var(--bg-2)',
-        color: 'var(--txt)',
-        padding: '2.5rem 1.15rem 1.5rem',
+        background: 'var(--green-d)',
+        color: 'var(--paper)',
+        padding: '3rem 1.15rem 1.5rem',
         position: 'relative',
         zIndex: 1,
-        borderTop: '1px solid var(--line)',
       }}>
         <div className="foot-grid">
           <div>
             <div style={{display:'flex',alignItems:'center',gap:'.6rem',marginBottom:'.9rem'}}>
               <img src="/djimmy-logo-96.png" alt="Djimmy Prints"
-                   style={{width:34,height:34,objectFit:'cover',borderRadius:'50%',border:'1px solid var(--line)'}} />
-              <span style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'.95rem'}}>
-                Djimmy <span style={{color:'var(--vio)'}}>Prints</span>
+                   style={{width:34,height:34,objectFit:'cover',borderRadius:'50%',border:'1px solid rgba(245,240,232,.25)'}} />
+              <span style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'.01em',textTransform:'uppercase',color:'#fff'}}>
+                Djimmy <span style={{color:'var(--gold-l)'}}>Prints</span>
               </span>
             </div>
-            <p style={{fontSize:'.83rem',color:'var(--muted)',lineHeight:1.75}}>
-              Impression professionnelle sur uniformes et tenues de travail.
-              Broderie, sérigraphie, transfert numérique. Livraison partout en Algérie.
+            <p style={{fontSize:'.92rem',color:'rgba(245,240,232,.72)',lineHeight:1.7}}>
+              Uniformes et tenues de travail personnalisés pour entreprises.
+              Broderie, sérigraphie, transfert numérique. Livraison dans les
+              58 wilayas.
             </p>
           </div>
 
           <div>
-            <p style={{fontSize:'.66rem',fontWeight:700,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--muted-light)',marginBottom:'.8rem'}}>Navigation</p>
+            <p style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.16em',textTransform:'uppercase',color:'var(--gold-l)',marginBottom:'.9rem'}}>Navigation</p>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.1rem .8rem'}}>
               {[['Accueil','/'],['Catalogue','/catalogue'],['Commander','/commande'],['Devis gratuit','/devis'],['Suivre ma commande','/suivi'],['Contact','/contact']].map(([label,href]) => (
-                <Link key={href} href={href} style={{fontSize:'.83rem',color:'var(--muted)',textDecoration:'none',padding:'.3rem 0',display:'block'}}>
+                <Link key={href} href={href} style={{fontSize:'.92rem',color:'rgba(245,240,232,.78)',textDecoration:'none',padding:'.35rem 0',display:'block'}}>
                   {label}
                 </Link>
               ))}
@@ -141,20 +147,26 @@ export default function Layout({ children }) {
           </div>
 
           <div>
-            <p style={{fontSize:'.66rem',fontWeight:700,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--muted-light)',marginBottom:'.8rem'}}>Contact</p>
-            <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:'.45rem'}}>📍 {ADDRESS}</p>
-            <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:'.45rem'}}>📞 {PHONE_DISPLAY}</p>
-            <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:'.9rem',overflowWrap:'anywhere'}}>📧 {EMAIL}</p>
+            <p style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.16em',textTransform:'uppercase',color:'var(--gold-l)',marginBottom:'.9rem'}}>Contact</p>
+            {/* Labelled rows rather than emoji: an address, a line and an
+                inbox are business facts, and the pictograms read as decoration
+                next to them. */}
+            {[['Adresse', ADDRESS], ['Téléphone', PHONE_DISPLAY], ['E-mail', EMAIL]].map(([k, v]) => (
+              <p key={k} style={{fontSize:'.92rem',color:'rgba(245,240,232,.78)',marginBottom:'.55rem',overflowWrap:'anywhere'}}>
+                <span style={{display:'block',fontSize:'.7rem',letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(245,240,232,.45)'}}>{k}</span>
+                {v}
+              </p>
+            ))}
             <a href={`https://wa.me/${WA}`} target="_blank" rel="noopener noreferrer"
-               style={{display:'inline-flex',alignItems:'center',gap:'.4rem',background:'#25D366',color:'#04120A',padding:'.6rem 1.1rem',borderRadius:'100px',fontSize:'.78rem',fontWeight:700,textDecoration:'none'}}>
-              💬 WhatsApp
+               style={{display:'inline-flex',alignItems:'center',gap:'.45rem',marginTop:'.5rem',background:'var(--gold-l)',color:'var(--green-d)',padding:'.65rem 1.2rem',borderRadius:'var(--r-s)',fontSize:'.88rem',fontWeight:700,textDecoration:'none'}}>
+              <WaIcon size={16} /> WhatsApp
             </a>
           </div>
         </div>
 
-        <div style={{borderTop:'1px solid var(--line)',paddingTop:'1.1rem',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'.5rem'}}>
-          <span style={{fontSize:'.72rem',color:'var(--muted-light)'}}>© {new Date().getFullYear()} Djimmy Prints</span>
-          <span style={{fontSize:'.72rem',color:'var(--muted-light)'}}>{SITE_URL}</span>
+        <div style={{borderTop:'1px solid rgba(245,240,232,.16)',paddingTop:'1.2rem',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'.5rem'}}>
+          <span style={{fontSize:'.78rem',color:'rgba(245,240,232,.5)'}}>© {new Date().getFullYear()} Djimmy Prints</span>
+          <span style={{fontSize:'.78rem',color:'rgba(245,240,232,.5)'}}>{SITE_URL}</span>
         </div>
 
         {/* Clears the fixed tab bar */}

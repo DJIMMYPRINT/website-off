@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { PRODUCTS , hasPriceGrid, priceRange } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import { WA, TECHNIQUES, WILAYAS, EMAIL, PHONE_DISPLAY, MIN_ORDER } from '../lib/constants'
+import Ico from '../components/Ico'
 
 // Deadlines are coarse on purpose — the exact date is settled on WhatsApp once
 // the artwork is in hand, so asking for a precise one here would be false
@@ -82,7 +83,7 @@ export default function Devis() {
   if (sent) return (
     <div style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'1.6rem 1.15rem 2.5rem',position:'relative',zIndex:1}}>
       <div style={{textAlign:'center',maxWidth:520}}>
-        <div style={{fontSize:'4rem',marginBottom:'1.5rem'}}>📨</div>
+        <div style={{width:72,height:72,margin:'0 auto 1.5rem',borderRadius:'50%',background:'var(--green-pale)',color:'var(--green)',display:'grid',placeItems:'center'}}><Ico n="check" size={34} stroke={2.2} /></div>
         <h1 className="s-ttl" style={{marginBottom:'1rem'}}>Demande <span className="kw">envoyée</span></h1>
         <p style={{color:'var(--muted)',lineHeight:1.8,marginBottom:'2rem'}}>
           Votre demande de devis part sur WhatsApp. Nous revenons vers vous avec un
@@ -123,7 +124,7 @@ export default function Devis() {
                   const on = picked.includes(p.name)
                   return (
                     <button key={p.name} type="button" onClick={() => toggle(p.name)} style={{
-                      padding:'.55rem .55rem .75rem', border:'1.5px solid', borderRadius:'16px', cursor:'pointer',
+                      padding:'.55rem .55rem .75rem', border:'1.5px solid', borderRadius:'var(--r)', cursor:'pointer',
                       fontFamily:'inherit', textAlign:'center', transition:'all .2s',
                       borderColor: on ? 'var(--green)' : 'var(--cream-border)',
                       background: on ? 'var(--green-pale)' : 'var(--white)',
@@ -162,7 +163,7 @@ export default function Devis() {
                   const on = technique === val
                   return (
                     <button key={t} type="button" onClick={() => setTechnique(val)} style={{
-                      padding:'.45rem .95rem', fontSize:'.8rem', border:'1.5px solid', borderRadius:'3px',
+                      padding:'.45rem .95rem', fontSize:'.8rem', border:'1.5px solid', borderRadius:'var(--r-s)',
                       cursor:'pointer', fontFamily:'inherit', fontWeight:600,
                       borderColor: on ? 'var(--green)' : 'var(--cream-border)',
                       background: on ? 'var(--green)' : 'var(--cream)',
@@ -217,17 +218,17 @@ export default function Devis() {
             </div>
 
             {err && (
-              <p role="alert" style={{color:'#FF6B6B',fontSize:'.85rem',fontWeight:600,marginBottom:'1rem'}}>⚠️ {err}</p>
+              <p role="alert" style={{color:'var(--warn)',fontSize:'.92rem',fontWeight:600,marginBottom:'1rem',display:'flex',alignItems:'center',gap:'.45rem'}}><Ico n="warn" size={17} /> {err}</p>
             )}
 
-            <button onClick={send} className="btn-g">💬 Recevoir mon devis</button>
+            <button onClick={send} className="btn-g">Recevoir mon devis</button>
           </div>
 
           {/* ── SIDEBAR ── */}
           <div className="sticky-side">
-            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden',marginBottom:'1.2rem'}}>
+            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',overflow:'hidden',marginBottom:'1.2rem'}}>
               <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontSize:'1rem',letterSpacing:'.04em'}}>
-                📋 Votre demande
+                Votre demande
               </div>
               <div style={{padding:'1.5rem'}}>
                 <div style={{fontSize:'.85rem',marginBottom:'.8rem'}}>
@@ -264,8 +265,8 @@ export default function Devis() {
               </div>
             </div>
 
-            <div style={{background:'var(--green-pale)',border:'1.5px solid rgba(111,175,82,.3)',borderRadius:'20px',padding:'1.3rem'}}>
-              <div style={{fontWeight:700,fontSize:'.88rem',marginBottom:'.5rem'}}>⏱️ Réponse sous 24h</div>
+            <div style={{background:'var(--green-pale)',border:'1.5px solid rgba(111,175,82,.3)',borderRadius:'var(--r)',padding:'1.3rem'}}>
+              <div style={{fontWeight:700,fontSize:'.95rem',marginBottom:'.5rem',display:'flex',alignItems:'center',gap:'.45rem'}}><Ico n="clock" size={17} /> Réponse sous 24h</div>
               <p style={{fontSize:'.8rem',color:'var(--muted)',lineHeight:1.7,marginBottom:'1rem'}}>
                 Vous savez déjà exactement ce que vous voulez, tailles comprises ?
                 Passez directement par le formulaire de commande.

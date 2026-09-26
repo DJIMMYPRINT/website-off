@@ -6,6 +6,7 @@ import ProductImg from '../components/ProductImg'
 import ProductSheet from '../components/ProductSheet'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS } from '../lib/constants'
 import { newOrderRef, saveOrder } from '../lib/orders'
+import Ico from '../components/Ico'
 
 export default function Commande() {
   const [step, setStep] = useState(1)
@@ -160,12 +161,12 @@ export default function Commande() {
   if(done) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2.5rem 1.15rem',position:'relative',zIndex:1}}>
       <div style={{textAlign:'center',maxWidth:520}}>
-        <div style={{fontSize:'4rem',marginBottom:'1.5rem'}}>✅</div>
+        <div style={{width:72,height:72,margin:'0 auto 1.5rem',borderRadius:'50%',background:'var(--green-pale)',color:'var(--green)',display:'grid',placeItems:'center'}}><Ico n="check" size={34} stroke={2.2} /></div>
         <h2 style={{fontFamily:'var(--display)',fontSize:'2rem',marginBottom:'1rem'}}>Commande envoyée !</h2>
 
         {orderRef && (
           <div style={{
-            background:'var(--white)', border:'1.5px solid var(--green)', borderRadius:'20px',
+            background:'var(--white)', border:'1.5px solid var(--green)', borderRadius:'var(--r)',
             padding:'1.4rem', marginBottom:'1.8rem',
           }}>
             <div style={{fontSize:'.72rem',fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'.4rem'}}>
@@ -217,13 +218,14 @@ export default function Commande() {
               <div style={{
                 width:32,height:32,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
                 fontWeight:700,fontSize:'.8rem',
-                background: step>=i+1 ? 'var(--grad)' : 'rgba(255,255,255,.07)',
+                background: step>=i+1 ? 'var(--green)' : 'var(--surface)',
+                border: step>=i+1 ? 'none' : '1px solid var(--line-strong)',
                 color: step>=i+1 ? '#fff' : 'var(--muted)',
                 transition:'all .3s',
               }}>
                 {step>i+1 ? '✓' : i+1}
               </div>
-              <div style={{fontSize:'.68rem',fontWeight:600,color:step===i+1?'var(--green)':'var(--muted)',textAlign:'center',textTransform:'uppercase',letterSpacing:'.06em'}}>{s}</div>
+              <div style={{fontSize:'.72rem',fontWeight:600,color:step===i+1?'var(--green)':'var(--muted)',textAlign:'center',textTransform:'uppercase',letterSpacing:'.08em'}}>{s}</div>
               {i<2 && <div style={{position:'absolute',width:'calc(33% - 32px)',height:'2px',background:step>i+1?'var(--green)':'var(--cream-border)',marginTop:'16px',marginLeft:'calc(16px + 33%)'}} />}
             </div>
           ))}
@@ -247,7 +249,7 @@ export default function Commande() {
                     return (
                       <button key={p.name} onClick={()=>setSheetProduct(p)} style={{
                         position:'relative',
-                        padding:'.6rem .6rem .8rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',
+                        padding:'.6rem .6rem .8rem',border:'1.5px solid',borderRadius:'var(--r)',cursor:'pointer',
                         fontFamily:'inherit',textAlign:'center',transition:'all .2s',
                         borderColor: inCart ? 'var(--green)' : 'var(--cream-border)',
                         background: inCart ? 'var(--green-pale)' : 'var(--white)',
@@ -255,10 +257,9 @@ export default function Commande() {
                         {inCart > 0 && (
                           <span style={{
                             position:'absolute',top:-9,right:-6,zIndex:2,
-                            background:'var(--grad)',color:'#fff',
-                            fontSize:'.66rem',fontWeight:700,
-                            padding:'.18rem .5rem',borderRadius:'100px',
-                            boxShadow:'0 3px 10px rgba(0,0,0,.4)',
+                            background:'var(--green)',color:'#fff',
+                            fontSize:'.72rem',fontWeight:700,
+                            padding:'.18rem .5rem',borderRadius:'3px',
                           }}>{inCart} pcs</span>
                         )}
                         <ProductImg product={p} fill radius={12} style={{marginBottom:'.55rem'}} />
@@ -318,7 +319,7 @@ export default function Commande() {
                   <div className="pick-grid">
                     {TECHNIQUES.map(t=>(
                       <button key={t} onClick={()=>setOrder(o=>({...o,technique:t}))} style={{
-                        padding:'.8rem 1rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',fontFamily:'inherit',fontSize:'.82rem',fontWeight:600,
+                        padding:'.8rem 1rem',border:'1.5px solid',borderRadius:'var(--r)',cursor:'pointer',fontFamily:'inherit',fontSize:'.82rem',fontWeight:600,
                         borderColor:order.technique===t?'var(--green)':'var(--cream-border)',
                         background:order.technique===t?'var(--green-pale)':'var(--white)',
                         color:order.technique===t?'var(--green)':'var(--black)',
@@ -334,18 +335,18 @@ export default function Commande() {
                 <div style={{marginBottom:'1.5rem'}}>
                   <label style={labelStyle}>Votre logo (PNG, SVG, PDF vectoriel)</label>
                   <div
-                    style={{border:'2px dashed var(--cream-border)',borderRadius:'16px',padding:'2rem',textAlign:'center',cursor:'pointer',background:'var(--cream)'}}
+                    style={{border:'2px dashed var(--cream-border)',borderRadius:'var(--r)',padding:'2rem',textAlign:'center',cursor:'pointer',background:'var(--cream)'}}
                     onClick={()=>document.getElementById('logoUpload').click()}
                   >
                     {order.logoName ? (
                       <div>
-                        <div style={{fontSize:'2rem',marginBottom:'.5rem'}}>✅</div>
+                        <div style={{marginBottom:'.5rem',color:'var(--green)',display:'flex',justifyContent:'center'}}><Ico n="check" size={26} stroke={2.2} /></div>
                         <div style={{fontWeight:600}}>{order.logoName}</div>
                         <div style={{fontSize:'.75rem',color:'var(--muted)',marginTop:'.3rem'}}>Cliquez pour changer</div>
                       </div>
                     ) : (
                       <div>
-                        <div style={{fontSize:'2rem',marginBottom:'.5rem'}}>📁</div>
+                        <div style={{marginBottom:'.5rem',color:'var(--green)',display:'flex',justifyContent:'center'}}><Ico n="upload" size={26} /></div>
                         <div style={{fontWeight:600,marginBottom:'.3rem'}}>Uploadez votre logo</div>
                         <div style={{fontSize:'.75rem',color:'var(--muted)'}}>PNG, SVG, PDF, AI — haute résolution recommandée</div>
                       </div>
@@ -353,7 +354,7 @@ export default function Commande() {
                     <input id="logoUpload" type="file" accept=".png,.jpg,.svg,.pdf,.ai" style={{display:'none'}} onChange={handleLogoUpload} />
                   </div>
                   <p style={{fontSize:'.75rem',color:'var(--muted)',marginTop:'.5rem'}}>
-                    💡 Pas de logo ? Notre équipe peut vous aider à le vectoriser. Mentionnez-le dans les notes.
+                    Pas de logo ? Notre équipe peut vous aider à le vectoriser. Mentionnez-le dans les notes.
                   </p>
                 </div>
 
@@ -423,17 +424,17 @@ export default function Commande() {
                   <label style={labelStyle}>Mode de paiement</label>
                   <div className="pay-grid">
                     {[
-                      {key:'livraison',label:'À la livraison',ic:'🚚',sub:'Standard'},
-                      {key:'ccp',label:'CCP / Baridimob',ic:'🏦',sub:'−10% de remise'},
-                      {key:'cib',label:'CIB / Edahabia',ic:'💳',sub:'−10% de remise'},
+                      {key:'livraison',label:'À la livraison',ic:'truck',sub:'Standard'},
+                      {key:'ccp',label:'CCP / Baridimob',ic:'bank',sub:'−10% de remise'},
+                      {key:'cib',label:'CIB / Edahabia',ic:'card',sub:'−10% de remise'},
                     ].map(m=>(
                       <button key={m.key} onClick={()=>setPayMode(m.key)} style={{
-                        padding:'1rem',border:'1.5px solid',borderRadius:'16px',cursor:'pointer',fontFamily:'inherit',textAlign:'center',
+                        padding:'1rem',border:'1.5px solid',borderRadius:'var(--r)',cursor:'pointer',fontFamily:'inherit',textAlign:'center',
                         borderColor:payMode===m.key?'var(--green)':'var(--cream-border)',
                         background:payMode===m.key?'var(--green-pale)':'var(--white)',
                         transition:'all .2s',
                       }}>
-                        <div style={{fontSize:'1.5rem',marginBottom:'.3rem'}}>{m.ic}</div>
+                        <div style={{marginBottom:'.4rem',display:'flex',justifyContent:'center',color: payMode===m.key ? 'var(--green)' : 'var(--muted)'}}><Ico n={m.ic} size={22} /></div>
                         <div style={{fontWeight:700,fontSize:'.8rem',marginBottom:'.2rem'}}>{m.label}</div>
                         <div style={{fontSize:'.7rem',color:payMode===m.key&&m.key!=='livraison'?'var(--green)':'var(--muted)'}}>{m.sub}</div>
                       </button>
@@ -444,7 +445,7 @@ export default function Commande() {
                 <div style={{display:'flex',gap:'1rem'}}>
                   <button onClick={()=>setStep(2)} className="btn-outline">← Retour</button>
                   <button onClick={submitOrder} className="btn-g" style={{flex:1,justifyContent:'center'}}>
-                    💬 Envoyer sur WhatsApp
+                    Envoyer sur WhatsApp
                   </button>
                 </div>
               </div>
@@ -453,9 +454,9 @@ export default function Commande() {
 
           {/* RIGHT — Récapitulatif */}
           <div className="sticky-side">
-            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'20px',overflow:'hidden'}}>
+            <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',overflow:'hidden'}}>
               <div style={{padding:'1.2rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontSize:'1rem',letterSpacing:'.04em'}}>
-                📋 Récapitulatif
+                Récapitulatif
               </div>
               <div style={{padding:'1.5rem'}}>
                 {order.prods.length===0 ? (
@@ -477,13 +478,13 @@ export default function Commande() {
                       </div>
                       {volDis>0 && (
                         <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'var(--green)',marginBottom:'.5rem'}}>
-                          <span>🏷️ Remise volume ({(disRate*100).toFixed(0)}%)</span>
+                          <span>Remise volume ({(disRate*100).toFixed(0)}%)</span>
                           <span>−{volDis.toLocaleString()} DA</span>
                         </div>
                       )}
                       {payDis>0 && (
                         <div style={{display:'flex',justifyContent:'space-between',fontSize:'.82rem',color:'var(--green)',marginBottom:'.5rem'}}>
-                          <span>💳 Remise paiement anticipé</span>
+                          <span>Remise paiement anticipé</span>
                           <span>−{payDis.toLocaleString()} DA</span>
                         </div>
                       )}
@@ -497,12 +498,12 @@ export default function Commande() {
 
                 {order.technique && (
                   <div style={{marginTop:'1rem',padding:'.7rem',background:'var(--green-pale)',borderRadius:'4px',fontSize:'.8rem',color:'var(--green)',fontWeight:600}}>
-                    🔧 {order.technique}
+                    {order.technique}
                   </div>
                 )}
                 {order.logoName && (
                   <div style={{marginTop:'.5rem',padding:'.7rem',background:'var(--cream)',borderRadius:'4px',fontSize:'.75rem',color:'var(--muted)'}}>
-                    📎 {order.logoName}
+                    {order.logoName}
                   </div>
                 )}
               </div>
