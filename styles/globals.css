@@ -233,6 +233,32 @@ input[type=range] { accent-color: var(--green); background: transparent !importa
 }
 .mqd { width: 3px; height: 3px; background: var(--gold-l); border-radius: 50%; display: inline-block; }
 
+/* ══ VIDÉO DE TECHNIQUE (components/TechVideo.js) ═════════
+   Illustration muette en tête des deux cartes de marquage qui
+   en ont une. Elle déborde le rembourrage de la carte pour
+   toucher ses bords : encadrée, elle aurait l'air d'une pièce
+   jointe plutôt que du sujet de la carte.
+   ═══════════════════════════════════════════════════════ */
+.tv {
+  position: relative;
+  margin: -1.6rem -1.4rem 1.2rem;
+  border-radius: var(--r) var(--r) 0 0;
+  overflow: hidden;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+}
+.tv-el {
+  display: block; width: 100%; aspect-ratio: 16 / 9;
+  object-fit: cover; background: var(--paper-2);
+}
+.tv-tag {
+  position: absolute; left: .7rem; bottom: .7rem;
+  font-size: .68rem; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #fff; background: rgba(30,61,27,.86);
+  padding: .3rem .6rem; border-radius: 3px;
+}
+
 /* ══ FOND ═════════════════════════════════════════════════
    What is left of the animated backdrop. The floating shapes
    and the drifting colour halos are gone: they belonged to a

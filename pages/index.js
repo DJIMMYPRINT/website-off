@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { WA } from '../lib/constants'
+import TechVideo from '../components/TechVideo'
 
 const WA_MSG = encodeURIComponent('Bonjour Djimmy Prints, je souhaite un devis pour des uniformes.')
 
@@ -18,9 +19,9 @@ const ICONS = {
 }
 
 const SERVICES = [
-  { ic: ICONS.broderie,    name: 'Broderie', desc: 'Fil cousu dans la matière. Tenue durable au lavage industriel, sur col, poitrine ou manche.' },
+  { ic: ICONS.broderie,    name: 'Broderie', desc: 'Fil cousu dans la matière. Tenue durable au lavage industriel, sur col, poitrine ou manche.', video: 'broderie' },
   { ic: ICONS.serigraphie, name: 'Sérigraphie', desc: 'Le meilleur coût unitaire au-delà de 100 pièces, sur aplats et grandes surfaces.' },
-  { ic: ICONS.transfert,   name: 'Transfert numérique', desc: 'Logos en dégradé ou multicolores reproduits à l\'identique, sans surcoût par couleur.' },
+  { ic: ICONS.transfert,   name: 'DTF', desc: 'Direct To Film : logos en dégradé ou multicolores reproduits à l\'identique, sans surcoût par couleur.', video: 'dtf' },
   { ic: ICONS.sublimation, name: 'Sublimation', desc: 'Encre intégrée à la fibre sur polyester : le marquage ne craquelle pas et ne se décolle pas.' },
   { ic: ICONS.flocage,     name: 'Flocage', desc: 'Lettrage velours ou flex, pour les numéros, noms de poste et mentions de service.' },
   { ic: ICONS.livraison,   name: 'Livraison nationale', desc: 'Domicile ou stop desk dans les 58 wilayas, avec bon de livraison détaillé.' },
@@ -152,7 +153,7 @@ export default function Home() {
       <div className="mqw">
         <div className="mqt">
           {[...Array(2)].map((_, i) => (
-            ['Broderie','Sérigraphie','Transfert Numérique','Sublimation','Flocage','Livraison Nationale','Devis 24H'].map((item) => (
+            ['Broderie','Sérigraphie','DTF','Sublimation','Flocage','Livraison Nationale','Devis 24H'].map((item) => (
               <span key={`${i}-${item}`} className="mqi">
                 {item}<span className="mqd"/>
               </span>
@@ -177,6 +178,7 @@ export default function Home() {
               onMouseOver={e => { e.currentTarget.style.borderColor='var(--green)' }}
               onMouseOut={e => { e.currentTarget.style.borderColor='var(--line)' }}
             >
+              {s.video && <TechVideo name={s.video} label="En atelier" />}
               <span style={{display:'block',marginBottom:'1rem'}}><Ic d={s.ic} /></span>
               <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.2rem',letterSpacing:'-.01em',marginBottom:'.5rem'}}>{s.name}</div>
               <p style={{fontSize:'.95rem',color:'var(--muted)',lineHeight:1.65}}>{s.desc}</p>
