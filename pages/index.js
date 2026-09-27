@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { WA } from '../lib/constants'
+import { WA, TECHNIQUES } from '../lib/constants'
 import TechVideo from '../components/TechVideo'
 
 const WA_MSG = encodeURIComponent('Bonjour Djimmy Prints, je souhaite un devis pour des uniformes.')
@@ -13,7 +13,6 @@ const ICONS = {
   broderie:   'M4 20c4-1 6-3 8-7s4-6 8-7M8 16l-2 4 4-2M15 4l5 5',
   serigraphie:'M4 5h16v9H4zM7 14v6M17 14v6M4 9h16',
   transfert:  'M12 3v11m0 0 4-4m-4 4-4-4M4 17v3h16v-3',
-  sublimation:'M12 3c3 3.5 5 6 5 8.5A5 5 0 0 1 7 11.5C7 9 9 6.5 12 3Z',
   flocage:    'M5 7h14M9 7v13M4 4h16',
   livraison:  'M3 7h11v9H3zM14 10h4l3 3v3h-7zM7 19a1.6 1.6 0 1 0 0-3.2A1.6 1.6 0 0 0 7 19Zm10 0a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2Z',
 }
@@ -22,10 +21,14 @@ const SERVICES = [
   { ic: ICONS.broderie,    name: 'Broderie', desc: 'Fil cousu dans la matière. Tenue durable au lavage industriel, sur col, poitrine ou manche.', video: 'broderie' },
   { ic: ICONS.serigraphie, name: 'Sérigraphie', desc: 'Le meilleur coût unitaire au-delà de 100 pièces, sur aplats et grandes surfaces.' },
   { ic: ICONS.transfert,   name: 'DTF', desc: 'Direct To Film : logos en dégradé ou multicolores reproduits à l\'identique, sans surcoût par couleur.', video: 'dtf' },
-  { ic: ICONS.sublimation, name: 'Sublimation', desc: 'Encre intégrée à la fibre sur polyester : le marquage ne craquelle pas et ne se décolle pas.' },
   { ic: ICONS.flocage,     name: 'Flocage', desc: 'Lettrage velours ou flex, pour les numéros, noms de poste et mentions de service.' },
   { ic: ICONS.livraison,   name: 'Livraison nationale', desc: 'Domicile ou stop desk dans les 58 wilayas, avec bon de livraison détaillé.' },
 ]
+
+// Le titre de section et la statistique comptaient les techniques à la main.
+// Retirer la sublimation demandait de corriger « Cinq » en toutes lettres et
+// un « 5 » à l'autre bout du fichier ; ils lisent la liste maintenant.
+const EN_TOUTES_LETTRES = ['Aucune', 'Une', 'Deux', 'Trois', 'Quatre', 'Cinq', 'Six', 'Sept']
 
 const WHY = [
   { n: '48H', t: 'Mise en production', d: 'Délai entre la validation de la maquette et le lancement en atelier.' },
@@ -139,7 +142,7 @@ export default function Home() {
             gap: '1.6rem 1.2rem', paddingTop: '2rem',
             borderTop: '1px solid var(--cream-border)',
           }}>
-            {[['500+','Entreprises équipées'],['48H','Mise en production'],['58','Wilayas desservies'],['5','Techniques de marquage']].map(([n,l]) => (
+            {[['500+','Entreprises équipées'],['48H','Mise en production'],['58','Wilayas desservies'],[String(TECHNIQUES.length),'Techniques de marquage']].map(([n,l]) => (
               <div key={l}>
                 <div style={{fontFamily:'var(--display)',fontSize:'2.4rem',fontWeight:700,letterSpacing:'-.03em',color:'var(--green)',lineHeight:1}}>{n}</div>
                 <div style={{fontSize:'.78rem',color:'var(--muted)',letterSpacing:'.04em',marginTop:'.35rem',fontWeight:500}}>{l}</div>
@@ -153,7 +156,7 @@ export default function Home() {
       <div className="mqw">
         <div className="mqt">
           {[...Array(2)].map((_, i) => (
-            ['Broderie','Sérigraphie','DTF','Sublimation','Flocage','Livraison Nationale','Devis 24H'].map((item) => (
+            [...TECHNIQUES, 'Livraison Nationale', 'Devis 24H'].map((item) => (
               <span key={`${i}-${item}`} className="mqi">
                 {item}<span className="mqd"/>
               </span>
@@ -165,7 +168,7 @@ export default function Home() {
       {/* ── SERVICES ── */}
       <section ref={rv(0)} className="rv" style={{padding:'3.2rem 1.15rem',background:'var(--surface)',borderTop:'1px solid var(--line)',borderBottom:'1px solid var(--line)',position:'relative',zIndex:1}}>
         <p className="s-lbl">Techniques de marquage</p>
-        <h2 className="s-ttl">Cinq façons d'appliquer <span className="kw">votre logo</span></h2>
+        <h2 className="s-ttl">{EN_TOUTES_LETTRES[TECHNIQUES.length]} façons d'appliquer <span className="kw">votre logo</span></h2>
         <p className="s-desc">Le choix dépend du support, de la quantité et du rendu attendu. On vous oriente au moment du devis.</p>
         <div className="cards" style={{marginTop:'3rem'}}>
           {SERVICES.map((s, i) => (
