@@ -126,7 +126,7 @@ export default function Layout({ children }) {
             </div>
             <p style={{fontSize:'.92rem',color:'rgba(245,240,232,.72)',lineHeight:1.7}}>
               Uniformes et tenues de travail personnalisés pour entreprises.
-              Broderie, DTF et flocage. Livraison dans les
+              Broderie et DTF, flocage sur vos propres tenues. Livraison dans les
               58 wilayas.
             </p>
           </div>

@@ -19,7 +19,7 @@ const ICONS = {
 const SERVICES = [
   { ic: ICONS.broderie,    name: 'Broderie', desc: 'Fil cousu dans la matière. Tenue durable au lavage industriel, sur col, poitrine ou manche.', video: 'broderie' },
   { ic: ICONS.transfert,   name: 'DTF', desc: 'Direct To Film : logos en dégradé ou multicolores reproduits à l\'identique, sans surcoût par couleur.', video: 'dtf' },
-  { ic: ICONS.flocage,     name: 'Flocage', desc: 'Lettrage velours ou flex, pour les numéros, noms de poste et mentions de service.' },
+  { ic: ICONS.flocage,     name: 'Flocage sur vos tenues', desc: 'Vous avez déjà vos tenues ? Nous y appliquons votre logo en DTF + flocage. Devis sur demande.' },
   { ic: ICONS.livraison,   name: 'Livraison nationale', desc: 'Domicile ou stop desk dans les 58 wilayas, avec bon de livraison détaillé.' },
 ]
 
@@ -72,9 +72,9 @@ export default function Home() {
     <>
       <Head>
         <title>Djimmy Prints — Uniformes Personnalisés Alger | Broderie Algérie</title>
-        <meta name="description" content="Djimmy Prints — Impression professionnelle sur uniformes et tenues de travail à Alger. Broderie, DTF et flocage. Devis gratuit sous 24h." />
+        <meta name="description" content="Djimmy Prints — Impression professionnelle sur uniformes et tenues de travail à Alger. Broderie et DTF, flocage sur vos propres tenues. Devis gratuit sous 24h." />
         <meta property="og:title" content="Djimmy Prints — Uniformes d'entreprise personnalisés | Alger" />
-        <meta property="og:description" content="Broderie, DTF et flocage sur uniformes et tenues de travail. À partir de 20 pièces, livré dans les 58 wilayas." />
+        <meta property="og:description" content="Broderie et DTF sur uniformes et tenues de travail. À partir de 20 pièces, livré dans les 58 wilayas." />
       </Head>
 
       {/* ── HERO ── */}
@@ -116,7 +116,7 @@ export default function Home() {
             fontSize: '1.12rem', color: 'var(--muted)',
             lineHeight: 1.7, maxWidth: 480, marginBottom: '2.4rem',
           }}>
-            Broderie, DTF et flocage sur polos, t-shirts,
+            Broderie et DTF sur polos, t-shirts,
             gilets et combinaisons. À partir de{' '}
             <strong style={{color:'var(--black)',fontWeight:600}}>20 pièces</strong>,
             livré dans les{' '}
@@ -154,7 +154,7 @@ export default function Home() {
       <div className="mqw">
         <div className="mqt">
           {[...Array(2)].map((_, i) => (
-            [...TECHNIQUES, 'Livraison Nationale', 'Devis 24H'].map((item) => (
+            [...TECHNIQUES, 'Flocage sur vos tenues', 'Livraison Nationale', 'Devis 24H'].map((item) => (
               <span key={`${i}-${item}`} className="mqi">
                 {item}<span className="mqd"/>
               </span>
@@ -165,7 +165,7 @@ export default function Home() {
 
       {/* ── SERVICES ── */}
       <section ref={rv(0)} className="rv" style={{padding:'3.2rem 1.15rem',background:'var(--surface)',borderTop:'1px solid var(--line)',borderBottom:'1px solid var(--line)',position:'relative',zIndex:1}}>
-        <p className="s-lbl">Techniques de marquage</p>
+        <p className="s-lbl">Techniques et services</p>
         <h2 className="s-ttl">{EN_TOUTES_LETTRES[TECHNIQUES.length]} façons d'appliquer <span className="kw">votre logo</span></h2>
         <p className="s-desc">Le choix dépend du support, de la quantité et du rendu attendu. On vous oriente au moment du devis.</p>
         <div className="cards" style={{marginTop:'3rem'}}>

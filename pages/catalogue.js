@@ -97,7 +97,7 @@ export default function Catalogue() {
     <>
       <Head>
         <title>Catalogue & Configurateur — Djimmy Prints</title>
-        <meta name="description" content="Configurez votre logo sur nos uniformes. Broderie, DTF et flocage. Prix affichés, livraison 58 wilayas." />
+        <meta name="description" content="Configurez votre logo sur nos uniformes. Broderie et DTF. Prix affichés, livraison 58 wilayas." />
       </Head>
 
       {/* PAGE HEADER */}
