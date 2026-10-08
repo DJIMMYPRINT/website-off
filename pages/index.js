@@ -11,7 +11,6 @@ const WA_MSG = encodeURIComponent('Bonjour Djimmy Prints, je souhaite un devis p
 // section a buyer reads first.
 const ICONS = {
   broderie:   'M4 20c4-1 6-3 8-7s4-6 8-7M8 16l-2 4 4-2M15 4l5 5',
-  serigraphie:'M4 5h16v9H4zM7 14v6M17 14v6M4 9h16',
   transfert:  'M12 3v11m0 0 4-4m-4 4-4-4M4 17v3h16v-3',
   flocage:    'M5 7h14M9 7v13M4 4h16',
   livraison:  'M3 7h11v9H3zM14 10h4l3 3v3h-7zM7 19a1.6 1.6 0 1 0 0-3.2A1.6 1.6 0 0 0 7 19Zm10 0a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2Z',
@@ -19,7 +18,6 @@ const ICONS = {
 
 const SERVICES = [
   { ic: ICONS.broderie,    name: 'Broderie', desc: 'Fil cousu dans la matière. Tenue durable au lavage industriel, sur col, poitrine ou manche.', video: 'broderie' },
-  { ic: ICONS.serigraphie, name: 'Sérigraphie', desc: 'Le meilleur coût unitaire au-delà de 100 pièces, sur aplats et grandes surfaces.' },
   { ic: ICONS.transfert,   name: 'DTF', desc: 'Direct To Film : logos en dégradé ou multicolores reproduits à l\'identique, sans surcoût par couleur.', video: 'dtf' },
   { ic: ICONS.flocage,     name: 'Flocage', desc: 'Lettrage velours ou flex, pour les numéros, noms de poste et mentions de service.' },
   { ic: ICONS.livraison,   name: 'Livraison nationale', desc: 'Domicile ou stop desk dans les 58 wilayas, avec bon de livraison détaillé.' },
@@ -74,9 +72,9 @@ export default function Home() {
     <>
       <Head>
         <title>Djimmy Prints — Uniformes Personnalisés Alger | Broderie Algérie</title>
-        <meta name="description" content="Djimmy Prints — Impression professionnelle sur uniformes et tenues de travail à Alger. Broderie, sérigraphie, transfert numérique. Devis gratuit sous 24h." />
+        <meta name="description" content="Djimmy Prints — Impression professionnelle sur uniformes et tenues de travail à Alger. Broderie, DTF et flocage. Devis gratuit sous 24h." />
         <meta property="og:title" content="Djimmy Prints — Uniformes d'entreprise personnalisés | Alger" />
-        <meta property="og:description" content="Broderie, sérigraphie et transfert numérique sur uniformes et tenues de travail. À partir de 20 pièces, livré dans les 58 wilayas." />
+        <meta property="og:description" content="Broderie, DTF et flocage sur uniformes et tenues de travail. À partir de 20 pièces, livré dans les 58 wilayas." />
       </Head>
 
       {/* ── HERO ── */}
@@ -118,7 +116,7 @@ export default function Home() {
             fontSize: '1.12rem', color: 'var(--muted)',
             lineHeight: 1.7, maxWidth: 480, marginBottom: '2.4rem',
           }}>
-            Broderie, sérigraphie et transfert numérique sur polos, t-shirts,
+            Broderie, DTF et flocage sur polos, t-shirts,
             gilets et combinaisons. À partir de{' '}
             <strong style={{color:'var(--black)',fontWeight:600}}>20 pièces</strong>,
             livré dans les{' '}
