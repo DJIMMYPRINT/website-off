@@ -126,13 +126,16 @@ export default function Home() {
           </p>
 
           {/* Le devis passe devant : un acheteur professionnel veut un
-              chiffrage avant de commander. */}
+              chiffrage avant de commander. Le second bouton mène droit aux
+              produits et à leurs prix, où la commande se passe — « Voir le
+              catalogue » envoyait vers une page de configuration de logo,
+              qui ne répond pas à « combien ça coûte et comment j'achète ». */}
           <div style={{display:'flex',gap:'.8rem',flexWrap:'wrap',marginBottom:'3.4rem'}}>
             <Link href="/devis" className="btn-g">
               Demander un devis
             </Link>
-            <Link href="/catalogue" className="btn-outline">
-              Voir le catalogue
+            <Link href="/commande" className="btn-outline">
+              Passer commande
             </Link>
           </div>
 

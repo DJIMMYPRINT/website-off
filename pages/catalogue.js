@@ -102,14 +102,92 @@ export default function Catalogue() {
 
       {/* PAGE HEADER */}
       <div className="rv" style={{padding:'1.6rem 1.15rem 1.2rem',position:'relative',zIndex:1}}>
-        <p className="s-lbl">Configurateur visuel</p>
-        <h1 className="s-ttl">Placez votre <span className="kw">logo</span> vous-même</h1>
-        <p className="s-desc">Choisissez un produit, uploadez votre logo, glissez-le où vous voulez. Téléchargez l'aperçu ou commandez directement.</p>
+        <p className="s-lbl">Catalogue</p>
+        <h1 className="s-ttl">Nos <span className="kw">produits &amp; prix</span></h1>
+        <p className="s-desc">Prix à l'unité. Remises à partir de 50 pièces, livraison dans les 58 wilayas.</p>
       </div>
 
       {/* CATALOGUE LAYOUT */}
       <div style={{padding:'0 1.15rem 2.5rem',position:'relative',zIndex:1}}>
         <div className="grid-2 rv">
+
+          {/* ── PRODUITS + PRIX ── */}
+          <div>
+            <div style={{display:'flex',flexDirection:'column',gap:'1rem',marginBottom:'3rem'}}>
+              {PRODUCTS.map(p => (
+                <div key={p.name} onClick={()=>setActiveProduct(p)} style={{
+                  background: activeProduct.name===p.name ? 'var(--green-pale)' : 'var(--white)',
+                  border: `1.5px solid ${activeProduct.name===p.name ? 'var(--green)' : 'var(--cream-border)'}`,
+                  borderRadius:'var(--r)', padding:'1.2rem',
+                  display:'flex', alignItems:'center', justifyContent:'space-between', gap:'.8rem',
+                  cursor:'pointer', transition:'all .2s', position:'relative',
+                }}>
+                  {p.popular && (
+                    <span style={{
+                      position:'absolute',top:'-10px',right:'12px',
+                      background:'var(--gold-d)',color:'#fff',
+                      fontSize:'.68rem',fontWeight:700,padding:'.22rem .6rem',borderRadius:'3px',
+                      letterSpacing:'.08em',textTransform:'uppercase',
+                    }}>Populaire</span>
+                  )}
+                  <div style={{display:'flex',alignItems:'center',gap:'1rem',minWidth:0,flex:1}}>
+                    <ProductImg product={p} size={104} radius={8} />
+                    <div style={{minWidth:0}}>
+                      <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'-.01em',marginBottom:'.25rem'}}>{p.name}</div>
+                      <div style={{fontSize:'.85rem',color:'var(--muted)',lineHeight:1.5}}>{p.desc}</div>
+                      <div style={{display:'flex',gap:'.4rem',marginTop:'.4rem',flexWrap:'wrap'}}>
+                        {p.techniques.map(t => (
+                          <span key={t} style={{fontSize:'.72rem',background:'var(--green-pale)',color:'var(--green)',padding:'.18rem .55rem',borderRadius:'3px',fontWeight:600}}>{t}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  {/* "dès" goes on its own line rather than in front of the
+                      figure: prefixed, the price column grew wide enough to
+                      push the row past the screen on a 320px handset. */}
+                  <div style={{textAlign:'right',flexShrink:0}}>
+                    {hasPriceGrid(p) && (
+                      <div style={{fontSize:'.72rem',color:'var(--muted)',lineHeight:1.2}}>à partir de</div>
+                    )}
+                    <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.45rem',letterSpacing:'-.02em',color:'var(--green)',lineHeight:1.05,whiteSpace:'nowrap'}}>
+                      {(hasPriceGrid(p) ? priceRange(p)[0] : p.price).toLocaleString('fr-DZ')}
+                    </div>
+                    <div style={{fontSize:'.76rem',color:'var(--muted)'}}>DA / pièce</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Remises volume */}
+            <div style={{background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',overflow:'hidden',marginBottom:'2rem'}}>
+              <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'-.01em'}}>
+                Remises volume
+              </div>
+              <div className="vol-grid">
+                {VOLUME_DISCOUNTS.map((d,i) => (
+                  <div key={d.qty} style={{
+                    padding:'1rem',textAlign:'center',
+                    borderRight: i<3 ? '1px solid var(--cream-border)' : 'none',
+                  }}>
+                    <div style={{fontFamily:'var(--display)',fontSize:'1.3rem',color:i>0?'var(--green)':'var(--muted)'}}>{d.dis}</div>
+                    <div style={{fontSize:'.7rem',fontWeight:700,color:'var(--black)',margin:'.2rem 0'}}>{d.qty} pièces</div>
+                    <div style={{fontSize:'.65rem',color:'var(--muted)'}}>{d.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Link href="/commande" className="btn-g" style={{width:'100%',justifyContent:'center'}}>
+              Commander ce produit
+            </Link>
+          </div>
+
+          {/* ── TITRE CONFIGURATEUR ── */}
+          <div>
+            <p className="s-lbl">Configurateur visuel</p>
+            <h2 className="s-ttl">Placez votre <span className="kw">logo</span> vous-même</h2>
+            <p className="s-desc">Choisissez un produit, uploadez votre logo, glissez-le où vous voulez. Téléchargez l'aperçu ou commandez directement.</p>
+          </div>
 
           {/* ── CONFIGURATEUR ── */}
           <div style={{background:'var(--white)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',overflow:'hidden'}}>
@@ -228,78 +306,6 @@ export default function Catalogue() {
             </div>
           </div>
 
-          {/* ── PRODUITS + PRIX ── */}
-          <div>
-            <h2 className="s-ttl" style={{marginBottom:'2rem'}}>Nos <span className="kw">produits & prix</span></h2>
-
-            <div style={{display:'flex',flexDirection:'column',gap:'1rem',marginBottom:'3rem'}}>
-              {PRODUCTS.map(p => (
-                <div key={p.name} onClick={()=>setActiveProduct(p)} style={{
-                  background: activeProduct.name===p.name ? 'var(--green-pale)' : 'var(--white)',
-                  border: `1.5px solid ${activeProduct.name===p.name ? 'var(--green)' : 'var(--cream-border)'}`,
-                  borderRadius:'var(--r)', padding:'1.2rem',
-                  display:'flex', alignItems:'center', justifyContent:'space-between', gap:'.8rem',
-                  cursor:'pointer', transition:'all .2s', position:'relative',
-                }}>
-                  {p.popular && (
-                    <span style={{
-                      position:'absolute',top:'-10px',right:'12px',
-                      background:'var(--gold-d)',color:'#fff',
-                      fontSize:'.68rem',fontWeight:700,padding:'.22rem .6rem',borderRadius:'3px',
-                      letterSpacing:'.08em',textTransform:'uppercase',
-                    }}>Populaire</span>
-                  )}
-                  <div style={{display:'flex',alignItems:'center',gap:'1rem',minWidth:0,flex:1}}>
-                    <ProductImg product={p} size={104} radius={8} />
-                    <div style={{minWidth:0}}>
-                      <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'-.01em',marginBottom:'.25rem'}}>{p.name}</div>
-                      <div style={{fontSize:'.85rem',color:'var(--muted)',lineHeight:1.5}}>{p.desc}</div>
-                      <div style={{display:'flex',gap:'.4rem',marginTop:'.4rem',flexWrap:'wrap'}}>
-                        {p.techniques.map(t => (
-                          <span key={t} style={{fontSize:'.72rem',background:'var(--green-pale)',color:'var(--green)',padding:'.18rem .55rem',borderRadius:'3px',fontWeight:600}}>{t}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  {/* "dès" goes on its own line rather than in front of the
-                      figure: prefixed, the price column grew wide enough to
-                      push the row past the screen on a 320px handset. */}
-                  <div style={{textAlign:'right',flexShrink:0}}>
-                    {hasPriceGrid(p) && (
-                      <div style={{fontSize:'.72rem',color:'var(--muted)',lineHeight:1.2}}>à partir de</div>
-                    )}
-                    <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.45rem',letterSpacing:'-.02em',color:'var(--green)',lineHeight:1.05,whiteSpace:'nowrap'}}>
-                      {(hasPriceGrid(p) ? priceRange(p)[0] : p.price).toLocaleString('fr-DZ')}
-                    </div>
-                    <div style={{fontSize:'.76rem',color:'var(--muted)'}}>DA / pièce</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Remises volume */}
-            <div style={{background:'var(--cream)',border:'1.5px solid var(--cream-border)',borderRadius:'var(--r)',overflow:'hidden',marginBottom:'2rem'}}>
-              <div style={{padding:'1rem 1.5rem',borderBottom:'1px solid var(--cream-border)',fontFamily:'var(--display)',fontWeight:700,fontSize:'1.05rem',letterSpacing:'-.01em'}}>
-                Remises volume
-              </div>
-              <div className="vol-grid">
-                {VOLUME_DISCOUNTS.map((d,i) => (
-                  <div key={d.qty} style={{
-                    padding:'1rem',textAlign:'center',
-                    borderRight: i<3 ? '1px solid var(--cream-border)' : 'none',
-                  }}>
-                    <div style={{fontFamily:'var(--display)',fontSize:'1.3rem',color:i>0?'var(--green)':'var(--muted)'}}>{d.dis}</div>
-                    <div style={{fontSize:'.7rem',fontWeight:700,color:'var(--black)',margin:'.2rem 0'}}>{d.qty} pièces</div>
-                    <div style={{fontSize:'.65rem',color:'var(--muted)'}}>{d.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Link href="/commande" className="btn-g" style={{width:'100%',justifyContent:'center'}}>
-              Commander ce produit
-            </Link>
-          </div>
         </div>
       </div>
     </>
