@@ -633,3 +633,43 @@ input[type=range] { accent-color: var(--green); background: transparent !importa
   background: var(--green); color: #fff; border: none; font: inherit; font-size: .78rem; font-weight: 700;
 }
 @media (prefers-reduced-motion: reduce) { .dv-tip { animation: none; } }
+
+/* ══ GUIDE DE COMMANDE (pop-up centré) ════════════════════
+   Une fenêtre au centre de l'écran par étape du wizard.
+   ═══════════════════════════════════════════════════════ */
+.gp-ov {
+  position: fixed; inset: 0; z-index: 960;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.2rem;
+  background: rgba(26,26,26,.42);
+  animation: promoFade .25s ease both;
+}
+.gp {
+  position: relative; width: 100%; max-width: 380px;
+  padding: 1.6rem 1.4rem 1.3rem; text-align: center;
+  background: var(--surface);
+  border: 1.5px solid var(--green);
+  border-radius: 14px;
+  box-shadow: 0 20px 56px rgba(26,26,26,.28);
+  animation: gpIn .38s cubic-bezier(.2,.8,.3,1) both;
+}
+.gp-warn { border-color: var(--warn); }
+@keyframes gpIn { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: none; } }
+.gp-x {
+  position: absolute; top: .6rem; right: .6rem;
+  width: 30px; height: 30px; border-radius: var(--r-s);
+  display: grid; place-items: center; cursor: pointer;
+  background: transparent; border: 1px solid var(--line); color: var(--muted); font-size: .75rem;
+}
+.gp-ic {
+  width: 46px; height: 46px; margin: 0 auto .8rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--green-pale); color: var(--green);
+}
+.gp-warn .gp-ic { background: rgba(154,75,46,.12); color: var(--warn); }
+.gp-lbl { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); margin-bottom: .3rem; }
+.gp-warn .gp-lbl { color: var(--warn); }
+.gp-ttl { font-family: var(--display); font-weight: 700; font-size: 1.35rem; line-height: 1.2; margin: 0 0 .5rem; }
+.gp-d { font-size: .9rem; color: var(--muted); line-height: 1.6; margin: 0 0 1.2rem; }
+.gp-acts { display: grid; gap: .6rem; }
+@media (prefers-reduced-motion: reduce) { .gp, .gp-ov { animation: none; } }

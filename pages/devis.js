@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { createPortal } from 'react-dom'
+import AskTenues from '../components/AskTenues'
 import { PRODUCTS , hasPriceGrid, priceRange } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import { WA, TECHNIQUES, WILAYAS, EMAIL, PHONE_DISPLAY, MIN_ORDER } from '../lib/constants'
@@ -35,8 +35,6 @@ export default function Devis() {
   const [mode, setMode] = useState(null)
   const [own, setOwn] = useState([])
   const [hiddenTip, setHiddenTip] = useState('')
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
   const [picked, setPicked] = useState([])
   const [qty, setQty] = useState('')
   const [technique, setTechnique] = useState('')
@@ -376,32 +374,9 @@ export default function Devis() {
       </div>
 
       {/* ── Question d'ouverture ── */}
-      {/* Portal: <main> carries z-index:1, which would trap the sheet under
-          the fixed tab bar (same reason as ProductSheet). */}
-      {mounted && mode === null && createPortal(
-        <div className="sheet-ov" onClick={() => setMode('catalogue')}>
-          <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="ask-ttl" onClick={e => e.stopPropagation()}>
-            <div className="sheet-grip" />
-            <button className="sheet-x" aria-label="Fermer" onClick={() => setMode('catalogue')}>✕</button>
-            <div className="sheet-body" style={{padding:'1rem 1.3rem 1.6rem'}}>
-              <p className="s-lbl" style={{marginBottom:'.4rem'}}>Devis gratuit</p>
-              <h2 id="ask-ttl" className="sheet-name" style={{marginBottom:'.5rem'}}>Avez-vous déjà vos tenues ?</h2>
-              <p style={{fontSize:'.9rem',color:'var(--muted)',lineHeight:1.6,marginBottom:'1.2rem'}}>
-                Une seule question, puis on vous guide étape par étape.
-              </p>
-              <div style={{display:'grid',gap:'.7rem'}}>
-                <button type="button" className="btn-g" style={{justifyContent:'center'}} onClick={() => setMode('catalogue')}>
-                  Non, je choisis mes tenues chez vous
-                </button>
-                <button type="button" className="btn-outline" style={{justifyContent:'center'}} onClick={() => setMode('propres')}>
-                  Oui, j'ai déjà mes tenues ({OWN_TECH})
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* ── Question d'ouverture ── */}
+      <AskTenues open={mode === null} onNo={() => setMode('catalogue')} onYes={() => setMode('propres')}
+        yesLabel={`Oui, j'ai déjà mes tenues (${OWN_TECH})`} />
 
       {/* ── Guide : une bulle par étape ── */}
       {mode !== null && hiddenTip !== tip.id && (

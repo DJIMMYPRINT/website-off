@@ -1,12 +1,15 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/router'
 import { PRODUCTS, hasPriceGrid, priceRange } from '../lib/products'
 import ProductImg from '../components/ProductImg'
 import ProductSheet from '../components/ProductSheet'
 import { WA, SIZES, COLORS, TECHNIQUES, WILAYAS } from '../lib/constants'
 import { newOrderRef, saveOrder } from '../lib/orders'
 import Ico from '../components/Ico'
+import AskTenues from '../components/AskTenues'
+import GuidePop from '../components/GuidePop'
 
 export default function Commande() {
   const [step, setStep] = useState(1)
@@ -29,6 +32,18 @@ export default function Commande() {
   // inside the sheet, so the wizard no longer carries a half-filled
   // selection around between products.
   const [sheetProduct, setSheetProduct] = useState(null)
+
+  // Opening question: a visitor who already owns the garments is priced on
+  // a quote (DTF + flocage), so « Oui » sends them to the devis page.
+  const router = useRouter()
+  const [asked, setAsked] = useState(false)
+  // Guide pop-ups: ids already shown and closed, plus a one-off reminder
+  // when the visitor tries to skip ahead.
+  const [seen, setSeen] = useState([])
+  const [nudge, setNudge] = useState(null)
+  const markSeen = (id) => setSeen(s => s.includes(id) ? s : [...s, id])
+  const remind = (t, d) => setNudge({ id: 'rappel', key: `rappel-${Date.now()}`, warn: true, label: 'Rappel', t, d,
+    actions: [{ label: 'Compris', primary: true, onClick: () => setNudge(null) }] })
 
   // Each step is a full page of its own, so changing step while scrolled
   // halfway down dropped the visitor into the middle of the next one — the
@@ -66,10 +81,10 @@ export default function Commande() {
   }
 
   const submitOrder = () => {
-    if(!form.nom || !form.tel) { alert('Nom et téléphone obligatoires.'); return }
-    if(!form.wilaya) { alert('Sélectionnez votre wilaya.'); return }
-    if(!form.adresse) { alert('Adresse de livraison obligatoire.'); return }
-    if(order.prods.length === 0) { alert('Ajoutez au moins un produit.'); return }
+    if(order.prods.length === 0) { setStep(1); remind("D'abord, choisissez vos tenues", 'Ajoutez au moins une tenue au panier.'); return }
+    if(!form.nom || !form.tel) { remind('Votre nom et votre téléphone', 'Ils sont obligatoires pour confirmer la commande avec vous.'); return }
+    if(!form.wilaya) { remind('Votre wilaya', 'Sélectionnez la wilaya de livraison.'); return }
+    if(!form.adresse) { remind('Votre adresse', "L'adresse de livraison est obligatoire."); return }
 
     const { sub, volDis, disRate, payDis, final, totalQty } = calcTotal()
     // The reference goes into the WhatsApp message AND into the local order
@@ -150,6 +165,59 @@ export default function Commande() {
 
   const { sub, volDis, disRate, payDis, final, totalQty } = calcTotal()
 
+  // ── Guide : chaque étape du wizard a ses propres pop-ups. Le premier qui
+  // n'est ni fait ni déjà fermé s'affiche au centre de l'écran.
+  const close = (id) => () => markSeen(id)
+  const next = (id, to) => () => { markSeen(id); setStep(to) }
+  const GUIDE = {
+    1: [
+      { id: 'produits', done: order.prods.length > 0, label: 'Étape 1 sur 3 · Produits',
+        t: 'Choisissez vos tenues',
+        d: 'Touchez un article pour choisir sa couleur, ses tailles et ses quantités, puis ajoutez-le au panier.',
+        actions: [{ label: "C'est parti", primary: true, onClick: close('produits') }] },
+      { id: 'suite1', label: 'Étape 1 sur 3 · Produits',
+        t: 'Ajouté au panier',
+        d: "Ajoutez d'autres tenues si besoin, ou passez à la personnalisation.",
+        actions: [
+          { label: 'Continuer →', primary: true, onClick: next('suite1', 2) },
+          { label: 'Ajouter une autre tenue', onClick: close('suite1') },
+        ] },
+    ],
+    2: [
+      { id: 'technique', done: !!order.technique, label: 'Étape 2 sur 3 · Personnalisation',
+        t: 'Choisissez la technique',
+        d: 'Broderie : fil cousu, très résistant au lavage. DTF : logos en couleurs ou en dégradé, reproduits à l\'identique.',
+        actions: [
+          ...TECHNIQUES.map((t, i) => ({ label: t, primary: i === 0, onClick: () => { setOrder(o => ({ ...o, technique: t })); markSeen('technique') } })),
+          { label: 'Je ne sais pas encore', onClick: close('technique') },
+        ] },
+      { id: 'logo', done: !!order.logoName, label: 'Étape 2 sur 3 · Personnalisation',
+        t: 'Ajoutez votre logo',
+        d: 'PNG, SVG ou PDF, en haute résolution. Pas de logo prêt ? Notre équipe peut vous aider : dites-le dans les notes.',
+        actions: [
+          { label: 'Ajouter mon logo', primary: true, onClick: () => { markSeen('logo'); document.getElementById('logoUpload')?.click() } },
+          { label: 'Plus tard', onClick: close('logo') },
+        ] },
+      { id: 'suite2', label: 'Étape 2 sur 3 · Personnalisation',
+        t: 'Personnalisation prête',
+        d: 'Une précision (couleur du fil, position du logo, date souhaitée) ? Écrivez-la dans les notes. Sinon, continuez.',
+        actions: [
+          { label: 'Continuer →', primary: true, onClick: next('suite2', 3) },
+          { label: 'Ajouter des notes', onClick: close('suite2') },
+        ] },
+    ],
+    3: [
+      { id: 'final', label: 'Étape 3 sur 3 · Livraison & paiement',
+        t: 'Dernière étape',
+        d: "Remplissez vos coordonnées et l'adresse de livraison, choisissez le paiement (−10 % en CCP ou CIB), puis envoyez sur WhatsApp.",
+        actions: [{ label: 'Compris', primary: true, onClick: close('final') }] },
+    ],
+  }
+  const guideTip = asked && !sheetProduct
+    ? (nudge || GUIDE[step].find(g => !g.done && !seen.includes(g.id)))
+    : null
+  const closeTip = () => { if (!guideTip) return; if (guideTip.id === 'rappel') setNudge(null); else markSeen(guideTip.id) }
+
   const inputStyle = {
     width:'100%', padding:'.75rem 1rem', border:'1.5px solid var(--cream-border)',
     borderRadius:'4px', fontSize:'.9rem', fontFamily:'inherit',
@@ -191,7 +259,7 @@ export default function Commande() {
               Suivre ma commande
             </Link>
           )}
-          <button onClick={()=>{setDone(false);setStep(1);setOrderRef('');setOrder({prods:[],technique:'',logo:null,logoName:'',notes:''});setForm({nom:'',tel:'',entreprise:'',wilaya:'',adresse:'',email:''})}}
+          <button onClick={()=>{setDone(false);setStep(1);setOrderRef('');setOrder({prods:[],technique:'',logo:null,logoName:'',notes:''});setSeen([]);setForm({nom:'',tel:'',entreprise:'',wilaya:'',adresse:'',email:''})}}
             className="btn-outline">
             Nouvelle commande
           </button>
@@ -303,7 +371,7 @@ export default function Commande() {
                   </div>
                 )}
 
-                <button onClick={()=>{if(order.prods.length===0){alert('Ajoutez au moins un produit.');return}setStep(2)}} className="btn-g">
+                <button onClick={()=>{if(order.prods.length===0){remind("D'abord, choisissez vos tenues", 'Touchez un article, choisissez couleur et tailles, puis ajoutez-le au panier.');return}setStep(2)}} className="btn-g">
                   Continuer →
                 </button>
               </div>
@@ -517,6 +585,10 @@ export default function Commande() {
         onAdd={addProduct}
         onClose={() => setSheetProduct(null)}
       />
+
+      <AskTenues open={!asked} onNo={() => setAsked(true)} onYes={() => router.push('/devis?tenues=client')}
+        yesLabel="Oui, j'ai déjà mes tenues (devis DTF + flocage)" />
+      <GuidePop tip={guideTip} onClose={closeTip} />
     </>
   )
 }
