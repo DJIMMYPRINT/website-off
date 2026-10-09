@@ -19,7 +19,7 @@ const ICONS = {
 const SERVICES = [
   { ic: ICONS.broderie,    name: 'Broderie', desc: 'Fil cousu dans la matière. Tenue durable au lavage industriel, sur col, poitrine ou manche.', video: 'broderie' },
   { ic: ICONS.transfert,   name: 'DTF', desc: 'Direct To Film : logos en dégradé ou multicolores reproduits à l\'identique, sans surcoût par couleur.', video: 'dtf' },
-  { ic: ICONS.flocage,     name: 'Flocage sur vos tenues', desc: 'Vous avez déjà vos tenues ? Nous y appliquons votre logo en DTF + flocage. Devis sur demande.' },
+  { ic: ICONS.flocage,     name: 'Flocage sur vos tenues', desc: 'Vous avez déjà vos tenues ? Nous y appliquons votre logo en DTF + flocage. Devis sur demande.', href: '/devis?tenues=client', cta: 'Demander mon devis flocage' },
   { ic: ICONS.livraison,   name: 'Livraison nationale', desc: 'Domicile ou stop desk dans les 58 wilayas, avec bon de livraison détaillé.' },
 ]
 
@@ -183,6 +183,7 @@ export default function Home() {
               <span style={{display:'block',marginBottom:'1rem'}}><Ic d={s.ic} /></span>
               <div style={{fontFamily:'var(--display)',fontWeight:700,fontSize:'1.2rem',letterSpacing:'-.01em',marginBottom:'.5rem'}}>{s.name}</div>
               <p style={{fontSize:'.95rem',color:'var(--muted)',lineHeight:1.65}}>{s.desc}</p>
+              {s.href && <Link href={s.href} className="btn-outline" style={{marginTop:'1rem'}}>{s.cta}</Link>}
             </div>
           ))}
         </div>

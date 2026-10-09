@@ -599,3 +599,37 @@ input[type=range] { accent-color: var(--green); background: transparent !importa
   font-size: .92rem; font-weight: 600; color: var(--green);
   line-height: 1.6; margin-bottom: .6rem;
 }
+
+/* ══ GUIDE DU DEVIS ═══════════════════════════════════════
+   Bulle flottante au-dessus de la barre d'onglets : elle
+   annonce l'étape suivante du devis et réapparaît (animée)
+   à chaque nouvelle étape.
+   ═══════════════════════════════════════════════════════ */
+.dv-tip {
+  position: fixed; left: .8rem; right: .8rem; z-index: 470;
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  max-width: 496px; margin: 0 auto;
+  display: flex; gap: .8rem; align-items: flex-start;
+  padding: .9rem 1rem;
+  background: var(--surface);
+  border: 1.5px solid var(--green);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(26,26,26,.18);
+  animation: tipUp .4s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes tipUp { from { opacity: 0; transform: translateY(16px) scale(.97); } to { opacity: 1; transform: none; } }
+.dv-tip-n {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--green); color: #fff; font-weight: 700; font-size: .9rem;
+}
+.dv-tip-x {
+  width: 26px; height: 26px; border-radius: var(--r-s);
+  display: grid; place-items: center; cursor: pointer;
+  background: transparent; border: 1px solid var(--line); color: var(--muted); font-size: .7rem;
+}
+.dv-tip-go {
+  padding: .4rem .8rem; border-radius: var(--r-s); cursor: pointer; white-space: nowrap;
+  background: var(--green); color: #fff; border: none; font: inherit; font-size: .78rem; font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) { .dv-tip { animation: none; } }
